@@ -1,0 +1,117 @@
+#home {
+    display: flex;
+}
+
+/*Navigation*/
+
+#navigation {
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 5px 20px 15px;
+}
+
+#credit-label {
+    display: flex;
+}
+
+#credit-label::after {
+    background-color: #2f2f2f;
+    border-radius: 20px;
+}
+
+#logo {
+    width: 70px;
+    height: 70px;
+}
+
+#credit-label>div {
+    flex-grow: 1;
+    align-self: center;
+}
+
+/*Projects*/
+
+#projects {
+    flex-grow: 1;
+    margin: 15px;
+    border-radius: 30px;
+    display: flex;
+}
+
+#architect-selector {
+    place-content: center;
+    display: flex;
+    border-radius: 15px;
+    height: 40px;
+    outline: solid 2px #efefef;
+    margin: 25px 15px;
+}
+
+.architect-navigate {
+    width: 50px;
+    height: 40px;
+    border-radius: 12px;
+    outline: solid 2px #efefef;
+    background-color: transparent;
+    border: none;
+    align-self: center;
+    margin: 0;
+}
+
+.architect-navigate:hover {
+    background-color: #efefef4b;
+}
+
+.architect-navigate>img {
+    height: 12px;
+    width: 12px;
+}
+
+#architect-label {
+    flex-grow: 1;
+    align-items: center;
+    place-content: center;
+    display: flex;
+    gap: 10px;
+}
+
+/* ProjectTile */
+
+.project-tile {
+    width: calc(100% - 30px);
+    margin: 5px 15px;
+    border-radius: 25px;
+    filter: drop-shadow(0 5px 10px black);
+    align-content: center;
+    cursor: pointer;
+}
+
+.project-tile::before {
+    border-radius: 25px;
+}
+
+.project-tile:hover {
+    filter: drop-shadow(0 10px 20px black);
+}
+
+.project-tile-background {
+    position: absolute;
+    border-radius: 25px;
+    width: 100%;
+    z-index: -1;
+    height: 100px;
+}
+
+.project-tile-foreground {
+    background-color: #00000099;
+    border-radius: 20px;
+    margin: 10px;
+    display: flex;
+}
+
+.project-tile-foreground>img {
+    border-radius: 20px;
+    height: 80px;
+    width: 80px;
+}
