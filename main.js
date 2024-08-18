@@ -19,6 +19,14 @@ ipcMain.handle('open:edit-project', (e, data) => {
     editProject.createWindow(data.win ?? home.win, data.project);
 });
 
+ipcMain.handle('close:home', () => {
+    home.close();
+});
+
+ipcMain.handle('close:edit-project', (e, data) => {
+    editProject.close();
+});
+
 ipcMain.handle('get:app-data-path', () => {
     return getAppDataPath("Beaver Architect");
 });

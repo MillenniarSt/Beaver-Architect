@@ -5,6 +5,8 @@ contextBridge.exposeInMainWorld('electron', {
 
     openHome: () => ipcRenderer.invoke('open:home'),
     openEditProject: (data) => ipcRenderer.invoke('open:edit-project', data),
+    closeHome: () => ipcRenderer.invoke('close:home'),
+    closeEditProject: () => ipcRenderer.invoke('close:edit-project'),
 
     openFile: (data) => ipcRenderer.invoke('dialog:openFile', data),
     

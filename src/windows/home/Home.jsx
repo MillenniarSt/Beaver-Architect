@@ -7,7 +7,7 @@ import ChooseArchitect from './ChooseArchitect';
 
 function Home() {
 
-  const [projectType, selectProjectType] = useState(0);
+  const [projectType, selectProjectType] = useState('world');
 
   const [chooseArchitect, setChooseArchitect] = useState(false);
 
@@ -28,15 +28,15 @@ function Home() {
           <span style={{fontSize: '18px', fontWeight: '500'}}>New Project</span>
         </div>
         <div style={{padding: '20px'}}>
-          <button className={projectType === 0 ? 'selected' : 'unselected'} onClick={() => selectProjectType(0)}>Worlds</button>
-          <button className={projectType === 1 ? 'selected' : 'unselected'} onClick={() => selectProjectType(1)}>Structures</button>
-          <button className={projectType === 2 ? 'selected' : 'unselected'} onClick={() => selectProjectType(2)}>Layers</button>
+          <button className={projectType === 'world' ? 'selected' : 'unselected'} onClick={() => selectProjectType('world')}>Worlds</button>
+          <button className={projectType === 'structure' ? 'selected' : 'unselected'} onClick={() => selectProjectType('structure')}>Structures</button>
+          <button className={projectType === 'terrain' ? 'selected' : 'unselected'} onClick={() => selectProjectType('terrain')}>Layers</button>
           <hr style={{margin: '15px 30px'}}></hr>
-          <button className={projectType === 3 ? 'selected' : 'unselected'} onClick={() => selectProjectType(3)}>Data Packs</button>
+          <button className={projectType === 'data-pack' ? 'selected' : 'unselected'} onClick={() => selectProjectType('data-pack')}>Data Packs</button>
         </div>
       </div>
       <div className='foreground' id='projects'>
-        <Projects setChooseArchitect={setChooseArchitect} />
+        <Projects type={projectType} setChooseArchitect={setChooseArchitect} />
       </div>
       {chooseArchitect && <ChooseArchitect close={() => setChooseArchitect(false)}/>}
     </div>

@@ -29,4 +29,9 @@ function createWindow() {
     }));
 }
 
-module.exports = { win, createWindow };
+function close() {
+    win.close;
+    win = null;
+}
+
+module.exports = { win, createWindow, close };
