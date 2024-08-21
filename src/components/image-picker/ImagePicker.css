@@ -11,7 +11,7 @@
     left: 10px;
     padding: 3px 8px;
     border-radius: 8px;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.6);
 }
 
 .image-picker-remove {
@@ -22,7 +22,7 @@
     width: 20px;
     padding: 5px;
     border-radius: 20px;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.6);
 }
 
 .image-picker-path {
@@ -32,6 +32,6 @@
     right: 0;
     padding: 5px 5px;
     border-radius: 0 0 20px 20px;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.6);
     font-size: 12px;
 }

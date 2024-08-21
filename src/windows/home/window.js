@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const url = require('url');
 
@@ -17,10 +17,6 @@ function createWindow() {
         }
     });
 
-    win.on('closed', () => {
-        if (process.platform !== 'darwin') app.quit();
-    });
-
     win.loadURL(url.format({
         pathname: path.join(app.getAppPath(), 'build', 'index.html'),
         protocol: 'file:',
@@ -30,8 +26,16 @@ function createWindow() {
 }
 
 function close() {
-    win.close;
+    win.close();
     win = null;
 }
+
+ipcMain.handle('home:open', () => {
+    createWindow();
+});
+
+ipcMain.handle('home:close', () => {
+    close();
+});
 
 module.exports = { win, createWindow, close };

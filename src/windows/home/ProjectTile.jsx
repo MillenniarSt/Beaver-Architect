@@ -23,10 +23,13 @@ function ProjectTile({ project }) {
     }
 
     return(
-        <div key={project.id} className='glow-hover project-tile' onContextMenu={(e) => handleContextMenu(e)}>
-            <img src={getProjectBackground(project.id)} className='project-tile-background'></img>
+        <div key={project.id} className='glow-hover project-tile' onContextMenu={(e) => handleContextMenu(e)} onClick={() => {
+            window.electron.closeHome();
+            window.electron.openProject(project);
+        }}>
+            <img src={getProjectBackground(project._id)} className='project-tile-background'></img>
             <div className='project-tile-foreground'>
-                <img src={getProjectImage(project.id)}></img>
+                <img src={getProjectImage(project._id)}></img>
                 <div style={{flexGrow: '1', alignContent: 'center', padding: '0 10px'}}>
                     <span style={{fontSize: '24px', fontWeight: 'bold'}}>{project.name}</span>
                     <div style={{height: '5px'}}></div>
@@ -35,7 +38,9 @@ function ProjectTile({ project }) {
             </div>
             {contextMenu.show && <ContextMenu x={contextMenu.position.x} y={contextMenu.position.y} title={project.name} items={[
                 {icon: load, text: 'Open', onClick: () => {}},
-                {icon: edit, text: 'Modify', onClick: () => {}},
+                {icon: edit, text: 'Modify', onClick: () => {
+                    window.electron.openEditProject({project});
+                }},
                 {icon: remove, text: 'Delete', onClick: () => {}, color: '#db0c0c'}
             ]} close={() => setContextMenu(initialContextMenu)}/>}
         </div>

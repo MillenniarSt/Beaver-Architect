@@ -22,7 +22,7 @@
     place-content: initial;
     width: 100%;
     background-color: rgba(0, 0, 0, 0.4);
-    border: none;
+    outline: none;
     margin: 0;
 }
 

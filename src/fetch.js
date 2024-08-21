@@ -1,58 +1,63 @@
+import { Error } from "./windows/dialog/dialogs";
+
 const backendUrl = 'http://localhost:8025';
 
-function Get(url, query, success, unsuccess) {
-    let params = ''
-    if(query.length > 0) {
-        params = '?' + Object.keys(query).map(key => 
-            `${encodeURIComponent(key)}=${encodeURIComponent(query[key])}`
-        ).join('&')
-    } 
-    fetch(`${backendUrl}/${url}${params}`)
+function BackGet(url, query, success, unsuccess) {
+    let params = '?' + Object.keys(query).map(key =>
+        `${encodeURIComponent(key)}=${encodeURIComponent(query[key])}`
+    ).join('&')
+    url = `${backendUrl}/${url}${params}`
+
+    fetch(url)
         .then(response => response.json())
-        .then(data => execute(data, success, unsuccess))
+        .then(data => execute(url, data, success, unsuccess))
         .catch(error => console.error('Error:', error))
 }
 
-function Post(url, data, success, unsuccess) {
-    fetch(`${backendUrl}/${url}`, {
+function BackPost(url, data, success, unsuccess) {
+    url = `${backendUrl}/${url}`
+
+    fetch(url, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
-      })
+    })
         .then(response => response.json())
-        .then(data => execute(data, success, unsuccess))
+        .then(data => execute(url, data, success, unsuccess))
         .catch(error => console.error('Error:', error))
 }
 
-function Put(url, data, success, unsuccess) {
-    fetch(`${backendUrl}/${url}`, {
+function BackPut(url, id, data, success, unsuccess) {
+    url = `${backendUrl}/${url}/${id}/modify`
+
+    fetch(url, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
-      })
+    })
         .then(response => response.json())
-        .then(data => execute(data, success, unsuccess))
+        .then(data => execute(url, data, success, unsuccess))
         .catch(error => console.error('Error:', error))
 }
 
-function Delete(url, id, success, unsuccess) {
-    fetch(`${backendUrl}/${url}/${id}`, {
+function BackDelete(url, id, success, unsuccess) {
+    url = `${backendUrl}/${url}/${id}/delete`
+
+    fetch(url, {
         method: 'DELETE'
-      })
+    })
         .then(response => response.json())
-        .then(data => execute(data, success, unsuccess))
+        .then(data => execute(url, data, success, unsuccess))
         .catch(error => console.error('Error:', error))
 }
 
-function execute(data, success, unsuccess) {
-    console.log(data)
-
+function execute(url, data, success, unsuccess) {
     if (data.err) {
-        showError(data.err)
+        showError(data.err, url)
     }
     if (data.success) {
         success(data)
@@ -61,8 +66,9 @@ function execute(data, success, unsuccess) {
     }
 }
 
-function showError(err) {
-    //TODO
+function showError(err, url) {
+    console.log(err.stack)
+    Error(err, url)
 }
 
-export { Get, Post, Put, Delete };
+export { BackGet, BackPost, BackPut, BackDelete };

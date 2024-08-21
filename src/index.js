@@ -5,6 +5,9 @@ import './index.css';
 import Home from './windows/home/Home';
 import EditProject from './windows/edit-project/EditProject'
 import { init } from './data';
+import Dialog from './windows/dialog/Dialog';
+import ErrorDialog from './windows/dialog/ErrorDialog';
+import Project from './windows/project/Project';
 
 init();
 
@@ -13,8 +16,11 @@ root.render(
   <React.StrictMode>
     <Router>
       <Routes>
+        <Route path="/dialog/base" element={<Dialog />} />
+        <Route path="/dialog/error" element={<ErrorDialog />} />
         <Route path="/home" element={<Home />} />
         <Route path="/edit-project" element={<EditProject />} />
+        <Route path="/project" element={<Project />} />
       </Routes>
     </Router>
   </React.StrictMode>

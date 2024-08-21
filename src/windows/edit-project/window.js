@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const url = require('url');
 
@@ -33,5 +33,13 @@ function close() {
     win.close();
     win = null;
 }
+
+ipcMain.handle('edit-project:open', (e, data) => {
+    createWindow(BrowserWindow.fromWebContents(e.sender), data.project);
+});
+
+ipcMain.handle('edit-project:close', (e, data) => {
+    close();
+});
 
 module.exports = { win, createWindow, close };

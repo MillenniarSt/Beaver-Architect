@@ -1,19 +1,21 @@
 export let dir;
 
-export let projects;
-export let architects;
+export let projectsDir;
+export let dataPacksDir;
+export let architectsDir;
 
 export async function init() {
     dir = await window.electron.getAppDataPath();
     console.log(dir);
-    projects = `${dir}\\projects`;
-    architects = `${dir}\\architects`;
+    projectsDir = `${dir}\\projects`;
+    dataPacksDir = `${dir}\\data_packs`;
+    architectsDir = `${dir}\\architects`;
 }
 
 export function getProjectImage(id) {
-    return `${projects}\\${id}\\image.png`;
+    return `${projectsDir}\\${id}\\image.png`;
 }
 
 export function getProjectBackground(id) {
-    return `${projects}\\${id}\\background.png`;
+    return `${projectsDir}\\${id}\\background.png`;
 }

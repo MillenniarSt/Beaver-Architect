@@ -4,6 +4,7 @@ import logo from '../../assets/logo.png';
 import Projects from './Projects';
 import { add } from '../../icons';
 import ChooseArchitect from './ChooseArchitect';
+import { Info } from '../dialog/dialogs';
 
 function Home() {
 
@@ -32,7 +33,7 @@ function Home() {
           <button className={projectType === 'structure' ? 'selected' : 'unselected'} onClick={() => selectProjectType('structure')}>Structures</button>
           <button className={projectType === 'terrain' ? 'selected' : 'unselected'} onClick={() => selectProjectType('terrain')}>Layers</button>
           <hr style={{margin: '15px 30px'}}></hr>
-          <button className={projectType === 'data-pack' ? 'selected' : 'unselected'} onClick={() => selectProjectType('data-pack')}>Data Packs</button>
+          <button className={projectType === 'data_pack' ? 'selected' : 'unselected'} onClick={() => selectProjectType('data_pack')}>Data Packs</button>
         </div>
       </div>
       <div className='foreground' id='projects'>

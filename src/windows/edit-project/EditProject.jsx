@@ -10,6 +10,11 @@ function EditProject() {
   useEffect(() => {
     window.electron.getProjectEdit((e, data) => {
       setProject(data);
+
+      let isNew = data === undefined || data._id === undefined;
+
+      setImage(isNew ? defaultImage : getProjectImage(data._id));
+      setBackground(isNew ? defaultBackground : getProjectBackground(data._id));
     });
 
     return () => {
@@ -19,10 +24,10 @@ function EditProject() {
 
   const [project, setProject] = useState();
 
-  let isNew = project === undefined || project.id === undefined;
+  let isNew = project === undefined || project._id === undefined;
 
-  const [image, setImage] = useState(isNew ? defaultImage : getProjectImage(project.id));
-  const [background, setBackground] = useState(isNew ? defaultBackground : getProjectBackground(project.id));
+  const [image, setImage] = useState(defaultImage);
+  const [background, setBackground] = useState(defaultBackground);
 
   if (project === undefined) {
     return <div className='background'></div>;
@@ -35,21 +40,21 @@ function EditProject() {
         <div style={{ display: 'flex', gap: '15px' }}>
           <div style={{ flexGrow: 1 }}>
             <span className='input-label'>Name</span>
-            <input placeholder='New Project' />
+            <input placeholder='New Project' value={project.name}/>
           </div>
           <div style={{ flexGrow: 1 }}>
             <span className='input-label'>Authors</span>
-            <input placeholder='Me and my Friends' />
+            <input placeholder='Me and my Friends' value={project.authors}/>
           </div>
         </div>
         <div>
           <span className='input-label'>Description</span>
-          <input placeholder='A small description' />
+          <input placeholder='A small description' value={project.description}/>
         </div>
         <div style={{ flexGrow: '1', display: 'flex', flexDirection: 'column' }}>
           <span className='input-label'>Info</span>
           <div style={{ flexGrow: '1', display: 'flex', gap: '15px' }}>
-            <textarea style={{ flexGrow: '1' }} placeholder='Add more info to your Project' />
+            <textarea style={{ flexGrow: '1' }} placeholder='Add more info to your Project' value={project.info}/>
             <div style={{ width: '500px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
               <div style={{ position: 'relative', height: '152px' }}>
                 <ImagePicker title='Image' empty={defaultImage} image={image} setImage={setImage} />

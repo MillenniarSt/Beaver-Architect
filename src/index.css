@@ -38,6 +38,16 @@ button:hover {
   outline: none;
 }
 
+span {
+  white-space: pre;
+  overflow: hidden;
+}
+
+p {
+  white-space: pre-line;
+  overflow-y: auto;
+}
+
 hr {
   border-color: #777777;
 }
@@ -69,6 +79,26 @@ textarea:focus-visible {
   outline: #0078e7;
 }
 
+/* Scroll Bar */
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #3f3f3f; 
+}
+ 
+::-webkit-scrollbar-thumb {
+  background: #6f6f6f;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8f8f8f;
+}
+
 /* Utilities */
 
 .background {
@@ -80,23 +110,18 @@ textarea:focus-visible {
   background-color: #2f2f2f;
 }
 
-.icon,
-.icon-button>img {
-  width: 20px;
-  height: 20px;
+.icon, .icon-button {
+  width: 24px;
+  height: 24px;
 }
 
-.icon-button {
-  width: 35px;
-  height: 35px;
-  background-color: transparent;
-  border: none;
-  padding: 0;
-  border-radius: 20px;
+.small-icon, .small-icon-button {
+  width: 18px;
+  height: 18px;
 }
 
-.icon-button:hover {
-  background-color: #005fdd4d;
+.icon-button, .small-icon-button {
+  cursor: pointer;
 }
 
 .decorated-label {
@@ -159,6 +184,28 @@ textarea:focus-visible {
   width: 100%;
   background-color: #005fdd99;
   outline: solid #00abe799 2px;
+}
+
+.icon-selected {
+  height: 30px;
+  width: 30px;
+  padding: 5px;
+  background-color: #005fdd99;
+  border-radius: 10px;
+}
+
+.icon-unselected {
+  height: 30px;
+  width: 30px;
+  padding: 5px;
+}
+
+.icon-unselected:hover {
+  height: 30px;
+  width: 30px;
+  padding: 5px;
+  background-color: #005fdd4d;
+  border-radius: 10px;
 }
 
 /* Animation */
