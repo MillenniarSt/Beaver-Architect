@@ -43,6 +43,26 @@ function browseDir(dir) {
     })
 }
 
+ipcMain.handle('file:read-text', (e, data) => {
+    return fs.readFileSync(data, 'utf8').replace(/\r\n/g, '\n')
+});
+
+ipcMain.handle('file:write-text', (e, data) => {
+    fs.writeFileSync(data.file, data.text)
+});
+
+ipcMain.handle('file:create-dir', (e, data) => {
+    fs.mkdirSync(data.dir);
+});
+
+ipcMain.handle('file:rename', (e, data) => {
+    fs.renameSync(data.file, data.rename);
+});
+
+ipcMain.handle('file:delete', (e, data) => {
+    fs.rmSync(data.file, { recursive: true });
+});
+
 ipcMain.handle('architect:get-all', () => {
     return fs.readdirSync(architectsDir).map((dir) => JSON.parse(fs.readFileSync(path.join(architectsDir, dir, 'architect.json'), 'utf8')))
 });

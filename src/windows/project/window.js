@@ -30,7 +30,7 @@ function createWindow(project) {
 
     win.maximize();
 
-    windows.set(project.id, win);
+    windows.set(project._id, win);
 }
 
 function close(id) {

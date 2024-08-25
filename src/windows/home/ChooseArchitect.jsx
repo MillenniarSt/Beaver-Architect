@@ -42,7 +42,7 @@ function ChooseArchitect({ close }) {
                     </div>
                 ))}
             </div>
-            <button style={{margin: '15px 10px 5px 10px'}} className='glow-hover' onClick={() => close()}>Cancel</button>
+            <button style={{margin: '15px 10px 5px 10px'}} className='decorated-button glow-hover' onClick={() => close()}>Cancel</button>
         </div>
     );
 }

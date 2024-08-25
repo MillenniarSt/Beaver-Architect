@@ -1,4 +1,4 @@
-import { Error } from "./windows/dialog/dialogs";
+import { BaseErrorDialog, ErrorDialog } from "./windows/dialog/dialogs";
 
 const backendUrl = 'http://localhost:8025';
 
@@ -30,7 +30,7 @@ function BackPost(url, data, success, unsuccess) {
 }
 
 function BackPut(url, id, data, success, unsuccess) {
-    url = `${backendUrl}/${url}/${id}/modify`
+    url = `${backendUrl}/${url}/${id}`
 
     fetch(url, {
         method: 'PUT',
@@ -45,7 +45,7 @@ function BackPut(url, id, data, success, unsuccess) {
 }
 
 function BackDelete(url, id, success, unsuccess) {
-    url = `${backendUrl}/${url}/${id}/delete`
+    url = `${backendUrl}/${url}/${id}`
 
     fetch(url, {
         method: 'DELETE'
@@ -68,7 +68,7 @@ function execute(url, data, success, unsuccess) {
 
 function showError(err, url) {
     console.log(err.stack)
-    Error(err, url)
+    ErrorDialog(err, url)
 }
 
 export { BackGet, BackPost, BackPut, BackDelete };

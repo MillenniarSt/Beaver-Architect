@@ -1,8 +1,10 @@
 import { ProjectContext } from '../../../../stores/contexts';
-import './Editors.css';
 import { useState, useEffect, useContext } from 'react';
+import React from "react";
+import MDEditor from '@uiw/react-md-editor';
+import './Editors.css';
 
-function TextFile({ file }) {
+function MarkdownFile({ file }) {
 
     const { page } = useContext(ProjectContext);
 
@@ -10,7 +12,7 @@ function TextFile({ file }) {
     const [text, setText] = useState();
 
     function save() {
-        window.electron.writeTextFile(file, page.data.text).then(() => {
+        window.electron.writeTextFile(file, text).then(() => {
             saveText(text)
             page.data.savedText = text
             page.isSaved = true
@@ -18,11 +20,11 @@ function TextFile({ file }) {
     }
 
     useEffect(() => {
-        if(!page.data) {
+        if (!page.data) {
             window.electron.readFileAsText(file).then((readed) => {
                 saveText(readed)
                 setText(readed)
-                page.data = {savedText: readed, text: readed}
+                page.data = { savedText: readed, text: readed }
                 page.isSaved = true
                 page.save = save
             })
@@ -35,8 +37,8 @@ function TextFile({ file }) {
     if (text === undefined || savedText === undefined) {
         return (
             <div className='editor-organize'>
-                <span style={{display: 'block', height: '45px'}} className='editor-title'>{file.substring(file.lastIndexOf('\\') + 1)}</span>
-                <textarea value='Reading...' />
+                <span style={{ display: 'block', height: '45px' }} className='editor-title'>{file.substring(file.lastIndexOf('\\') + 1)}</span>
+                <div style={{flexGrow: '1'}}>Reading...</div>
                 <span style={{ fontSize: '14px' }}>{` > ${file}`}</span>
             </div>
         )
@@ -49,15 +51,18 @@ function TextFile({ file }) {
                 {!page.isSaved && <button className='secondary-button'>Cancel</button>}
                 {!page.isSaved && <button className='decorated-button glow-hover' onClick={save}>Save</button>}
             </div>
-            <textarea value={text} style={{ flexGrow: '1' }} onChange={(e) => {
-                const changedText = e.target.value
-                setText(changedText)
-                page.data.text = changedText
-                page.isSaved = savedText === changedText
-            }} />
+            <MDEditor
+                value={text}
+                onChange={(change) => {
+                    setText(change)
+                    page.data.text = change
+                    page.isSaved = savedText === change
+                }}
+                style={{ flexGrow: '1' }}
+            />
             <span style={{ fontSize: '14px' }}>{` > ${file}`}</span>
         </div>
     );
 }
 
-export default TextFile;
+export default MarkdownFile;

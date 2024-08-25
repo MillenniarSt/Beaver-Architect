@@ -1,5 +1,8 @@
 import { BackGet } from '../../../../fetch';
-import { file, fileJson, fileText } from "../../../../icons";
+import { file, fileImage, fileJson, fileMarkdown, fileText } from "../../../../icons";
+import ImageFile from './ImageFile';
+import JsonFile from './JsonFile';
+import MarkdownFile from './MarkdownFile';
 import TextFile from "./TextFile";
 
 /** 
@@ -14,9 +17,9 @@ let editors;
  */
 const beaverEditors = {
     text: { icon: fileText, page: (file) => <TextFile file={file} /> },
-    markdown: { icon: fileText, page: (file) => <TextFile file={file} /> },
-    json: { icon: fileJson, page: (file) => <TextFile file={file} /> },
-    image: { icon: file, page: (file) => <TextFile file={file} /> }
+    markdown: { icon: fileMarkdown, page: (file) => <MarkdownFile file={file}/> },
+    json: { icon: fileJson, page: (file) => <JsonFile file={file} /> },
+    image: { icon: fileImage, page: (file) => <ImageFile file={file} /> }
 }
 
 async function reloadEditors(then) {
@@ -51,7 +54,7 @@ function getEditorIcon(file) {
 function getEditorPage(file) {
     const [source, editor] = getSourceEditor(file);
     if (source === 'beaver') {
-        return beaverEditors[editor].page(file);
+        return () => beaverEditors[editor].page(file);
     } else {
         return null;
     }

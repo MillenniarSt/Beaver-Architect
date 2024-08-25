@@ -80,7 +80,7 @@
 
 .project-tile {
     width: calc(100% - 30px);
-    margin: 5px 15px;
+    margin: 0 15px 20px 15px;
     border-radius: 25px;
     filter: drop-shadow(0 5px 10px black);
     align-content: center;

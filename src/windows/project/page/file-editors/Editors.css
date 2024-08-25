@@ -1,0 +1,160 @@
+.editor-organize {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 15px;
+    height: calc(100% - 20px);
+    gap: 10px;
+}
+
+.editor-head {
+    display: flex;
+    gap: 5px;
+    height: 45px;
+    align-items: center;
+}
+
+.editor-title {
+    font-size: 20px;
+    font-weight: 500;
+    flex-grow: 1;
+    margin-left: 10px;
+}
+
+.editor-container {
+    flex-grow: 1;
+    border-radius: 15px;
+    border: solid 2px #00abe7;
+}
+
+.editor {
+    flex-grow: 1;
+}
+
+.editor>div {
+    height: 100%;
+}
+
+/* Markdown Editor */
+
+.w-md-editor {
+    --md-editor-background-color: rgba(0, 0, 0, 0.3) !important;
+    --md-editor-box-shadow-color: #00abe7 !important;
+}
+
+.wmde-markdown {
+    background-color: transparent !important;
+}
+
+/* Json Editor */
+
+tr:hover td:not(.TableSortingLabel__TableCell--head___yxhXj) {
+    background-color: #005fdd4d !important;
+}
+
+tr.jsoneditor-highlight,
+tr.jsoneditor-selected {
+    background-color: transparent !important;
+}
+
+.jsoneditor {
+    border: none !important;
+}
+
+.jsoneditor-menu,
+.jsoneditor-navigation-bar {
+    border-radius: 10px;
+    margin-bottom: 5px !important;
+    color: #efefef !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    border: none !important;
+}
+
+.jsoneditor-contextmenu .jsoneditor-menu button:focus {
+    background-color: #005fdd99 !important;
+}
+
+.jsoneditor-contextmenu .jsoneditor-menu button {
+    color: #efefef !important;
+}
+
+.jsoneditor-contextmenu .jsoneditor-menu {
+    color: #efefef !important;
+}
+
+.jsoneditor-menu {
+    backdrop-filter: blur(8px);
+    padding: 5px !important;
+}
+
+.jsoneditor-contextmenu .jsoneditor-menu button:hover {
+    background-color: #005fdd4d !important;
+    color: #efefef !important;
+}
+
+.jsoneditor-contextmenu .jsoneditor-menu li button.jsoneditor-selected,
+.jsoneditor-contextmenu .jsoneditor-menu li button.jsoneditor-selected:focus,
+.jsoneditor-contextmenu .jsoneditor-menu li button.jsoneditor-selected:hover {
+    background-color: #005fdd99 !important;
+    color: #efefef !important;
+}
+
+.jsoneditor-frame {
+    background-color: #2f2f2f !important;
+    border-radius: 10px;
+}
+
+.jsoneditor-tree {
+    border-radius: 15px;
+}
+
+div.jsoneditor-tree {
+    background: rgba(0, 0, 0, 0.3) !important;
+    border: solid 2px #00abe7;
+    padding: 5px;
+    width: calc(100% - 10px) !important;
+    height: calc(100% - 20px) !important;
+}
+
+.jsoneditor-popover,
+.jsoneditor-schema-error,
+div.jsoneditor td,
+div.jsoneditor textarea,
+div.jsoneditor th,
+div.jsoneditor-field,
+pre.jsoneditor-preview {
+    color: #efefef !important;
+}
+
+div.jsoneditor-value.jsoneditor-string {
+    color: #00abe7 !important;
+}
+
+div.jsoneditor-value.jsoneditor-number {
+    color: #0655e7 !important;
+}
+
+div.jsoneditor-value {
+    color: grey !important;
+}
+
+div.jsoneditor-field[contenteditable=true]:focus,
+div.jsoneditor-field[contenteditable=true]:hover,
+div.jsoneditor-value[contenteditable=true]:focus,
+div.jsoneditor-value[contenteditable=true]:hover,
+div.jsoneditor-field.jsoneditor-highlight,
+div.jsoneditor-value.jsoneditor-highlight {
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 2px !important;
+}
+
+div.jsoneditor-field.jsoneditor-highlight-active,
+div.jsoneditor-field.jsoneditor-highlight-active:focus,
+div.jsoneditor-field.jsoneditor-highlight-active:hover,
+div.jsoneditor-value.jsoneditor-highlight-active,
+div.jsoneditor-value.jsoneditor-highlight-active:focus,
+div.jsoneditor-value.jsoneditor-highlight-active:hover {
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 2px !important;
+}

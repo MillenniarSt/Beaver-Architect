@@ -7,6 +7,7 @@ import EditProject from './windows/edit-project/EditProject'
 import { init } from './data';
 import Dialog from './windows/dialog/Dialog';
 import ErrorDialog from './windows/dialog/ErrorDialog';
+import TextInput from './windows/dialog/TextInput';
 import Project from './windows/project/Project';
 
 init();
@@ -18,6 +19,8 @@ root.render(
       <Routes>
         <Route path="/dialog/base" element={<Dialog />} />
         <Route path="/dialog/error" element={<ErrorDialog />} />
+        <Route path="/dialog/text" element={<TextInput />} />
+
         <Route path="/home" element={<Home />} />
         <Route path="/edit-project" element={<EditProject />} />
         <Route path="/project" element={<Project />} />

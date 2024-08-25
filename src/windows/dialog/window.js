@@ -4,9 +4,7 @@ const url = require('url');
 
 let dialogs = new Map();
 
-function createWindow(parentWin, type, width, height, display) {
-    id = 'random-id';
-
+function createWindow(parentWin, type, width, height, id, display) {
     let dialog = new BrowserWindow({
         modal: true,
         parent: parentWin,
@@ -32,27 +30,33 @@ function createWindow(parentWin, type, width, height, display) {
         dialog.webContents.send('dialog:get', { id, display });
     });
 
-    dialogs.set(id, dialog);
+    dialogs.set(id, { dialog, parentWin });
 }
 
-function close(id) {
-    dialogs.get(id).close();
+/**
+ * send to @var parentWin the data receive from the dialog window
+ * use @param id to identify which dialog send the data
+ */
+function close(id, data) {
+    const { dialog, parentWin } = dialogs.get(id);
+    parentWin.webContents.send('dialog:result', { id, data });
+    dialog.close();
     dialogs.delete(id);
 }
 
 function closeAll() {
-    dialogs.forEach((dialog) => {
-        dialog.close();
+    dialogs.forEach((i) => {
+        i.dialog.close();
     });
     dialogs.clear();
 }
 
 ipcMain.handle('dialog:open', (e, data) => {
-    createWindow(BrowserWindow.fromWebContents(e.sender), data.type, data.width, data.height, data.display);
+    createWindow(BrowserWindow.fromWebContents(e.sender), data.type, data.width, data.height, data.id, data.display);
 });
 
 ipcMain.handle('dialog:close', (e, data) => {
-    close(data);
+    close(data.id, data.data);
 });
 
 ipcMain.handle('dialog:close-all', (e, data) => {

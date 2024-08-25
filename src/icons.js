@@ -24,7 +24,9 @@ import files from './assets/icon/files.svg';
 import folder from './assets/icon/folder.svg';
 import file from './assets/icon/file.svg';
 import fileText from './assets/icon/file-text.svg';
+import fileMarkdown from './assets/icon/file-markdown.svg';
 import fileJson from './assets/icon/file-json.svg';
+import fileImage from './assets/icon/file-image.svg';
 
 import world from './assets/icon/world.svg';
 import structure from './assets/icon/structure.svg';
@@ -36,6 +38,6 @@ export {
     info, warning, error, permissionDenided, databaseError, 
     close, add, load, edit, remove, reload,
     files,
-    folder, file, fileText, fileJson,
+    folder, file, fileText, fileMarkdown, fileJson, fileImage,
     world, structure, dataPack 
 };

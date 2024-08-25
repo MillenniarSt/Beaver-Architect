@@ -29,7 +29,7 @@ function ErrorDialog() {
                         Please report the problem by clicking on the (!)
                     </p>
                     <div className='dialog-button-region'>
-                        <button style={{ backgroundColor: '#ea1010', outline: '0' }} onClick={() => window.electron.closeAllDialogs()}>Ok</button>
+                        <button className='decorated-button' style={{ backgroundColor: '#ea1010', outline: '0', flexGrow: '1' }} onClick={() => window.electron.closeAllDialogs()}>Ok</button>
                     </div>
                 </div>
                 <img src={error} className='dialog-icon' />
@@ -48,16 +48,16 @@ function ErrorDialog() {
                 <p className='dialog-stack'>{err.stack}</p>
                 <div style={{ padding: '0 15px' }}>
                     <div style={{ display: 'flex', textAlign: 'center' }}>
-                        <span style={{ flexGrow: '1'}}>{`Code: ${err.errno}`}</span>
-                        <span style={{ flexGrow: '1'}}>{`System: ${err.syscall}`}</span>
+                        <span style={{ flexGrow: '1', fontSize: '14px'}}>{`Code: ${err.errno}`}</span>
+                        <span style={{ flexGrow: '1', fontSize: '14px'}}>{`System: ${err.syscall}`}</span>
                     </div>
                     {url !== undefined && <div style={{ display: 'flex', gap: '10px' }}>
                         <img src={infoUrl} className='dialog-url' />
-                        <span>{url}</span>
+                        <span style={{fontSize: '12px'}}>{url}</span>
                     </div>}
                 </div>
                 <div className='dialog-button-region'>
-                    <button style={{ backgroundColor: '#ea1010', outline: '0' }} onClick={() => window.electron.closeDialog(data.id)}>Ok</button>
+                    <button className='decorated-button' style={{ backgroundColor: '#ea1010', outline: '0', flexGrow: '1' }} onClick={() => window.electron.closeDialog(data.id, {})}>Ok</button>
                 </div>
             </div>
             <img src={error} className='dialog-icon' />

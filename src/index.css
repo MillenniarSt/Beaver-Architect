@@ -18,24 +18,11 @@ code {
 /* Default */
 
 button {
-  display: flex;
-  align-items: center;
-  place-content: center;
-  gap: 8px;
-  background-color: #005fdd;
+  background-color: transparent;
   color: #efefef;
-  outline: solid #00abe7 2px;
   border: none;
   border-radius: 12px;
-  height: 35px;
-  padding: 0 15px;
-  margin: 5px;
   cursor: pointer;
-}
-
-button:hover {
-  background-color: #0078e7;
-  outline: none;
 }
 
 span {
@@ -67,11 +54,15 @@ form {
 input,
 textarea {
   border-radius: 10px;
-  background-color: #2f2f2f;
+  background-color: transparent;
   border: solid 2px #00abe7;
   color: #efefef;
   padding: 10px 15px;
   width: calc(100% - 30px);
+}
+
+textarea {
+  white-space: pre;
 }
 
 input:focus-visible,
@@ -87,7 +78,7 @@ textarea:focus-visible {
 }
 
 ::-webkit-scrollbar-track {
-  background: #3f3f3f; 
+  background: transparent;
 }
  
 ::-webkit-scrollbar-thumb {
@@ -99,6 +90,10 @@ textarea:focus-visible {
   background: #8f8f8f;
 }
 
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
 /* Utilities */
 
 .background {
@@ -108,6 +103,36 @@ textarea:focus-visible {
 
 .foreground {
   background-color: #2f2f2f;
+}
+
+.decorated-button {
+  display: flex;
+  align-items: center;
+  place-content: center;
+  gap: 8px;
+  background-color: #005fdd;
+  color: #efefef;
+  outline: solid #00abe7 2px;
+  height: 35px;
+  padding: 0 15px;
+  margin: 5px;
+}
+
+.secondary-button {
+  display: flex;
+  align-items: center;
+  place-content: center;
+  gap: 8px;
+  color: #d6d6d6;
+  outline: solid #d6d6d6 2px;
+  height: 35px;
+  padding: 0 15px;
+  margin: 5px;
+}
+
+.decorated-button:hover {
+  background-color: #0078e7;
+  outline: none;
 }
 
 .icon, .icon-button {
@@ -167,21 +192,31 @@ textarea:focus-visible {
   color: #00abe7;
 }
 
+.input-label-error {
+  font-size: 14px;
+  margin-left: 15px;
+  margin-bottom: 3px;
+  display: block;
+  color: #da3333;
+}
+
+.error-input {
+  border: solid 2px #da3333;
+}
+
 /* Selectable Items */
 
-.unselected {
+.unselected, .selected {
   width: 100%;
-  background-color: transparent;
-  outline: none;
+  height: 35px;
+  margin: 5px;
 }
 
 .unselected:hover {
   background-color: #005fdd4d;
-  outline: none;
 }
 
 .selected {
-  width: 100%;
   background-color: #005fdd99;
   outline: solid #00abe799 2px;
 }

@@ -9,8 +9,8 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    backdrop-filter: blur(8px);
-    background-color: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(6px);
+    background-color: rgba(150, 150, 150, 0.2);
 }
 
 .context-menu-title {
@@ -19,13 +19,17 @@
 }
 
 .context-menu>button {
-    place-content: initial;
     width: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
-    outline: none;
+    background-color: rgba(0, 0, 0, 0.3);
     margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #efefef;
+    height: 35px;
+    padding: 0 15px;
 }
 
 .context-menu>button:hover {
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(0, 0, 0, 0.5);
 }
