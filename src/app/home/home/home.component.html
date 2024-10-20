@@ -1,0 +1,50 @@
+<div class="bg-back-1 flex h-full">
+
+  <div class="w-64 flex flex-col gap-6 py-5 pr-1 pl-4">
+    <div class="glow flex after:bg-back-2 after:rounded-2xl">
+      <img class="w-[70px] h-[70px]" src="assets/logo.png">
+      <div class="py-2">
+        <h3 class="text-lg font-semibold">Beaver Architect</h3>
+        <em class="text-sm">By Millenniar</em>
+      </div>
+    </div>
+    <div class="decorated-label py-2 pt-14 pb-8 cursor-pointer" (click)="newProject()">
+      <div class="decorated-icon glow">
+        <img src="assets/icon/add.svg">
+      </div>
+      <span class="text-lg font-semibold">New Project</span>
+    </div>
+
+    <div class="p-5 flex flex-col gap-3">
+      <button class="type-selector"
+        [ngClass]="{'selected': isSelectedType('world'), 'unselected': !isSelectedType('world')}"
+        (click)="selectType('world')">Worlds</button>
+      <button class="type-selector"
+        [ngClass]="{'selected': isSelectedType('structure'), 'unselected': !isSelectedType('structure')}"
+        (click)="selectType('structure')">Structures</button>
+      <button class="type-selector"
+        [ngClass]="{'selected': isSelectedType('terrain'), 'unselected': !isSelectedType('terrain')}"
+        (click)="selectType('terrain')">Terrains</button>
+      <button class="type-selector"
+        [ngClass]="{'selected': isSelectedType('biome'), 'unselected': !isSelectedType('biome')}"
+        (click)="selectType('biome')">Biomes</button>
+      <hr class="my-4 mx-7">
+      <button class="type-selector"
+        [ngClass]="{'selected': isSelectedType('data_pack'), 'unselected': !isSelectedType('data_pack')}"
+        (click)="selectType('data_pack')">Data Packs</button>
+    </div>
+
+    <div class="grow"></div>
+    <div class="ml-3 mb-2 flex gap-3">
+      <img class="w-1/2" src="assets/credit/millenniar_title.svg">
+      <div class="grow"></div>
+      <button (click)="openSettings()">
+        <i class="pi pi-cog text-lg text-fore-3"></i>
+      </button>
+    </div>
+  </div>
+
+  <projects *ngIf="interactive === 'projects'" class="home-interactive" [type]="type" (editProject)="doEditProject($event)"></projects>
+  <edit-project *ngIf="interactive === 'new_project'" class="home-interactive" [type]="type ?? 'world'" (changeInteractive)="changeInteractive($event)"></edit-project>
+  <edit-project *ngIf="interactive === 'edit_project'" class="home-interactive" [isNew]="false" [type]="editProject!.type" [project]="editProject!" (changeInteractive)="changeInteractive($event)"></edit-project>
+</div>

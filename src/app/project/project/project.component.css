@@ -1,0 +1,14 @@
+/* Split View */
+
+.as-split-gutter {
+    display: initial !important;
+    background-color: transparent !important;
+}
+
+.as-split-gutter .sidebar-collapsed {
+    display: none !important;
+}
+
+.as-split-gutter-icon {
+    background-image: none !important;
+}

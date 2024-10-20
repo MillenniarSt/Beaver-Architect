@@ -1,0 +1,26 @@
+<ng-template *ngIf="pages.length > 0; then display else empty"></ng-template>
+
+<ng-template #empty>
+    <div class="h-full flex flex-col gap-3 justify-center items-center">
+        <div class='big-decorated-icon glow'>
+            <img src="assets/icon/add.svg">
+        </div>
+        <span class="text-lg font-semibold">Open a page from the left panel</span>
+    </div>
+</ng-template>
+
+<ng-template #display>
+    <div class="h-full flex flex-col p-2 pl-0 gap-2">
+        <div class="flex gap-2">
+            <di *ngFor="let page of pages; index as i" class="flex items-center gap-2 rounded-2xl px-3 py-[6px] cursor-pointer hover:bg-main-hover-tr" [ngClass]="{'bg-main-tr': selectedIndex === i}" (click)="select(i)">
+                <img [src]="page.icon" class="h-5 w-5">
+                <span>{{page.label}}</span>
+                <i *ngIf="selectedIndex === i" class="pi pi-times ml-1 cursor-pointer" style="font-size: 0.75rem" (click)="closePage(selectedIndex)"></i>
+            </di>
+        </div>
+    
+        <div class="grow border-solid border-2 border-fore-main rounded-2xl p-2">
+            <ng-container *ngComponentOutlet="pages[selectedIndex].component; inputs: { index: selectedIndex }"></ng-container>
+        </div>
+    </div>
+</ng-template>

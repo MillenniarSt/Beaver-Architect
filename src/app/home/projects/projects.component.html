@@ -1,0 +1,32 @@
+<ng-template *ngIf="projects.length === 0; then emptyProjects else projectsList"></ng-template>
+
+<ng-template #emptyProjects>
+    <div class="h-full flex flex-col items-center justify-center cursor-pointer">
+        <div class='big-decorated-icon glow'>
+            <img src="assets/icon/add.svg">
+        </div>
+        <span class="text-lg mt-2 text-fore-3">Create New Project</span>
+    </div>
+</ng-template>
+
+<ng-template #projectsList>
+    <div class="h-full flex flex-col mx-3 my-2 gap-5">
+        <div class="flex">
+            <img *ngIf="selectedArchitect > 0; else arrowEmpty" class="icon-button" src="assets/icon/left.svg"
+                (click)="switchArchitect(-1)">
+            <span
+                class="grow text-center font-semibold text-lg place-self-center">{{architects[selectedArchitect].name}}</span>
+            <img *ngIf="selectedArchitect < architects.length -1; else arrowEmpty" class="icon-button"
+                src="assets/icon/right.svg" (click)="switchArchitect(+1)">
+
+            <ng-template #arrowEmpty>
+                <div class="w-[32px]"></div>
+            </ng-template>
+        </div>
+
+        <div class="grow flex flex-col gap-5">
+            <project-tile *ngFor="let project of projects" [project]="project" (edit)="doEditProject($event)"
+                (delete)="doDeleteProject($event)"></project-tile>
+        </div>
+    </div>
+</ng-template>

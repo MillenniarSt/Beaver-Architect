@@ -1,0 +1,10 @@
+.type-selector {
+    border-radius: 10px;
+}
+
+.home-interactive {
+    background-color: theme('colors.back.2');
+    border-radius: 30px;
+    flex-grow: 1;
+    margin: 16px;
+}

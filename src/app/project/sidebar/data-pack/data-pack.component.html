@@ -1,0 +1,36 @@
+<div class="flex flex-col h-full gap-2">
+    <div class="flex">
+        <span class="grow font-semibold text-2xl">{{title()}}</span>
+    </div>
+
+    <div class="flex gap-2">
+        <button *ngFor="let folder of folders" 
+            class="w-10 h-10 p-2 rounded-xl bg-back-3 hover:bg-main-hover-tr" [ngClass]="{'bg-main': folder === selectedFolder}"
+            (click)="selectFolder(folder)">
+            <img [src]="folder.icon">
+        </button>
+    </div>
+
+    <p-tree class="grow w-full md:w-30rem" [value]="tree" (onNodeExpand)="nodeExpand($event)" (onNodeCollapse)="nodeCollapse($event)">
+        <ng-template let-node pTemplate="dir">
+            <div class="flex">
+                <span class="grow folder">{{ node.label }}</span>
+                <div class="gap-2 createFiles">
+                    <button>
+                        <i class="pi pi-file-plus" (click)="newFile(node, node.data.path)"></i>
+                    </button>
+                    <button>
+                        <i class="pi pi-folder-plus" (click)="newDir(node, node.data.path)"></i>
+                    </button>
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template let-node pTemplate="file">
+            <button class="w-full flex gap-2 items-center" (click)="openFile(node)">
+                <img [src]="selectedFolder.icon" class="h-5">
+                <span class="grow text-start">{{ node.label }}</span>
+            </button>
+        </ng-template>
+    </p-tree>
+</div>

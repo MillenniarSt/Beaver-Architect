@@ -1,0 +1,23 @@
+<div class="glow-hover project-tile" (contextmenu)="contextMenu($event)" (click)="click()">
+    <div *ngIf="showMenu" class="absolute w-full h-full rounded-3xl backdrop-blur-sm flex items-center justify-evenly">
+        <button class="w-16 h-16 rounded-full bg-overlay p-3">
+            <img src="assets/icon/load.svg">
+        </button>
+        <button class="w-16 h-16 rounded-full bg-overlay p-3" (click)="editProject()">
+            <img src="assets/icon/edit.svg">
+        </button>
+        <button class="w-16 h-16 rounded-full bg-overlay p-3" (click)="deleteProject()">
+            <img src="assets/icon/remove.svg">
+        </button>
+    </div>
+
+    <img [src]="getBackground()" class="absolute w-full h-full rounded-3xl z-[-1]">
+    <div class="bg-overlay rounded-2xl m-3 flex">
+        <img [src]="getImage()" class="rounded-2xl h-20 w-20">
+        <div class="grow content-center px-2">
+            <span class="text-2xl font-bold">{{project!.name}}</span>
+            <div class="h-1"></div>
+            <span class="text-lg">{{project!.description}}</span>
+        </div>
+    </div>
+</div>

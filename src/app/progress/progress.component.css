@@ -1,0 +1,39 @@
+/* Tree */
+
+.p-treenode-content {
+    margin: 8px 0;
+    display: flex;
+    gap: 5px;
+}
+
+.p-treenode-children {
+    margin-left: 15px;
+}
+
+/* Progress Bar */
+
+.process .p-progressbar {
+    height: 24px;
+    border-radius: 8px;
+    background-color: theme('colors.back.3');
+}
+
+.process .p-progressbar-value {
+    border-radius: 8px;
+    background-color: theme('colors.main.tr');
+}
+
+.task .p-progressbar {
+    height: 20px;
+    border-radius: 8px;
+    background-color: theme('colors.back.4');
+}
+
+.task .p-progressbar-value {
+    border-radius: 8px;
+    background-color: theme('colors.main.DEFAULT');
+}
+
+.p-progressbar-determinate .p-progressbar-value-animate {
+    transition: width 0.2s ease-in-out;
+}

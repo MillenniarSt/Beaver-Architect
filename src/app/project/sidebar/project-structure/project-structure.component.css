@@ -1,0 +1,23 @@
+.createFiles {
+  display: none;
+}
+
+.folder:hover + .createFiles, .createFiles:hover {
+  display: flex;
+}
+
+/* TreeView */
+
+.p-treenode-content {
+  margin: 3px 0;
+  display: flex;
+  gap: 5px;
+}
+
+.p-treenode-label {
+  width: calc(100% - 30px);
+}
+
+.p-treenode-children {
+  margin-left: 12px;
+}

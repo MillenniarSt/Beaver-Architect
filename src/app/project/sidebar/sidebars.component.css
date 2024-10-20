@@ -1,0 +1,15 @@
+.bar-icon {
+    padding: 8px;
+    border-radius: 10px;
+    height: 52px;
+    width: 52px;
+    cursor: pointer;
+}
+
+.bar-icon:hover {
+    background-color: theme('colors.main-hover.tr');
+}
+
+.bar-icon-selected {
+    background-color: theme('colors.main.tr');
+}

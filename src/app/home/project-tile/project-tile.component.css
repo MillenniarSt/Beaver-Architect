@@ -1,0 +1,15 @@
+.project-tile {
+    width: 100%;
+    border-radius: 25px;
+    filter: drop-shadow(0 5px 10px black);
+    align-content: center;
+    cursor: pointer;
+}
+
+.project-tile::before {
+    border-radius: 25px;
+}
+
+.project-tile:hover {
+    filter: drop-shadow(0 10px 20px black);
+}

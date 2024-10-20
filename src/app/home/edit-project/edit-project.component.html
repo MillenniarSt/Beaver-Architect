@@ -1,0 +1,102 @@
+<div class="h-full flex flex-col gap-5 p-3">
+    <div class="flex">
+        <img *ngIf="page > 0; else arrowEmpty" class="icon-button" src="assets/icon/left.svg" (click)="switchPage(-1)">
+        <span class="grow text-center font-semibold text-lg place-self-center">{{pages[page]}}</span>
+        <img *ngIf="page < 2; else arrowEmpty" class="icon-button" src="assets/icon/right.svg" (click)="switchPage(+1)">
+
+        <ng-template #arrowEmpty>
+            <div class="w-[32px]"></div>
+        </ng-template>
+    </div>
+
+
+    <form #projectform="ngForm" class="grow flex flex-col gap-4">
+        <div *ngIf="page === 0" class="page flex flex-col gap-6">
+            <div class="flex gap-4 h-32">
+                <div [class]="'type' + (type === 'world' ? ' glow' : '')" (click)="setType('world')">
+                    <img class="type-icon" src="assets/icon/world.svg">
+                    <span class="type-title">World</span>
+                </div>
+                <div [class]="'type' + (type === 'structure' ? ' glow' : '')" (click)="setType('structure')">
+                    <img class="type-icon" src="assets/icon/structure.svg">
+                    <span class="type-title">Structure</span>
+                </div>
+                <div [class]="'type' + (type === 'terrain' ? ' glow' : '')" (click)="setType('terrain')">
+                    <img class="type-icon" src="assets/icon/terrain.svg">
+                    <span class="type-title">Terrain</span>
+                </div>
+                <div [class]="'type' + (type === 'biome' ? ' glow' : '')" (click)="setType('biome')">
+                    <img class="type-icon" src="assets/icon/biome.svg">
+                    <span class="type-title">Biome</span>
+                </div>
+                <div [class]="'type' + (type === 'data_pack' ? ' glow' : '')" (click)="setType('data_pack')">
+                    <img class="type-icon" src="assets/icon/data-pack.svg">
+                    <span class="type-title">Data Pack</span>
+                </div>
+            </div>
+            <div class="grow relative flex place-content-center items-center">
+                <img class="absolute -translate-y-8 h-full blur-3xl" [src]="getArchitectIcon()">
+                <img class="absolute -translate-y-8 h-3/5" [src]="getArchitectIcon()">
+                <span class="translate-y-8 font-semibold text-2xl">{{getArchitectName()}}</span>
+                <button *ngIf="selectArchitect > 0"
+                    class="absolute left-8 top-10 bottom-10 rounded-2xl hover:bg-back-3 flex items-center"
+                    (click)="setArchitect(selectArchitect -1)">
+                    <img class="icon" src="assets/icon/left.svg">
+                </button>
+                <button *ngIf="selectArchitect < architects.length -1"
+                    class="absolute right-8 top-10 bottom-10 rounded-2xl hover:bg-back-3 flex items-center"
+                    (click)="setArchitect(selectArchitect +1)">
+                    <img class="icon" src="assets/icon/right.svg">
+                </button>
+                <div class="absolute bottom-0 rounded-2xl h-14 p-2 bg-back-3 flex gap-3">
+                    <img *ngFor="let architect of architects; index as i" class="cursor-pointer" [src]="getArchitectIcon(i)" (click)="setArchitect(i)">
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="page === 1" class="page flex flex-col gap-3">
+            <div class="flex gap-4">
+                <div class="grow">
+                    <label for="name">Name</label>
+                    <input id="name" name="name" [(ngModel)]="project.name" #nameInput="ngModel" required
+                        [ngClass]="{'invalid': nameInput.invalid && nameInput.touched}">
+                </div>
+                <div class="grow">
+                    <label for="identifier">Identifier</label>
+                    <input id="identifier" name="identifier" [(ngModel)]="project.identifier" #identifierInput="ngModel"
+                        required [ngClass]="{'invalid': identifierInput.invalid && identifierInput.touched}">
+                </div>
+            </div>
+            <div>
+                <label for="authors">Authors</label>
+                <input id="authors" name="authors" [(ngModel)]="project.authors" #authorsInput="ngModel"
+                    [ngClass]="{'invalid': authorsInput.invalid && authorsInput.touched}">
+            </div>
+            <div>
+                <label for="description">Description</label>
+                <input id="description" name="description" [(ngModel)]="project.description" #descriptionInput="ngModel"
+                    [ngClass]="{'invalid': descriptionInput.invalid && descriptionInput.touched}">
+            </div>
+            <div></div>
+            <div class="grow flex gap-4">
+                <image-picker title="Image" [image]="project.image" class="grow" (changeImage)="project.image = $event"></image-picker>
+                <image-picker title="Background" [image]="project.background" class="grow"
+                    (changeImage)="project.background = $event"></image-picker>
+            </div>
+        </div>
+
+        <div *ngIf="page === 2" class="page">
+            <md-editor name="Content" [(ngModel)]="project.info" [height]="'100%'">
+                <slot custom-btns></slot>
+            </md-editor>
+        </div>
+
+
+        <hr class="mx-3">
+        <div class="flex flex-row-reverse gap-2">
+            <button [class]="isNew && page !== 2 ? 'secondary-button' : 'decorated-button glow'" (click)="submit()"
+                [disabled]="(isNew && page !== 2) || !projectform.valid">{{isNew ? 'Create' : 'Apply'}}</button>
+            <button class="secondary-button" (click)="close()">Cancel</button>
+        </div>
+    </form>
+</div>

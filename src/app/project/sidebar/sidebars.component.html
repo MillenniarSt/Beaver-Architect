@@ -1,0 +1,13 @@
+<div class="flex h-full gap-1">
+    
+    <div class="flex flex-col p-2 gap-1">
+        <img *ngFor="let bar of bars; index as i" class="bar-icon" [ngClass]="{'bar-icon-selected': i === selectIndex}"
+            [src]="bar.icon"
+            (click)="select(i)"
+        >
+    </div>
+
+    <div *ngIf="expanded" class="grow my-2 panel">
+        <ng-container *ngComponentOutlet="bars[selectIndex].component" class="h-full"></ng-container>
+    </div>
+</div>

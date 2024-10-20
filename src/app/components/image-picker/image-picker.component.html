@@ -1,0 +1,20 @@
+<div class="h-full relative cursor-pointer" (click)="chooseImage()">
+    <ng-template *ngIf="image; then displayImage else displayNone"></ng-template>
+
+    <ng-template #displayImage>
+        <span class="absolute top-2 left-2 py-1 px-2 rounded-lg bg-overlay">{{title}}</span>
+        <span class="absolute bottom-0 left-0 right-0 py-1 px-2 rounded-b-2xl bg-overlay text-sm">{{image}}</span>
+        <button class="absolute top-2 right-2 icon-button" (click)="removeImage()">
+            <img src="assets/icon/remove.svg">
+        </button>
+        <img [src]="image" class="-z-10 h-full rounded-2xl">
+    </ng-template>
+
+    <ng-template #displayNone>
+        <span class="absolute top-2 left-2 py-1 px-2 rounded-lg">{{title}}</span>
+        <div class="h-full rounded-2xl bg-back-3 flex flex-col place-content-center items-center">
+            <img src="assets/icon/add-image.svg" class="w-1/4">
+            <span class="font-semibold">Choose an Image</span>
+        </div>
+    </ng-template>
+</div>

@@ -1,0 +1,18 @@
+<div class='dialog-container'>
+    <div class="dialog">
+        <span class="text-2xl font-semibold text-center">{{name}}</span>
+        <p>{{message}}</p>
+        <p class="dialog-stack">{{stack}}</p>
+        <div *ngIf="errno || syscall" class="flex">
+            <span class="grow text-center text-sm">Code: {{errno}}</span>
+            <span class="grow text-center text-sm">System: {{syscall}}</span>
+        </div>
+        <span *ngIf="url" class="text-sm">> {{url}}</span>
+        <div class='dialog-button-region'>
+            <button class="rounded-2xl grow bg-error" (click)="close()">OK</button>
+        </div>
+    </div>
+    <img src="assets/icon/error.svg" class="dialog-icon">
+    <img src="assets/icon/report.svg" class='absolute top-[73px] right-[18px] h-10 w-10 cursor-pointer'
+        (click)="report()">
+</div>

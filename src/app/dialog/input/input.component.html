@@ -1,0 +1,15 @@
+<div class='dialog-container'>
+    <div class="dialog" [ngClass]="color">
+        <span class="text-2xl font-semibold text-center">{{title}}</span>
+        <p class='grow'>{{message}}</p>
+        <form #form="ngForm">
+            <input [placeholder]="placeholder" [(ngModel)]="value" #input="ngModel" required
+                [ngClass]="{'invalid': input.invalid && input.touched}">
+        </form>
+        <div class='dialog-button-region'>
+            <button class="rounded-2xl grow bg-main-acc glow" (click)="send()">OK</button>
+            <button class="rounded-2xl grow bg-back-3" (click)="close()">Cancel</button>
+        </div>
+    </div>
+    <img [src]="icon" class="dialog-icon">
+</div>

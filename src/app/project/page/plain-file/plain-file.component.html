@@ -1,0 +1,8 @@
+<div class="h-full flex flex-col gap-2">
+    <div class="flex">
+        <span class="grow text-lg font-semibold">{{name}}</span>
+        <button class="decorated-button" (click)="save()" *ngIf="!isSaved">Save</button>
+    </div>
+    <textarea class="grow" [(ngModel)]="text" (ngModelChange)="change()"></textarea>
+    <span class="text-sm font-semibold">> {{path}}</span>
+</div>
