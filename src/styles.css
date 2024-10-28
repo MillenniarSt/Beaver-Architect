@@ -84,7 +84,22 @@ textarea:focus-visible {
   outline: theme("colors.main-focus.DEFAULT");
 }
 
-/* Scroll Bar */
+select {
+  background-color: transparent;
+  border: solid 2px theme("colors.main-acc.DEFAULT");
+  border-radius: 10px;
+  padding: 2px 8px;
+}
+
+select option {
+  background-color: theme("colors.back.3");
+}
+
+select option:checked {
+  background-color: theme("colors.main.tr");
+}
+
+/* WebKit */
 
 ::-webkit-scrollbar {
   width: 10px;
@@ -106,6 +121,12 @@ textarea:focus-visible {
 
 ::-webkit-scrollbar-corner {
   background: transparent;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 /* Utilities */
@@ -206,6 +227,10 @@ textarea:focus-visible {
   border: solid 3px theme('colors.main.tr');
   border-radius: 15px;
   padding: 10px 15px;
+}
+
+.input-small {
+  padding: 5px 10px;
 }
 
 .input-label {

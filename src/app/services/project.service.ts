@@ -18,9 +18,7 @@ export type PageMessage = {
   selectPage?: number
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class ProjectService {
 
   _project?: Project

@@ -8,9 +8,16 @@
 </ng-template>
 
 <ng-template #display>
-    <div class="absolute top-3 bottom-3 right-3 w-1/4 panel">
-        
-    </div>
-    <ngt-canvas [sceneGraph]="sceneGraph!">
-    </ngt-canvas>
+    <as-split direction="horizontal" class="h-full">
+        <as-split-area [size]="75" [minSize]="20">
+            <div class="rounded-2xl border-2 border-main-tr h-full">
+                <ngt-canvas [sceneGraph]="sceneGraph!"/>
+            </div>
+        </as-split-area>
+        <as-split-area [size]="25" [minSize]="15">
+            <div class="panel h-full">
+                <form-util [inputs]="formDataInput" (edit)="editSelection($event)" class="my-1"/>
+            </div>
+        </as-split-area>
+    </as-split>
 </ng-template>

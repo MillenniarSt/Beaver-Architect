@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Material, MeshBasicMaterial, NearestFilter, SRGBColorSpace, Texture, TextureLoader } from 'three';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class RenderService {
 
   private readonly loader = new TextureLoader()

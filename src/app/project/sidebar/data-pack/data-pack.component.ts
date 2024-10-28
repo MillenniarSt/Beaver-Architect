@@ -59,7 +59,7 @@ export class DataPackComponent implements OnInit {
   load(): void {
     const mainDir = `projects\\${this.ps.project.identifier}\\data_pack\\${this.selectedFolder.folder}`
 
-    this.server.get('file/read-all-dir', { path: mainDir }, this, (entries) => {
+    this.server.get('file/read-all-dir', { path: mainDir, relPaths: 'true' }, this, (entries) => {
       this.tree = [{
         label: this.selectedFolder.title,
         icon: 'pi pi-folder',

@@ -44,7 +44,13 @@ module.exports = {
         },
 
         'warn': '#f28618',
-        'error': '#da3333'
+        'error': '#da3333',
+
+        'axis': {
+          x: '#ed0c15',
+          y: '#1cd715',
+          z: '#0825db'
+        }
       }
     },
   },

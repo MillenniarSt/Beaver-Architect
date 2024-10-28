@@ -1,1 +1,61 @@
-<p>form works!</p>
+<form [formGroup]="form" class="flex flex-col gap-5">
+    <ng-container *ngFor="let input of inputs">
+        <ng-container [ngSwitch]="input.type">
+            <div *ngSwitchCase="'separator'" class="mt-1">
+                <span class="text-lg">{{input.name}}</span>
+            </div>
+
+            <div *ngSwitchCase="'checkbox'" class="flex gap-2">
+                <input type="checkbox" [formControlName]="input.id!">
+                <span class="text-fore-2">{{input.name}}</span>
+            </div>
+
+            <div *ngSwitchCase="'select'" class="flex gap-1 items-center">
+                <span class="text-fore-2">{{input.name}}</span>
+                <div class="grow"></div>
+                <select [formControlName]="input.id!">
+                    <option *ngFor="let option of input.options" [value]="option.value">{{ option.label }}</option>
+                </select>
+            </div>
+
+            <div *ngSwitchDefault class="flex flex-col gap-1">
+                <label class="ml-2 text-sm text-fore-2">{{input.name}}</label>
+                <ng-container [ngSwitch]="input.type">
+
+                    <input *ngSwitchCase="'text'" [formControlName]="input.id!"
+                        [placeholder]="input.options?.placeholder" class="input-small">
+                    <input *ngSwitchCase="'email'" type="email" [formControlName]="input.id!"
+                        [placeholder]="input.options?.placeholder" class="input-small">
+                    <input *ngSwitchCase="'password'" type="password" [formControlName]="input.id!" class="input-small">
+
+                    <input *ngSwitchCase="'date'" type="date" [formControlName]="input.id!">
+                    <input *ngSwitchCase="'datetime'" type="datetime-local" [formControlName]="input.id!">
+                    <input *ngSwitchCase="'time'" type="time" [formControlName]="input.id!">
+                    <input *ngSwitchCase="'month'" type="month" [formControlName]="input.id!">
+                    <input *ngSwitchCase="'week'" type="week" [formControlName]="input.id!">
+
+                    <input *ngSwitchCase="'number'" type="number" [formControlName]="input.id!" class="input-small">
+                    <input *ngSwitchCase="'range'" type="range" [formControlName]="input.id!">
+
+                    <div *ngSwitchCase="'radio'" class="flex flex-col gap-1">
+                        <div *ngFor="let radio of input.options" class="flex gap-2">
+                            <input type="radio" [formControlName]="input.id!" [value]="radio.value">
+                            <span class="text-fore-2">{{radio.name}}</span>
+                        </div>
+                    </div>
+
+                    <div *ngSwitchCase="'vec2'" class="flex gap-2">
+                        <input type="number" [formControlName]="input.id! + '-0'" class="border-axis-x input-small">
+                        <input type="number" [formControlName]="input.id! + '-1'" class="border-axis-z input-small">
+                    </div>
+
+                    <div *ngSwitchCase="'vec3'" class="flex gap-2">
+                        <input type="number" [formControlName]="input.id! + '-0'" class="border-axis-x input-small">
+                        <input type="number" [formControlName]="input.id! + '-1'" class="border-axis-y input-small">
+                        <input type="number" [formControlName]="input.id! + '-2'" class="border-axis-z input-small">
+                    </div>
+                </ng-container>
+            </div>
+        </ng-container>
+    </ng-container>
+</form>

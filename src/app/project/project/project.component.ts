@@ -18,7 +18,8 @@ import { Project } from '../../../types';
   imports: [NgIf, AngularSplitModule, SidebarsComponent, PagesComponent, NgClass],
   templateUrl: './project.component.html',
   styleUrl: './project.component.css',
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  providers: [ProjectService, RenderService]
 })
 export class ProjectComponent {
 
