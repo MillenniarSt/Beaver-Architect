@@ -7,6 +7,18 @@ const { createSettingsWindow } = require('../settings/window')
 const projectsWin = new Map()
 
 function createWindow(identifier) {
+    const win = new BrowserWindow({
+        width: 1200,
+        height: 800,
+        minWidth: 800,
+        minHeight: 600,
+        roundedCorners: true,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false
+        }
+    })
+
     Menu.setApplicationMenu(Menu.buildFromTemplate([
         {
             label: 'File',
@@ -21,20 +33,14 @@ function createWindow(identifier) {
                 } },
                 { label: 'Exit', click: () => close(identifier) }
             ]
+        },
+        {
+            label: 'Dev',
+            submenu: [
+                { label: 'Tools', click: () => win.webContents.openDevTools(), accelerator: 'Ctrl+Shift+I' }
+            ]
         }
     ]))
-
-    const win = new BrowserWindow({
-        width: 1200,
-        height: 800,
-        minWidth: 800,
-        minHeight: 600,
-        roundedCorners: true,
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false
-        }
-    })
 
     win.maximize()
 

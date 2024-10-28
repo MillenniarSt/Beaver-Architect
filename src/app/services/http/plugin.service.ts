@@ -27,12 +27,12 @@ export class PluginsService {
 
   ensurePlugins(electron: ElectronService): Promise<void> {
     return new Promise((resolve) => {
-      if (!this.plugins) {
-        electron.ipcRenderer.invoke('plugin:load-all')
+      if (this.plugins.length === 0) {
         electron.ipcRenderer.once('plugin:send-all', (e, data) => {
           this.plugins = data
           resolve()
         })
+        electron.ipcRenderer.invoke('plugin:init-all')
       } else {
         resolve()
       }

@@ -3,7 +3,7 @@ import { extend, NgtCanvas, NgtArgs, NGT_STORE } from 'angular-three';
 import * as THREE from 'three';
 import { CubeComponent } from '../../../render/cube.component';
 import { RenderCube, RenderService } from '../../../services/render.service';
-import { SceneService } from '../../../services/scene.service';
+import { SceneObject, SceneService } from '../../../services/scene.service';
 import { OrbitControls } from 'three-stdlib';
 import { ProjectService } from '../../../services/project.service';
 import { PluginDirection, PluginsService } from '../../../services/http/plugin.service';
@@ -25,6 +25,18 @@ extend({ OrbitControls })
 export class SchematicComponent implements OnInit {
 
   @Input() index!: number
+
+  selectObjects: SceneObject[] = [{
+    position: [0, 0, 0],
+    key: 'test',
+    properties: {
+      'string': 'String',
+      'combo': 'option',
+      'number': 0,
+      'boolean': true
+    },
+    models: []
+  }]
 
   sceneGraph?: Type<SceneGraph>
 
@@ -67,9 +79,9 @@ class SceneGraph implements OnInit {
   ngOnInit(): void {
     this.scene.data.objects.forEach((object) => {
       object.models.forEach((modelRef) => {
-        const model = this.render.getModel(modelRef.key)
+        const model = this.render.getModel(modelRef)
         if(model) {
-          this.cubes = [...this.cubes, ...model.cubes.map((cube) => cube.modify(modelRef.position, modelRef.size, modelRef.rotation))]
+          this.cubes = [...this.cubes, ...model.cubes.map((cube) => cube.modify(object.position, object.size, object.rotation))]
         }
       })
     })

@@ -35,7 +35,27 @@ app.whenReady().then(() => {
 
 let plugins = []
 
+ipcMain.handle('plugin:init-all', async (e) => {
+    if(plugins.length === 0) {
+        loadAllPlugins(e)
+    } else {
+        sendAllPlugins(e.sender)
+    }
+})
+
 ipcMain.handle('plugin:load-all', async (e) => {
+    loadAllPlugins(e)
+})
+
+ipcMain.handle('plugin:get-all', async (e) => {
+    sendAllPlugins(e.sender)
+})
+
+function sendAllPlugins(sender) {
+    sender.send('plugin:send-all', plugins)
+}
+
+async function loadAllPlugins(e) {
     plugins = []
     const pluginsDir = `${getAppDataPath("Beaver Architect")}\\plugins`
     const dirs = fs.readdirSync(pluginsDir)
@@ -43,12 +63,8 @@ ipcMain.handle('plugin:load-all', async (e) => {
         await loadPlugin(path.join(pluginsDir, dirs[i]))
         e.sender.send('plugin:loaded', i / (dirs.length - 1))
     }
-    e.sender.send('plugin:send-all', plugins)
-})
-
-ipcMain.handle('plugin:get-all', async (e) => {
-    e.sender.send('plugin:send-all', plugins)
-})
+    sendAllPlugins(e.sender)
+}
 
 function loadPlugin(dir) {
     return new Promise((resolve) => {
