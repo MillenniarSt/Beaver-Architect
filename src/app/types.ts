@@ -14,19 +14,9 @@ export type Project = {
 }
 
 export type Architect = {
-    identifier: string
+    identifier: string,
 
     name: string,
-    info?: string,
-
-    port: number
-}
-
-export type Plugin = {
-    identifier: string
-
-    name: string,
-    info?: string,
-
+    icon?: string,
     port: number
 }

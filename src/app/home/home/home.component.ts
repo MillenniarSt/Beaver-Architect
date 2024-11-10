@@ -2,7 +2,7 @@ import { NgClass, NgFor, NgIf } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { ProjectsComponent } from "../projects/projects.component";
 import { EditProjectComponent } from "../edit-project/edit-project.component";
-import { Project } from '../../../types';
+import { Project } from '../../types';
 import { ElectronService } from 'ngx-electron';
 
 @Component({

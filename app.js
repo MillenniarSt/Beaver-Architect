@@ -31,56 +31,6 @@ app.whenReady().then(() => {
     })
 })
 
-// Load Plugins
-
-let plugins = []
-
-ipcMain.handle('plugin:init-all', async (e) => {
-    if(plugins.length === 0) {
-        loadAllPlugins(e)
-    } else {
-        sendAllPlugins(e.sender)
-    }
-})
-
-ipcMain.handle('plugin:load-all', async (e) => {
-    loadAllPlugins(e)
-})
-
-ipcMain.handle('plugin:get-all', async (e) => {
-    sendAllPlugins(e.sender)
-})
-
-function sendAllPlugins(sender) {
-    sender.send('plugin:send-all', plugins)
-}
-
-async function loadAllPlugins(e) {
-    plugins = []
-    const pluginsDir = `${getAppDataPath("Beaver Architect")}\\plugins`
-    const dirs = fs.readdirSync(pluginsDir)
-    for (let i = 0; i < dirs.length; i++) {
-        await loadPlugin(path.join(pluginsDir, dirs[i]))
-        e.sender.send('plugin:loaded', i / (dirs.length - 1))
-    }
-    sendAllPlugins(e.sender)
-}
-
-function loadPlugin(dir) {
-    return new Promise((resolve) => {
-        const pluginProcess = fork(`${dir}\\src\\index.js`, {
-            cwd: dir,
-            stdio: 'inherit',
-        });
-
-        pluginProcess.on('message', (data) => {
-            plugins.push(data)
-            console.log(`Loaded Plugin: ${data.identifier}`)
-            resolve()
-        })
-    })
-}
-
 // System Info
 
 ipcMain.handle('get:user_name', () => {

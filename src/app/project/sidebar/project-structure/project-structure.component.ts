@@ -5,7 +5,7 @@ import { ProjectService } from '../../../services/project.service';
 import { NgIf } from '@angular/common';
 import { baseErrorDialog, openBaseDialog, openInputDialog } from '../../../dialog/dialogs';
 import { PlainFileComponent } from '../../page/plain-file/plain-file.component';
-import { ServerService } from '../../../services/http/server.service';
+import { ServerService } from '../../../services/server.service';
 
 type File = {
   name: string,
@@ -25,15 +25,15 @@ export class ProjectStructureComponent implements OnInit {
 
   @Input() tree: TreeNode[] = []
 
-  constructor(private cdr: ChangeDetectorRef, private server: ServerService, private ps: ProjectService) { }
+  constructor(private cdr: ChangeDetectorRef, private ps: ProjectService) { }
 
   ngOnInit(): void {
-    this.loadProjetct()
+    this.loadProject()
   }
 
-  loadProjetct(): void {
-    this.server.get('file/read-all-dir', { path: `projects\\${this.ps.project.identifier}` }, this, (entries) => {
-      this.tree = this.loadDir(entries)
+  loadProject(): void {
+    this.ps.server.request('file/read-all-dir', { path: '' }).then((data) => {
+      this.tree = this.loadDir(data)
 
       this.cdr.detectChanges()
     })
@@ -88,18 +88,15 @@ export class ProjectStructureComponent implements OnInit {
 
     const path = `${folder}\\${file}`
 
-    this.server.get('file/exists', { path: path }, this, (exists) => {
-      if (!exists) {
-        this.server.post('file/write-text', { path: path }, this, () => {
-          this.addFile(node, {
-            name: file,
-            path: path
-          })
-        })
-      } else {
-        openBaseDialog(baseErrorDialog('File Exists', `Could not create new file ${file}, it already exists in the folder ${folder}`))
-      }
-    })
+    if(!(await this.ps.server.request('file/exists', { path: path }))) {
+      this.ps.server.send('file/write-text', { path: path, data: '' })
+      this.addFile(node, {
+        name: file,
+        path: path
+      })
+    } else {
+      openBaseDialog(baseErrorDialog('File Exists', `Could not create new file ${file}, it already exists in the folder ${folder}`))
+    }
   }
 
   async newDir(node: TreeNode, parentFolder: string) {
@@ -111,19 +108,16 @@ export class ProjectStructureComponent implements OnInit {
 
     const path = `${parentFolder}\\${folder}`
 
-    this.server.get('file/exists', { path: path }, this, (exists) => {
-      if (!exists) {
-        this.server.post('file/mkdirs', { path: path }, this, () => {
-          this.addFile(node, {
-            name: folder,
-            path: path,
-            children: []
-          })
-        })
-      } else {
-        openBaseDialog(baseErrorDialog('Folder Exists', `Could not create new folder ${folder}, it already exists in the folder ${parentFolder}`))
-      }
-    })
+    if(!(await this.ps.server.request('file/exists', { path: path }))) {
+      this.ps.server.send('file/mkdirs', { path: path })
+      this.addFile(node, {
+        name: folder,
+        path: path,
+        children: []
+      })
+    } else {
+      openBaseDialog(baseErrorDialog('Folder Exists', `Could not create new folder ${folder}, it already exists in the folder ${parentFolder}`))
+    }
   }
 
   addFile(node: TreeNode, file: File) {

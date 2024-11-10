@@ -1,0 +1,25 @@
+.node-actions {
+  display: none;
+}
+
+.node-area:hover + .node-actions,
+.node-actions:hover, 
+.node-selected > .node-actions {
+  display: flex;
+}
+
+.node-hover:hover {
+  background-color: theme('colors.main-hover.tr');
+  border-radius: 5px;
+}
+
+.node-selected {
+  background-color: theme('colors.main.tr');
+  border-radius: 5px;
+}
+
+:host ::ng-deep {
+  [pDraggable] {
+      cursor: move;
+  }
+}

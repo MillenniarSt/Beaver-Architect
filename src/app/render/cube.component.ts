@@ -19,7 +19,7 @@ export class CubeComponent {
 
     @Input() render!: RenderCube
 
-    @Output() click = new EventEmitter<void>()
+    @Output() click = new EventEmitter<number>()
 
     onAttached(geometry: THREE.BoxGeometry) {
         if (this.render.uvs) {
@@ -58,6 +58,6 @@ export class CubeComponent {
             console.log('Normale della faccia cliccata:', normal);
         }*/
 
-        this.click.emit()
+        this.click.emit(event.button)
     }
 }

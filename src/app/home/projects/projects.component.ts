@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { ServerService } from '../../services/http/server.service';
+import { ServerService } from '../../services/server.service';
 import { NgFor, NgIf } from '@angular/common';
 import { ProjectTileComponent } from '../project-tile/project-tile.component';
-import { Architect, Project } from '../../../types';
+import { Architect, Project } from '../../types';
 
 @Component({
   selector: 'projects',
@@ -25,7 +25,7 @@ export class ProjectsComponent implements OnInit, OnChanges {
   selectedArchitect: number = 0
 
   ngOnInit(): void {
-    this.server.get('architects', {}, this, (data: any[]) => this.architects = [{ identifier: '', name: 'All' }, ...data])
+    this.server.get('architects').then(({data}) => this.architects = [{ identifier: '', name: 'All' }, ...data])
     this.reloadProjects()
   }
 
@@ -38,9 +38,9 @@ export class ProjectsComponent implements OnInit, OnChanges {
       this.server.get('projects', this.type ?
         { type: this.type, architect: this.architects[this.selectedArchitect].identifier } :
         { architect: this.architects[this.selectedArchitect].identifier },
-        this, (data: any[]) => this.projects = data)
+      ).then(({data}) => this.projects = data)
     } else {
-      this.server.get('projects', this.type ? { type: this.type } : {}, this, (data: any[]) => this.projects = data)
+      this.server.get('projects', this.type ? { type: this.type } : {}).then(({data}) => this.projects = data)
     }
   }
 
@@ -54,6 +54,6 @@ export class ProjectsComponent implements OnInit, OnChanges {
   }
 
   doDeleteProject(identifier: string): void {
-    this.server.delete('projects', identifier, this, (_) => this.reloadProjects())
+    this.server.delete(`projects/${identifier}`).then(() => this.reloadProjects())
   }
 }

@@ -2,88 +2,108 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { extend } from 'angular-three';
 import * as THREE from 'three';
-import { ObjectManagerData, ObjectManagerModes } from '../render/object-manager.component';
+import { EditGraph } from '../render/edit-graph.component';
 
 extend(THREE)
 
 export type SceneData = {
+  elements: ElementView[]
+}
+
+export type ElementView = {
+  id: string,
   objects: SceneObject[]
 }
 
-export type SceneUpdate = {
-  id: string,
-  object: SceneObject
-}
-
 export type SceneObject = {
-  id: string,
-
   position: [number, number, number],
   size?: [number, number, number],
   rotation?: [number, number, number],
 
-  models: string[],
+  models: string[]
+}
 
-  center?: [number, number, number]
+export type ElementNode = {
+  id: string,
+  label: string,
+  isGroup?: boolean,
+  children?: ElementNode[]
+}
+
+export type SceneUpdate = {
+  id: string,
+  mode?: 'push' | 'delete'
+
+  view?: ElementView
 }
 
 @Injectable()
-export class SceneService<Selectable extends Object> {
-
-  camera!: THREE.Camera
+export class SceneService<Update extends SceneUpdate> {
 
   data: SceneData = {
-    objects: []
+    elements: []
   }
 
-  private updatesMessageSource = new BehaviorSubject<SceneUpdate[]>([])
+  private updatesMessageSource = new BehaviorSubject<Update[]>([])
   updatesMessage = this.updatesMessageSource.asObservable()
 
-  update(updates: SceneUpdate[]) {
+  update(updates: Update[]) {
     this.updatesMessageSource.next(updates)
   }
 
-  selection: Selectable[] = []
-
-  private selectionMessageSource = new BehaviorSubject<Selectable[]>([])
-  selectionMessage = this.selectionMessageSource.asObservable()
-
-  private editSelectionMessageSource = new BehaviorSubject<{ object: string, data: ObjectManagerData} | undefined>(undefined)
-  editSelectionMessage = this.editSelectionMessageSource.asObservable()
-
-  editSelection(object?: string, data?: ObjectManagerData) {
-    this.editSelectionMessageSource.next(object && data ? {object, data} : undefined)
+  onUpdate(onUpdate: (element: Update) => void, mode?: 'push' | 'delete') {
+    this.updatesMessage.subscribe((updates) => {
+      updates.forEach((update) => {
+        if(update.mode === mode) {
+          onUpdate(update)
+        }
+      })
+    })
   }
+
+  private editGraphMessageSource = new BehaviorSubject<EditGraph | undefined>(undefined)
+  editGraphMessage = this.editGraphMessageSource.asObservable()
+
+  updateEditGraph(editGraph?: EditGraph) {
+    this.editGraphMessageSource.next(editGraph)
+  }
+
+  selection: string[] = []
+
+  private selectionMessageSource = new BehaviorSubject<string[]>([])
+  selectionMessage = this.selectionMessageSource.asObservable()
 
   clearSelection() {
     this.selection = []
     this.updateSelection()
   }
 
-  setSelection(selection: Selectable[]) {
+  setSelection(selection: string[]) {
     this.selection = selection
     this.updateSelection()
   }
 
-  select(selected: Selectable) {
+  select(selected: string) {
     this.selection = [selected]
     this.updateSelection()
   }
 
-  addOrRemoveToSelection(selected: Selectable) {
+  selectOrClear(selected: string) {
     if(this.selection.includes(selected)) {
-      this.removeToSelection(selected)
+      this.clearSelection()
     } else {
-      this.addToSelection(selected)
+      this.select(selected)
     }
   }
 
-  addToSelection(selected: Selectable) {
-    this.selection.push(selected)
-    this.updateSelection()
+  addToSelection(selected: string) {
+    if(!this.selection.includes(selected)) {
+      this.selection.push(selected)
+      this.updateSelection()
+    }
   }
 
-  removeToSelection(selected: Selectable) {
+  removeToSelection(selected: string) {
     const index = this.selection.indexOf(selected)
     if (index !== -1) {
       this.selection = this.selection.splice(index, 1)
@@ -91,25 +111,19 @@ export class SceneService<Selectable extends Object> {
     }
   }
 
+  addOrRemoveToSelection(selected: string) {
+    if (this.selection.includes(selected)) {
+      this.removeToSelection(selected)
+    } else {
+      this.addToSelection(selected)
+    }
+  }
+
   updateSelection() {
     this.selectionMessageSource.next(this.selection)
   }
 
-  setSelectionNoUpdates(selection: Selectable[]) {
+  setSelectionNoUpdates(selection: string[]) {
     this.selection = selection
   }
-}
-
-function calculateDimensionOf(object: SceneObject): {
-  min: number[],
-  max: number[]
-} {
-  let dim = {
-    min: [Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE],
-    max: [Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE]
-  }
-
-  
-
-  return dim
 }

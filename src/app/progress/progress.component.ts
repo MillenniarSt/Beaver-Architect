@@ -7,13 +7,13 @@ import { ProgressBarModule } from 'primeng/progressbar';
 
 type Task = {
   label: string,
-  weigth: number,
+  weight: number,
   progress?: number,
   currentSubtask: number,
   currentSubtaskProgress: number,
   subtasks: {
     label: string
-    weigth: number
+    weight: number
   }[]
 }
 
@@ -55,14 +55,14 @@ export class ProgressComponent implements OnInit {
       this.tasks = data.tasks.map((task: any) => {
         return {
           label: task.label,
-          weigth: task.weigth ?? 1,
+          weight: task.weight ?? 1,
           progress: task.started === true ? 0 : undefined,
           currentSubtask: 0,
           currentSubtaskProgress: 0,
           subtasks: task.subtasks.map((subtask: any) => {
             return {
               label: subtask.label,
-              weigth: subtask.weigth ?? 1
+              weight: subtask.weight ?? 1
             }
           })
         }
@@ -127,17 +127,17 @@ export class ProgressComponent implements OnInit {
   }
 
   updateTasksProgress(): void {
-    let weigth = 0
-    let weigthCompleted = 0
+    let weight = 0
+    let weightCompleted = 0
 
     this.tasks.forEach((task) => {
       this.updateTaskProgress(task)
 
-      weigth += task.weigth
-      weigthCompleted += task.weigth * (task.progress ?? 0)
+      weight += task.weight
+      weightCompleted += task.weight * (task.progress ?? 0)
     })
 
-    this.progress = weigthCompleted / weigth
+    this.progress = weightCompleted / weight
   }
 
   updateTaskProgress(task: Task) {
@@ -150,17 +150,17 @@ export class ProgressComponent implements OnInit {
       return
     }
     
-    let weigth = 0
-    let weigthCompleted = task.subtasks[task.currentSubtask].weigth * task.currentSubtaskProgress
+    let weight = 0
+    let weightCompleted = task.subtasks[task.currentSubtask].weight * task.currentSubtaskProgress
 
     task.subtasks.forEach((subtask, i) => {
-      weigth += subtask.weigth
+      weight += subtask.weight
       if (i < task.currentSubtask) {
-        weigthCompleted += subtask.weigth
+        weightCompleted += subtask.weight
       }
     })
 
-    task.progress = weigthCompleted / weigth
+    task.progress = weightCompleted / weight
   }
 
   displayTaskProgress(task: Task): number {

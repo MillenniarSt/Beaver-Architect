@@ -2,8 +2,6 @@ import { ChangeDetectorRef, Component, Input, OnChanges, OnInit, SimpleChanges }
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
 import { ProjectService } from '../../../services/project.service';
-import { ServerService } from '../../../services/http/server.service';
-import { dir } from '../../../../paths';
 
 @Component({
   selector: 'plain-file',
@@ -19,7 +17,7 @@ export class PlainFileComponent implements OnInit, OnChanges {
   oldIndex?: number
   text: string = 'Reading...'
 
-  constructor(private cdr: ChangeDetectorRef, private ps: ProjectService, private server: ServerService) { }
+  constructor(private cdr: ChangeDetectorRef, private ps: ProjectService) { }
 
   get name(): string {
     return this.ps.getPage(this.index).data.name
@@ -38,20 +36,18 @@ export class PlainFileComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if(this.oldIndex !== this.index) {
+    if (this.oldIndex !== this.index) {
       this.loadText()
     }
   }
 
-  loadText(): void {
-    this.server.get('file/read-text', { path: this.path.substring(dir.length +1) }, this, (text) => {
-      this.text = text
+  async loadText() {
+    this.text = await this.ps.server.request('file/read-text', { path: this.path })
 
-      this.oldIndex = this.index
-      this.ps.getPage(this.index).save = this.save
+    this.oldIndex = this.index
+    this.ps.getPage(this.index).save = this.save
 
-      this.cdr.detectChanges()
-    })
+    this.cdr.detectChanges()
   }
 
   change() {
@@ -60,9 +56,9 @@ export class PlainFileComponent implements OnInit, OnChanges {
   }
 
   save(): void {
-    this.server.post('file/write-text', { path: this.path.substring(dir.length +1), data: this.text }, this, () => {
-      this.ps.getPage(this.index).isSaved = true
-      this.cdr.detectChanges()
-    })
+    this.ps.server.send('file/write-text', { path: this.path, data: this.text })
+
+    this.ps.getPage(this.index).isSaved = true
+    this.cdr.detectChanges()
   }
 }

@@ -6,8 +6,6 @@ import { SchematicComponent } from '../../page/schematic/schematic.component';
 import { baseErrorDialog, openBaseDialog, openInputDialog } from '../../../dialog/dialogs';
 import { NgClass, NgFor } from '@angular/common';
 import { StyleComponent } from '../../page/style/style.component';
-import { PluginDirection, PluginsService } from '../../../services/http/plugin.service';
-import { ServerService } from '../../../services/http/server.service';
 
 type File = {
   name: string,
@@ -50,16 +48,16 @@ export class DataPackComponent implements OnInit {
 
   tree: TreeNode[] = []
 
-  constructor(private cdr: ChangeDetectorRef, private server: ServerService, private ps: ProjectService, private plugins: PluginsService) { }
+  constructor(private cdr: ChangeDetectorRef, private ps: ProjectService) { }
 
   ngOnInit(): void {
     this.load()
   }
 
   load(): void {
-    const mainDir = `projects\\${this.ps.project.identifier}\\data_pack\\${this.selectedFolder.folder}`
+    const mainDir = `data_pack\\${this.selectedFolder.folder}`
 
-    this.server.get('file/read-all-dir', { path: mainDir, relPaths: 'true' }, this, (entries) => {
+    this.ps.server.request('file/read-all-dir', { path: mainDir }).then((data) => {
       this.tree = [{
         label: this.selectedFolder.title,
         icon: 'pi pi-folder',
@@ -69,7 +67,7 @@ export class DataPackComponent implements OnInit {
           path: mainDir
         },
         type: 'dir',
-        children: this.loadDir(entries)
+        children: this.loadDir(data)
       }]
 
       this.cdr.detectChanges()
@@ -139,21 +137,15 @@ export class DataPackComponent implements OnInit {
     file = this.fileName(file, '.json')
     const path = `${folder}\\${file}`
 
-    this.server.get('file/exists', { path: path }, this, (exists) => {
-      if (!exists) {
-        this.plugins.get(PluginDirection.ARCHITECT, 'data-pack/schematics/new', {}, this, async (data) => {
-          this.server.post('file/write-json', { path: path, data: data }, this, () => {
-            this.addFile(node, {
-              name: file,
-              path: path
-            })
-          })
-        })
-        
-      } else {
-        openBaseDialog(baseErrorDialog('File Exists', `Could not create new file ${file}, it already exists in the folder ${folder}`))
-      }
-    })
+    if(!(await this.ps.server.request('file/exists', { path: path }))) {
+      this.ps.server.send('file/write-json', { path: path, data: await this.ps.architect.request('data-pack/schematics/new') })
+      this.addFile(node, {
+        name: file,
+        path: path
+      })
+    } else {
+      openBaseDialog(baseErrorDialog('File Exists', `Could not create new file ${file}, it already exists in the folder ${folder}`))
+    }
   }
 
   async newDir(node: TreeNode, parentFolder: string) {
@@ -166,19 +158,16 @@ export class DataPackComponent implements OnInit {
     folder = this.fileName(folder)
     const path = `${parentFolder}\\${folder}`
 
-    this.server.get('file/exists', { path: path }, this, (exists) => {
-      if (!exists) {
-        this.server.post('file/mkdirs', { path: path }, this, () => {
-          this.addFile(node, {
-            name: folder,
-            path: path,
-            children: []
-          })
-        })
-      } else {
-        openBaseDialog(baseErrorDialog('Folder Exists', `Could not create new folder ${folder}, it already exists in the folder ${parentFolder}`))
-      }
-    })
+    if(!(await this.ps.server.request('file/exists', { path: path }))) {
+      this.ps.server.send('file/mkdirs', { path: path })
+      this.addFile(node, {
+        name: folder,
+        path: path,
+        children: []
+      })
+    } else {
+      openBaseDialog(baseErrorDialog('Folder Exists', `Could not create new folder ${folder}, it already exists in the folder ${parentFolder}`))
+    }
   }
 
   addFile(node: TreeNode, file: File) {

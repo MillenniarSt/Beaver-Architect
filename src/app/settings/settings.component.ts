@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { ServerService } from '../services/http/server.service';
+import { ServerService } from '../services/server.service';
 import { NgClass, NgFor, NgIf } from '@angular/common';
 
 type Settings = Record<string, {
@@ -23,8 +23,8 @@ export class SettingsComponent implements OnInit {
   constructor(private cdr: ChangeDetectorRef, private server: ServerService) { }
 
   ngOnInit(): void {
-    this.server.get('settings', {}, this, (settings) => {
-      this.settings = settings
+    this.server.get('settings').then(({data}) => {
+      this.settings = data
 
       this.cdr.detectChanges()
     })

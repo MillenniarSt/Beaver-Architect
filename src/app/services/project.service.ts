@@ -1,7 +1,8 @@
 import { Injectable, Type } from '@angular/core';
-import { Project } from '../../types';
+import { Architect, Project } from '../types';
 import { ProjectType } from '../project/types';
 import { BehaviorSubject } from 'rxjs';
+import { WebSocketServer } from '../socket';
 
 export type Page = {
   path: string,
@@ -21,8 +22,12 @@ export type PageMessage = {
 @Injectable()
 export class ProjectService {
 
+  readonly server: WebSocketServer = new WebSocketServer()
+  readonly architect: WebSocketServer = new WebSocketServer()
+
   _project?: Project
   _projectType?: ProjectType
+  _architectData?: Architect
 
   pages: Page[] = []
 
@@ -53,5 +58,9 @@ export class ProjectService {
 
   get projectType(): ProjectType {
     return this._projectType!
+  }
+
+  get architectData(): Architect {
+    return this._architectData!
   }
 }

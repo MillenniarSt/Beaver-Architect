@@ -1,0 +1,15 @@
+.right-panel {
+    position: absolute;
+    width: 25%;
+    right: 8px;
+    bottom: 8px;
+    top: 8px;
+}
+
+.bottom-panel {
+    position: absolute;
+    height: 25%;
+    bottom: 8px;
+    left: 8px;
+    right: calc(25% + 20px);
+}

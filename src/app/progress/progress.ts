@@ -7,11 +7,11 @@ export type ProgressDisplay = {
 
 export type Task = {
     label: string,
-    weigth?: number,
+    weight?: number,
     started?: boolean,
     subtasks: {
         label: string
-        weigth?: number
+        weight?: number
     }[]
 }
 

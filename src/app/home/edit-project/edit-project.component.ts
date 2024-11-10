@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
-import { Architect, Project } from '../../../types';
+import { Architect, Project } from '../../types';
 import { getArchitectDir, getProjectDir, userName } from '../../../paths';
-import { ServerService } from '../../services/http/server.service';
+import { ServerService } from '../../services/server.service';
 import { NgClass, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ImagePickerComponent } from "../../components/image-picker/image-picker.component";
@@ -57,7 +57,7 @@ export class EditProjectComponent implements OnInit {
   page: number = 0
 
   ngOnInit(): void {
-    this.server.get('architects', {}, this, (data: any[]) => {
+    this.server.get('architects').then(({data}) => {
       this.architects = data
       this.selectArchitect = this.architects.indexOf(this.architects.find((architect) => architect.identifier === this.project.architect)!)
     })
@@ -97,9 +97,9 @@ export class EditProjectComponent implements OnInit {
 
   submit(): void {
     if (this.isNew) {
-      this.server.post('projects', this.project, this, (_) => this.close())
+      this.server.post('projects', this.project).then(() => this.close())
     } else {
-      this.server.put('projects', this.project.identifier, this.project, this, (_) => this.close())
+      this.server.put('projects', this.project.identifier, this.project).then(() => this.close())
     }
   }
 }
