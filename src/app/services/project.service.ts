@@ -2,7 +2,7 @@ import { Injectable, Type } from '@angular/core';
 import { Architect, Project } from '../types';
 import { ProjectType } from '../project/types';
 import { BehaviorSubject } from 'rxjs';
-import { WebSocketServer } from '../socket';
+import { WebSocketServer } from '../../socket';
 
 export type Page = {
   path: string,

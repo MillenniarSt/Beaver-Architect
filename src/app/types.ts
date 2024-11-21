@@ -7,16 +7,13 @@ export type Project = {
     name: string
     authors: string
     description: string
-    info?: string
-
-    image?: string
-    background?: string
 }
 
 export type Architect = {
     identifier: string,
+    version: string,
 
     name: string,
-    icon?: string,
+    icon: string,
     port: number
 }

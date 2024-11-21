@@ -1,13 +1,13 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { Architect, Project } from '../../types';
-import { getArchitectDir, getProjectDir, userName } from '../../../paths';
-import { ServerService } from '../../services/server.service';
+import { getArchitectDir, getProjectDir, userName } from '../../paths';
 import { NgClass, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ImagePickerComponent } from "../../components/image-picker/image-picker.component";
 import { LMarkdownEditorModule } from 'ngx-markdown-editor';
 import { BrowserModule } from '@angular/platform-browser';
 import { HomeInteractive } from '../home/home.component';
+import { ElectronService } from 'ngx-electron';
 
 @Component({
   selector: 'edit-project',
@@ -22,44 +22,35 @@ export class EditProjectComponent implements OnInit {
   @Input() isNew: boolean = true
 
   @Input() type: string = 'world'
-  @Input() architect: string = 'generic'
 
   @Input() project: Project = {
     identifier: `${userName.toLowerCase()}.new_project`,
     type: this.type,
-    architect: this.architect,
+    architect: 'minecraft',
     name: 'New Project',
     authors: userName,
-    description: 'A new project',
-    info: '# New Project\nA new beautiful project',
-    image: this.isNew ? undefined : `${getProjectDir(`${userName.toLowerCase()}.new_project`)}\\image.png`,
-    background: this.isNew ? undefined : `${getProjectDir(`${userName.toLowerCase()}.new_project`)}\\background.png`
+    description: 'A new project'
   }
+
+  @Input() info: string = '# New Project\nA new beautiful project'
+
+  image = this.isNew ? undefined : `${getProjectDir(this.project.identifier)}\\image.png`
+  background = this.isNew ? undefined : `${getProjectDir(this.project.identifier)}\\background.png`
 
   @Output() changeInteractive = new EventEmitter<HomeInteractive>()
 
-  constructor(private server: ServerService) {
-    //this.doUpload = this.doUpload.bind(this);
-  }
+  constructor(private electron: ElectronService) { }
 
-  /*doUpload(files: Array<File>): Promise<Array<UploadResult>> {
-    return Promise.resolve(files.map((file) => {
-      return { name: file.name, url: file.path, isImg: true }
-    }));
-  }*/
-
-  existingProjects: string[] = ['test', 'test2']
-
-  architects: Architect[] = [{ identifier: 'generic', name: 'Generic', port: 0 }]
-  selectArchitect: number = 0
+  architects: Architect[] = []
+  selectArchitect: number = -1
 
   pages = ['Type', 'Project', 'Info']
   page: number = 0
 
   ngOnInit(): void {
-    this.server.get('architects').then(({data}) => {
-      this.architects = data
-      this.selectArchitect = this.architects.indexOf(this.architects.find((architect) => architect.identifier === this.project.architect)!)
+    this.electron.ipcRenderer.invoke('architect:get-all').then((architects) => {
+      this.architects = architects
+      this.selectArchitect = this.architects.findIndex((architect) => architect.identifier === this.project.architect)
     })
   }
 
@@ -79,7 +70,7 @@ export class EditProjectComponent implements OnInit {
   }
 
   getArchitectIcon(architect: number = this.selectArchitect): string {
-    return `${getArchitectDir(this.architects[architect].identifier)}\\icon.svg`
+    return `${getArchitectDir(this.architects[architect].identifier)}\\${this.architects[architect].icon}`
   }
 
   setArchitect(index: number): void {
@@ -97,9 +88,13 @@ export class EditProjectComponent implements OnInit {
 
   submit(): void {
     if (this.isNew) {
-      this.server.post('projects', this.project).then(() => this.close())
+      this.electron.ipcRenderer.invoke('project:create', 
+        { data: this.project, info: this.info, image: this.image, background: this.background }
+      ).then(() => this.close())
     } else {
-      this.server.put('projects', this.project.identifier, this.project).then(() => this.close())
+      this.electron.ipcRenderer.invoke('project:edit', 
+        { identifier: this.project.identifier, data: this.project, info: this.info, image: this.image, background: this.background }
+      ).then(() => this.close())
     }
   }
 }

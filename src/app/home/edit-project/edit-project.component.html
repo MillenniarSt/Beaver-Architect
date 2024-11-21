@@ -1,4 +1,4 @@
-<div class="h-full flex flex-col gap-5 p-3">
+<div *ngIf="selectArchitect !== -1" class="h-full flex flex-col gap-5 p-3">
     <div class="flex">
         <img *ngIf="page > 0; else arrowEmpty" class="icon-button" src="assets/icon/left.svg" (click)="switchPage(-1)">
         <span class="grow text-center font-semibold text-lg place-self-center">{{pages[page]}}</span>
@@ -79,14 +79,14 @@
             </div>
             <div></div>
             <div class="grow flex gap-4">
-                <image-picker title="Image" [image]="project.image" class="grow" (changeImage)="project.image = $event"></image-picker>
-                <image-picker title="Background" [image]="project.background" class="grow"
-                    (changeImage)="project.background = $event"></image-picker>
+                <image-picker title="Image" [image]="image" class="grow" (changeImage)="image = $event"></image-picker>
+                <image-picker title="Background" [image]="background" class="grow"
+                    (changeImage)="background = $event"></image-picker>
             </div>
         </div>
 
         <div *ngIf="page === 2" class="page">
-            <md-editor name="Content" [(ngModel)]="project.info" [height]="'100%'">
+            <md-editor name="Content" [(ngModel)]="info" [height]="'100%'">
                 <slot custom-btns></slot>
             </md-editor>
         </div>

@@ -44,7 +44,11 @@
     </div>
   </div>
 
-  <projects *ngIf="interactive === 'projects'" class="home-interactive" [type]="type" (editProject)="doEditProject($event)"></projects>
-  <edit-project *ngIf="interactive === 'new_project'" class="home-interactive" [type]="type ?? 'world'" (changeInteractive)="changeInteractive($event)"></edit-project>
-  <edit-project *ngIf="interactive === 'edit_project'" class="home-interactive" [isNew]="false" [type]="editProject!.type" [project]="editProject!" (changeInteractive)="changeInteractive($event)"></edit-project>
+  <projects *ngIf="interactive === 'projects' && !loading" class="home-interactive" [type]="type"
+    (editProject)="doEditProject($event)"></projects>
+  <edit-project *ngIf="interactive === 'new_project' && !loading" class="home-interactive" [type]="type ?? 'world'"
+    (changeInteractive)="changeInteractive($event)"></edit-project>
+  <edit-project *ngIf="interactive === 'edit_project' && !loading" class="home-interactive" [isNew]="false"
+    (changeInteractive)="changeInteractive($event)" [type]="editProject!.type" [project]="editProject!"
+    [info]="editProjectInfo!"></edit-project>
 </div>

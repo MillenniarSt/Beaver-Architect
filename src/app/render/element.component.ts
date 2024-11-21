@@ -8,6 +8,7 @@ import { ElementView, SceneService, SceneUpdate } from "../services/scene.servic
     standalone: true,
     template: `
       <scene-object *ngFor="let object of element.objects" [object]="object" (click)="click($event)"/>
+      <element *ngFor="let element of element.children ?? []" [element]="element"/>
     `,
     imports: [SceneObjectComponent, NgFor],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]

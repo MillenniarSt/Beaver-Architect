@@ -32,7 +32,7 @@ export class ProjectStructureComponent implements OnInit {
   }
 
   loadProject(): void {
-    this.ps.server.request('file/read-all-dir', { path: '' }).then((data) => {
+    this.ps.server.request('file/map-dir', { path: '' }).then((data) => {
       this.tree = this.loadDir(data)
 
       this.cdr.detectChanges()

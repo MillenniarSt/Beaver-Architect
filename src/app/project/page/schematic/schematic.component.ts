@@ -22,7 +22,9 @@ export type SchematicUpdate = {
   parent?: string,
 
   view?: ElementView,
-  node?: ElementNode
+  node?: ElementNode,
+  editGraph?: boolean,
+  form?: boolean
 }
 
 @Component({
@@ -38,7 +40,7 @@ export class SchematicComponent implements OnInit, OnDestroy {
 
   @Input() index!: number
 
-  path!: string
+  ref!: string
 
   formDataInput: FormDataInput[] = []
   nodes: ElementNode[] = []
@@ -50,55 +52,56 @@ export class SchematicComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>()
 
   ngOnInit(): void {
-    this.path = this.ps.getPage(this.index).data.path
-    this.ps.server.request('file/read-json', { path: this.path }).then((data) => {
-      this.ps.architect.request('data-pack/schematics/open', { path: this.path, data: data }).then((data) => {
-        this.nodes = data.nodes
-        this.scene.data = data.view
-        this.sceneGraph = SceneGraph
-        this.cdr.detectChanges()
-      })
+    const path = this.ps.getPage(this.index).data.path
+    this.ref = path.substring(21, path.lastIndexOf('.'))
+    this.ps.server.request('data-pack/schematics/open', { ref: this.ref }).then((data) => {
+      console.log('Init', data)
+      this.nodes = data.tree
+      this.scene.elements = data.view
+      this.sceneGraph = SceneGraph
+      this.cdr.detectChanges()
     })
 
-    this.ps.architect.listen('data-pack/schematics/update', (data) => {
-      if(data.path === this.path) {
+    this.ps.server.listen('data-pack/schematics/update', (data) => {
+      console.log('Update', data)
+      if (data.ref === this.ref) {
         this.scene.update(data.updates)
       }
     }, this.destroy$)
-    this.ps.architect.listen('data-pack/schematics/update-client', (data) => {
-      if(data.path === this.path) {
-        if(data.form) {
-          this.formDataInput = data.form
+    this.ps.server.listen('data-pack/schematics/update-client', (data) => {
+      console.log('Update Client', data)
+      if (data.ref === this.ref) {
+        if (data.client.form) {
+          this.formDataInput = data.client.form
+          this.cdr.detectChanges()
         }
-        if(data.editGraph) {
-          this.scene.updateEditGraph(data.editGraph)
+        if (data.client.editGraph) {
+          this.scene.updateEditGraph(data.client.editGraph)
         }
-      }
-    }, this.destroy$)
-    this.ps.architect.listen('data-pack/schematics/update-file', (data) => {
-      if(data.path === this.path) {
-        this.ps.server.send('file/write-json', { path: this.path, data: data.file })
       }
     }, this.destroy$)
 
     this.scene.onUpdate((update) => {
-      if(update.id === this.scene.selection[0]) {
+      if (update.id === this.scene.selection[0]) {
+        if (update.editGraph || update.form) {
+          this.ps.server.send('data-pack/schematics/selection-data', { ref: this.ref, selection: this.scene.selection, form: update.form, editGraph: update.editGraph })
+        }
+      }
+    })
+    this.scene.onUpdate((update) => {
+      if (update.id === this.scene.selection[0]) {
         this.formDataInput = []
+        this.scene.updateEditGraph(undefined)
+        this.cdr.detectChanges()
       }
     }, 'delete')
 
     this.scene.selectionMessage.subscribe((selection: string[]) => {
       if (selection.length > 0) {
-        this.ps.architect.request(
-          'data-pack/schematics/selection',
-          { path: this.path, selection: selection }
-        ).then((data) => {
-          this.formDataInput = data.form
-          this.scene.updateEditGraph(data.editGraph)
-          this.cdr.detectChanges()
-        })
+        this.ps.server.send('data-pack/schematics/selection-data', { ref: this.ref, selection: selection, form: true, editGraph: true })
       } else {
         this.formDataInput = []
+        this.cdr.detectChanges()
       }
     })
   }
@@ -117,8 +120,8 @@ export class SchematicComponent implements OnInit, OnDestroy {
   }
 
   editSelection(updates: FormDataOutput) {
-    this.ps.architect.send('data-pack/schematics/update-form', {
-      path: this.path,
+    this.ps.server.send('data-pack/schematics/update-form', {
+      ref: this.ref,
       selection: this.scene.selection,
       updates: updates
     })
@@ -146,7 +149,7 @@ class SceneGraph implements OnInit {
   editGraph?: EditGraph
 
   constructor(private scene: SceneService<SchematicUpdate>, private cdr: ChangeDetectorRef) {
-    this.elements = this.scene.data.elements
+    this.elements = this.scene.elements
   }
 
   ngOnInit(): void {

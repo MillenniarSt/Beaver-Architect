@@ -399,3 +399,16 @@ input[type="number"]::-webkit-inner-spin-button {
   0%,70% {transform:translate(0)}
   100%  {transform:translate(200%)}
 }
+
+/* PrimeNG */
+
+.p-inputnumber {
+  border: solid 2px theme('colors.main-acc.DEFAULT');
+  border-radius: 10px;
+  padding: 0 4px 0 8px;
+}
+
+.p-inputnumber > input {
+  border: none;
+  padding: 0px;
+}

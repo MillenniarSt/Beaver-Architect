@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { getProjectDir } from '../../../paths';
+import { getProjectDir } from '../../paths';
 import { ContextMenuComponent } from "../../components/context-menu/context-menu.component";
 import { NgIf } from '@angular/common';
 import { Project } from '../../types';

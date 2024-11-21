@@ -1,9 +1,10 @@
 import { NgClass, NgFor, NgIf } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { ProjectsComponent } from "../projects/projects.component";
 import { EditProjectComponent } from "../edit-project/edit-project.component";
 import { Project } from '../../types';
 import { ElectronService } from 'ngx-electron';
+import { getProjectDir } from '../../paths';
 
 @Component({
   selector: 'home',
@@ -12,9 +13,20 @@ import { ElectronService } from 'ngx-electron';
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
 
-  constructor(private electron: ElectronService) { }
+  loading = true
+
+  constructor(private cdr: ChangeDetectorRef, private electron: ElectronService) { }
+
+  ngOnInit(): void {
+    this.electron.ipcRenderer.invoke('architect:load-all').then(() => {
+      this.electron.ipcRenderer.invoke('project:load-all').then(() => {
+        this.loading = false
+        this.cdr.detectChanges()
+      })
+    })
+  }
 
   @Input() type?: string
 
@@ -36,10 +48,14 @@ export class HomeComponent {
   }
 
   editProject?: Project
+  editProjectInfo?: string
 
-  doEditProject(project: Project) {
-    this.editProject = project
-    this.changeInteractive(HomeInteractive.EDIT_PROJECT)
+  doEditProject(identifier: string) {
+    this.electron.ipcRenderer.invoke('project:get', identifier).then((project) => {
+      this.editProject = project.data
+      this.editProjectInfo = project.info
+      this.changeInteractive(HomeInteractive.EDIT_PROJECT)
+    })
   }
 
   changeInteractive(interactive: HomeInteractive) {

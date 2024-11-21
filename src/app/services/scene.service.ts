@@ -6,13 +6,10 @@ import { EditGraph } from '../render/edit-graph.component';
 
 extend(THREE)
 
-export type SceneData = {
-  elements: ElementView[]
-}
-
 export type ElementView = {
   id: string,
-  objects: SceneObject[]
+  objects: SceneObject[],
+  children?: ElementView[]
 }
 
 export type SceneObject = {
@@ -40,9 +37,7 @@ export type SceneUpdate = {
 @Injectable()
 export class SceneService<Update extends SceneUpdate> {
 
-  data: SceneData = {
-    elements: []
-  }
+  elements: ElementView[] = []
 
   private updatesMessageSource = new BehaviorSubject<Update[]>([])
   updatesMessage = this.updatesMessageSource.asObservable()
@@ -64,7 +59,7 @@ export class SceneService<Update extends SceneUpdate> {
   private editGraphMessageSource = new BehaviorSubject<EditGraph | undefined>(undefined)
   editGraphMessage = this.editGraphMessageSource.asObservable()
 
-  updateEditGraph(editGraph?: EditGraph) {
+  updateEditGraph(editGraph: EditGraph | undefined) {
     this.editGraphMessageSource.next(editGraph)
   }
 

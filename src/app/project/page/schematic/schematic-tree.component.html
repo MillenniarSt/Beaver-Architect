@@ -1,18 +1,13 @@
 <div class="h-full flex flex-col gap-2">
     <div class="flex gap-1">
         <span class="grow font-semibold text-xl">{{title}}</span>
-        <button>
-            <i class="pi pi-file-plus" (click)="newElement(undefined)"></i>
-        </button>
     </div>
 
     <ng-template *ngIf="elementsTree.length === 0; then empty else tree"></ng-template>
 
     <ng-template #empty>
         <div class="grow flex flex-col gap-3 items-center justify-center">
-            <button>
-                <i class="pi pi-file-plus text-3xl" (click)="newElement(undefined)"></i>
-            </button>
+            <i class="pi pi-file-plus text-3xl"></i>
             <span class="text-lg">Create An Element</span>
         </div>
     </ng-template>
@@ -29,7 +24,7 @@
                     </button>
                     <div class="flex gap-3 node-actions">
                         <button>
-                            <i class="pi pi-file-plus" (click)="newElement(node)"></i>
+                            <i class="pi pi-folder-plus" (click)="inGroup(node)"></i>
                         </button>
                         <button>
                             <i class="pi pi-trash" (click)="deleteElement(node)"></i>

@@ -18,7 +18,7 @@ import { CommonModule } from '@angular/common';
 })
 export class SchematicTreeComponent implements OnInit {
 
-  @Input() path!: string
+  @Input() ref!: string
   @Input() title: string = 'Schematic'
   @Input() nodes: ElementNode[] = []
 
@@ -53,11 +53,15 @@ export class SchematicTreeComponent implements OnInit {
       const parent = this.elementsMap.get(update.id)!.parent
       if (parent) {
         parent.children!.splice(parent.children!.findIndex((child) => child.data === update.id), 1)
+        this.cdr.detectChanges()
       } else {
-        this.elementsTree.splice(this.elementsTree.findIndex((child) => child.data === update.id), 1)
+        const index = this.elementsTree.findIndex((child) => child.data === update.id)
+        if(index !== -1) {
+          this.elementsTree.splice(this.elementsTree.findIndex((child) => child.data === update.id), 1)
+          this.cdr.detectChanges()
+        }
       }
       this.elementsMap.delete(update.id)
-      this.cdr.detectChanges()
     }, 'delete')
 
     this.scene.onUpdate((update) => {
@@ -100,13 +104,15 @@ export class SchematicTreeComponent implements OnInit {
   }
 
   drop(node: TreeNode) {
+    console.log('drop', node, this.dragged)
     if (this.dragged) {
-      this.ps.architect.send('data-pack/schematics/move-elements', { path: this.path, ids: [this.dragged.data], parent: node.data })
+      this.ps.server.send('data-pack/schematics/move-elements', { ref: this.ref, ids: [this.dragged.data], parent: node.data })
       this.dragged = null
     }
   }
 
   dragEnd() {
+    console.log('drag-end', this.dragged)
     this.dragged = null
   }
 
@@ -136,17 +142,13 @@ export class SchematicTreeComponent implements OnInit {
     this.scene.selectOrClear(id)
   }
 
-  newElement(node: TreeNode | undefined) {
-    this.ps.architect.send('data-pack/schematics/new-elements', { path: this.path, parent: node?.data })
-  }
-
   deleteElement(node: TreeNode) {
     this.scene.addToSelection(node.data)
-    this.ps.architect.send('data-pack/schematics/delete-elements', { path: this.path, ids: this.scene.selection })
+    this.ps.server.send('data-pack/schematics/delete-elements', { ref: this.ref, ids: this.scene.selection })
   }
 
   inGroup(node: TreeNode) {
     this.scene.addToSelection(node.data)
-    this.ps.architect.send('data-pack/schematics/in-group', { path: this.path, ids: this.scene.selection, in: node.data })
+    this.ps.server.send('data-pack/schematics/in-group', { ref: this.ref, ids: this.scene.selection, in: node.data })
   }
 }
