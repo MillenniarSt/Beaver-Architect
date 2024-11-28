@@ -80,10 +80,8 @@ export type MaterialData = {
 }
 
 export type RenderCubeData = {
-  dimension: {
-    pos: [number, number, number]
-    size: [number, number, number]
-  },
+  pos: [number, number, number],
+  size: [number, number, number],
   rotation: [number, number, number],
   faces: [
     MaterialData?,
@@ -123,8 +121,8 @@ export class RenderCube extends RenderShape {
     }
 
     return new RenderCube(
-      json.dimension.pos,
-      json.dimension.size,
+      json.pos,
+      json.size,
       json.rotation,
       materials,
       uvs

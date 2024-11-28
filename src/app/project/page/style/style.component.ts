@@ -24,18 +24,7 @@ export class StyleComponent implements OnInit, OnDestroy {
 
   ref!: string
 
-  materials: Record<string, Material[]> = {
-    test: [
-      {
-        id: 'oak',
-        weight: 1
-      },
-      {
-        id: 'spruce',
-        weight: 2
-      }
-    ]
-  }
+  patterns: { id: string, materials: Material[] }[] = []
 
   constructor(private cdr: ChangeDetectorRef, private ps: ProjectService) { }
 
@@ -44,7 +33,11 @@ export class StyleComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const path = this.ps.getPage(this.index).data.path
     this.ref = path.substring(17, path.lastIndexOf('.'))
-    console.log(this.materialsItems)
+    this.ps.server.request('data-pack/styles/open', { ref: this.ref }).then((data) => {
+      console.log(data)
+      this.patterns = data.patterns
+      this.cdr.detectChanges()
+    })
   }
 
   ngOnDestroy(): void {
@@ -53,11 +46,11 @@ export class StyleComponent implements OnInit, OnDestroy {
   }
 
   get materialsItems(): { id: string, materials: MaterialItem[] }[] {
-    return Object.entries(this.materials).map((entry) => {
+    return this.patterns.map((pattern) => {
       let totalWeight = 0
-      entry[1].forEach((material) => totalWeight += material.weight)
+      pattern.materials.forEach((material) => totalWeight += material.weight)
       return {
-        id: entry[0], materials: entry[1].map((material) => {
+        id: pattern.id, materials: pattern.materials.map((material) => {
           return {
             id: material.id,
             weight: material.weight,

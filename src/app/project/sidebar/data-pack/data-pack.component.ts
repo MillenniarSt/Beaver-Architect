@@ -138,7 +138,7 @@ export class DataPackComponent implements OnInit {
     const path = `${folder}\\${file}`
 
     if(!(await this.ps.server.request('file/exists', { path: path }))) {
-      this.ps.server.send('file/write-json', { path: path, data: await this.ps.architect.request('data-pack/schematics/new') })
+      await this.ps.server.request(`data-pack/${this.selectedFolder.folder}/create`, { ref: path.substring(`data_pack\\${this.selectedFolder.folder}`.length, path.lastIndexOf('.')) })
       this.addFile(node, {
         name: file,
         path: path

@@ -5,7 +5,6 @@ import { ProjectService } from '../../../services/project.service';
 import { NgIf } from '@angular/common';
 import { baseErrorDialog, openBaseDialog, openInputDialog } from '../../../dialog/dialogs';
 import { PlainFileComponent } from '../../page/plain-file/plain-file.component';
-import { ServerService } from '../../../services/server.service';
 
 type File = {
   name: string,

@@ -1,63 +1,34 @@
-import { NgFor } from '@angular/common';
-import { Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Input, Output } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import * as THREE from 'three';
 import { RenderCube } from '../services/render.service';
-import { NgtThreeEvent } from 'angular-three';
+import { NgtArgs, NgtThreeEvent } from 'angular-three';
 
 @Component({
     selector: 'cube',
     standalone: true,
     template: `
-        <ngt-mesh [position]="render.pos" [rotation]="render.rotation" [material]="render.materials" (click)="clickEvent($event)">
-            <ngt-box-geometry [args]="render.size" (attached)="onAttached($event.node)"/>
-        </ngt-mesh>
+        <ngt-primitive *args="[cube]"></ngt-primitive>
     `,
-    imports: [NgFor],
+    imports: [NgtArgs],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class CubeComponent {
+export class CubeComponent implements OnInit {
 
     @Input() render!: RenderCube
 
     @Output() click = new EventEmitter<number>()
 
-    onAttached(geometry: THREE.BoxGeometry) {
-        if (this.render.uvs) {
-            const uvAttribute = geometry.attributes['uv']
-            const uv = uvAttribute.array
+    cube!: THREE.Mesh
 
-            this.render.uvs.forEach((value, i) => {
-                uv[i] = value
-            })
-
-            uvAttribute.needsUpdate = true
-        }
-    }
-
-    /*private raycaster = new THREE.Raycaster();
-    private mouse = new THREE.Vector2();*/
-
-    clickEvent(event: NgtThreeEvent<MouseEvent>) {
-        /*this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-        // Esegui il raycasting per ottenere l'intersezione con la mesh
-        this.raycaster.setFromCamera(this.mouse, event.camera);
-        const intersects = this.raycaster.intersectObject(event.object, true);
-
-        if (intersects.length > 0) {
-            const intersection = intersects[0];
-
-            // Punto nello spazio
-            const point = intersection.point;
-
-            // Direzione perpendicolare alla faccia cliccata
-            const normal = intersection.face?.normal.clone().applyMatrix4(intersection.object.matrixWorld).normalize();
-
-            console.log('Punto cliccato nello spazio:', point);
-            console.log('Normale della faccia cliccata:', normal);
-        }*/
-
-        this.click.emit(event.button)
+    ngOnInit(): void {
+        this.cube = new THREE.Mesh(
+            new THREE.BoxGeometry(this.render.size[0], this.render.size[1], this.render.size[2]),
+            this.render.materials
+        )
+        this.cube.position.set(this.render.pos[0], this.render.pos[1], this.render.pos[2])
+        this.cube.rotation.set(this.render.rotation[0], this.render.rotation[1], this.render.rotation[2])
+        const uvAttribute = this.cube.geometry.getAttribute('uv')
+        uvAttribute.array.set(this.render.uvs)
+        uvAttribute.needsUpdate = true
     }
 }
