@@ -54,7 +54,14 @@ export class ProjectComponent {
             { label: 'Textures', weight: 5 },
             { label: 'Objects', weight: 5 }
           ]
-        }
+        },
+        {
+          label: 'Loading Builders',
+          subtasks: [
+            { label: 'Schematics' },
+            { label: 'Styles' }
+          ]
+        },
       ], async (update) => {
         await new Promise<void>((resolve) => {
           this.electron.ipcRenderer.once('project:open-server', () => {
@@ -81,6 +88,10 @@ export class ProjectComponent {
           progress: 1
         })
 
+        update({
+          index: 1,
+          progress: 0
+        })
         await this.ps.architect.connectLocal(project.architect.port)
 
         await this.ps.architect.request('open-project')
@@ -112,6 +123,15 @@ export class ProjectComponent {
             progress: i / (objectEntries.length - 1)
           })
         }
+
+        update({
+          index: 2,
+          progress: 0
+        })
+        await this.ps.server.channel('init', {}, (data) => update({
+          index: 2,
+          progress: data
+        }))
       }).then((process) => {
         this.cdRef.detectChanges()
       })

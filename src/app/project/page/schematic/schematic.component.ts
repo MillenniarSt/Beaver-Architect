@@ -54,7 +54,7 @@ export class SchematicComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const path = this.ps.getPage(this.index).data.path
     this.ref = path.substring(21, path.lastIndexOf('.'))
-    this.ps.server.request('data-pack/schematics/open', { ref: this.ref }).then((data) => {
+    this.ps.server.request('data-pack/schematics/get', { ref: this.ref }).then((data) => {
       console.log('Init', data)
       this.nodes = data.tree
       this.scene.elements = data.view

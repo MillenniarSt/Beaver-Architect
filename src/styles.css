@@ -412,3 +412,11 @@ input[type="number"]::-webkit-inner-spin-button {
   border: none;
   padding: 0px;
 }
+
+p-splitter {
+  display: block;
+}
+
+.p-splitter-horizontal {
+  height: 100%;
+}

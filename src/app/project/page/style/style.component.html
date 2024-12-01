@@ -1,4 +1,51 @@
-<div class="flex flex-col gap-4">
-    <page-style-material *ngFor="let item of materialsItems; trackBy: trackByFn" class="flex flex-col gap-3 rounded-xl bg-back-2 py-2 px-3"
-        [id]="item.id" [materials]="item.materials" [ref]="ref" />
-</div>
+<p-splitter [panelSizes]="[75, 25]" class="h-full">
+    <ng-template pTemplate>
+        <ng-template *ngIf="selected; then pattern else style" />
+
+        <ng-template #pattern>
+            <div class="flex flex-col w-full gap-3 m-2">
+                <span class="text-lg">{{displayId(selected!.id)}}</span>
+                <div class="flex-grow flex flex-col gap-2">
+                    <div *ngFor="let material of selected!.materials; trackBy: trackByFn" class="flex gap-3">
+                        <div
+                            class="grow relative flex gap-2 rounded-lg border-solid border-2 border-back-4 items-center">
+                            <div class="absolute h-full bg-main-hover-tr rounded-md"
+                                [ngStyle]="{ width: material.percent + '%' }"></div>
+                            <img [src]="material.icon" class="ml-2 h-5 w-5">
+                            <span class="grow text-fore-2">{{displayId(material.id)}}</span>
+                            <span class="text-fore-4 mr-2">{{material.percent.toFixed(1)}}%</span>
+                        </div>
+                        <p-inputNumber [(ngModel)]="material.weight" mode="decimal" [min]="1" [showButtons]="true" [min]="0"
+                            class="w-24" />
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template #style>
+
+        </ng-template>
+    </ng-template>
+    <ng-template pTemplate>
+        <div class="h-full w-full panel flex flex-col gap-2">
+            <div class="flex">
+                <span class="flex-grow font-semibold text-lg">Patterns</span>
+                <button>
+                    <i class="pi pi-plus-circle" (click)="createPattern()"></i>
+                </button>
+            </div>
+            <div class="flex flex-grow flex-col gap-1">
+                <div *ngFor="let pattern of patterns; trackBy: trackByFn" class="flex px-1 pattern"
+                    [ngClass]="{'pattern-selected': isSelected(pattern.id)}">
+                    <button class="grow node-area flex gap-2.5 items-center" (click)="select(pattern.id)">
+                        <i class="pi pi-file"></i>
+                        <span class="grow text-start">{{ displayId(pattern.id) }}</span>
+                    </button>
+                    <button class="pattern-actions items-center">
+                        <i class="pi pi-trash" (click)="deletePattern(pattern.id)"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</p-splitter>

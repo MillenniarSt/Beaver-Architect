@@ -28,7 +28,7 @@ export class WebSocketServer {
 
   public messages$: Observable<WebSocketMessage> = this.messageSubject.asObservable()
 
-  private waitingRequests: Map<string, (value: any) => void> = new Map()
+  private openChannels: Map<string, (value: any) => boolean | void> = new Map()
 
   connectLocal(port: number): Promise<void> {
     return this.connect(`ws://localhost:${port}`)
@@ -52,10 +52,11 @@ export class WebSocketServer {
           }
 
           if(message.id) {
-            const resolve = this.waitingRequests.get(message.id)
+            const resolve = this.openChannels.get(message.id)
             if(resolve) {
-              resolve(message.data)
-              this.waitingRequests.delete(message.id)
+              if(resolve(message.data)) {
+                this.openChannels.delete(message.id)
+              }
             } else {
               console.error('Invalid Response Id')
             }
@@ -104,7 +105,27 @@ export class WebSocketServer {
     return new Promise((resolve) => {
       if(this.isOpen) {
         const id = v4()
-        this.waitingRequests.set(id, resolve)
+        this.openChannels.set(id, resolve)
+        this.ws!.send(JSON.stringify({path: path, id: id, data: data ?? {}}))
+      } else {
+        console.error('WebSocket Server connection not available')
+        resolve(undefined)
+      }
+    })
+  }
+
+  channel(path: string, data: {}, on: (data: any) => boolean | void): Promise<void> {
+    return new Promise((resolve) => {
+      if(this.isOpen) {
+        const id = v4()
+        this.openChannels.set(id, (data: any) => {
+          if(data === '$close') {
+            resolve()
+            return true
+          } else {
+            return on(data) ?? false
+          }
+        })
         this.ws!.send(JSON.stringify({path: path, id: id, data: data ?? {}}))
       } else {
         console.error('WebSocket Server connection not available')

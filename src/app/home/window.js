@@ -26,7 +26,7 @@ function createHomeWindow(onOpen) {
         hash: 'home'
     }))
 
-    homeWin.webContents.on('did-finish-load', () => {
+    homeWin.webContents.on('did-finish-load', async () => {
         if(onOpen) {
             onOpen()
         }

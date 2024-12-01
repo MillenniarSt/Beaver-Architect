@@ -1,0 +1,19 @@
+.pattern-actions {
+  display: none;
+}
+
+.pattern:hover + .pattern-actions,
+.pattern-actions:hover, 
+.pattern-selected > .pattern-actions {
+  display: flex;
+}
+
+.pattern:hover {
+  background-color: theme('colors.main-hover.tr');
+  border-radius: 5px;
+}
+
+.pattern-selected {
+  background-color: theme('colors.main.tr');
+  border-radius: 5px;
+}
