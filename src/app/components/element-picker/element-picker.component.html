@@ -1,1 +1,20 @@
-<p>element-picker works!</p>
+<div class="flex gap-2">
+    <div class="flex flex-col gap-1">
+        <img src="assets/icon/world.svg" class="element-icon mb-1"
+            [ngClass]="{'element-icon-selected': groupIndex === -1}" (click)="setGroup(-1)">
+        <img *ngFor="let group of groups; index as i" [src]="group.icon" class="element-icon"
+            [ngClass]="{'element-icon-selected': groupIndex === i}" (click)="setGroup(i)">
+    </div>
+    <div class="grow flex flex-col gap-2">
+        <div class="flex gap-2 items-center">
+            <search-bar class="grow" [value]="research" (edit)="search($event)"></search-bar>
+            <button *ngIf="nullable">
+                <i class="pi pi-trash" (click)="click(null)"></i>
+            </button>
+        </div>
+        <div class="grow flex gap-1">
+            <img *ngFor="let element of getElements(); trackBy: trackByFn" [src]="element.icon" class="element-icon"
+                [ngClass]="{'element-icon-selected': element.id === value}" (click)="click(element)">
+        </div>
+    </div>
+</div>

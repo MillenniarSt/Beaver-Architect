@@ -4,7 +4,7 @@ import { ProjectBar, types } from '../types';
 import { SidebarsComponent } from '../sidebar/sidebars.component';
 import { AngularSplitModule } from 'angular-split';
 import { NgClass, NgIf } from '@angular/common';
-import { ProjectService } from '../../services/project.service';
+import { Material, ProjectService } from '../../services/project.service';
 import { PagesComponent } from "../page/pages.component";
 import { RenderModelData, RenderService } from '../../services/render.service';
 import { openProgress } from '../../progress/progress';
@@ -51,6 +51,7 @@ export class ProjectComponent {
           label: 'Starting Architect',
           subtasks: [
             { label: 'Initializing' },
+            { label: 'Materials', weight: 2 },
             { label: 'Textures', weight: 5 },
             { label: 'Objects', weight: 5 }
           ]
@@ -99,6 +100,14 @@ export class ProjectComponent {
           index: 1,
           progress: 1
         })
+
+        const materialsData = await this.ps.architect.request('data-pack/materials/get')
+        this.ps.materialGroups = materialsData.groups
+        this.ps.materials = Object.fromEntries(materialsData.materials.map((material: Material) => [material.id, material]))
+        update({
+          index: 1,
+          progress: 1
+        }) 
 
         const textures: Record<string, string> = await this.ps.architect.request('render/textures')
 

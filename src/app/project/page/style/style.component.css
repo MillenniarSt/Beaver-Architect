@@ -1,8 +1,25 @@
+.implementation-actions {
+  display: none;
+}
+
+.implementation:hover > .implementation-actions,
+.implementation-actions:hover {
+  display: flex;
+}
+
+.material-weight {
+  background: linear-gradient(90deg, theme('colors.main-hover.tr') 70%, theme('colors.main.tr') 100%);
+}
+
+.pattern-preview {
+  background: linear-gradient(90deg, rgba(18,71,190,1) 40%, rgba(0,0,0,0) 110%);
+}
+
 .pattern-actions {
   display: none;
 }
 
-.pattern:hover + .pattern-actions,
+.pattern:hover > .pattern-actions,
 .pattern-actions:hover, 
 .pattern-selected > .pattern-actions {
   display: flex;

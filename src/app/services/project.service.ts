@@ -4,6 +4,18 @@ import { ProjectType } from '../project/types';
 import { BehaviorSubject } from 'rxjs';
 import { WebSocketServer } from '../../socket';
 
+export type MaterialGroup = {
+  label: string,
+  icon: string,
+  children: Material[]
+}
+
+export type Material = {
+  id: string,
+  label: string,
+  icon: string
+}
+
 export type Page = {
   path: string,
   icon: string,
@@ -28,6 +40,9 @@ export class ProjectService {
   _project?: Project
   _projectType?: ProjectType
   _architectData?: Architect
+
+  materialGroups: MaterialGroup[] = []
+  materials: Record<string, Material> = {}
 
   pages: Page[] = []
 

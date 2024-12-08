@@ -1,0 +1,15 @@
+.element-icon {
+  padding: 3px;
+  border-radius: 6px;
+  height: 32px;
+  width: 32px;
+  cursor: pointer;
+}
+
+.element-icon:hover {
+  background-color: theme('colors.main-hover.tr');
+}
+
+.element-icon-selected {
+  background-color: theme('colors.main.tr');
+}
