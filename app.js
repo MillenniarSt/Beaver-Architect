@@ -44,6 +44,20 @@ app.whenReady().then(() => {
     })
 })
 
+// Log
+
+ipcMain.handle('log', (e, data) => {
+    console.log(data)
+})
+
+ipcMain.handle('warn', (e, data) => {
+    console.warn(data)
+})
+
+ipcMain.handle('error', (e, data) => {
+    console.error(data)
+})
+
 // System Info
 
 ipcMain.handle('get:user_name', () => {

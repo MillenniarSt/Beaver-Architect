@@ -88,72 +88,71 @@ export class StyleComponent implements OnInit, OnDestroy {
 
     this.ps.server.listen('data-pack/styles/update', (data) => {
       console.log('Update', data)
-      if (data.ref === this.ref) {
-        this.isAbstract = data.update.isAbstract ?? this.isAbstract
-
-        if(data.update.implementations) {
-          data.update.implementations.forEach((implementation: any) => {
-            if(implementation.mode === 'push') {
-              this.implementations.push(implementation.data)
-            } else if(implementation.mode === 'delete') {
-              this.implementations.splice(this.implementations.findIndex((imp) => imp.pack === implementation.pack && imp.location === implementation.location), 1)
-            }
-            this.searchForImplementations()
-          })
-        }
-
-        if(data.update.patterns) {
-          data.update.patterns.forEach((pattern: any) => {
-            if (pattern.mode === 'push') {
-              this.patterns.push({ id: pattern.id, type: pattern.type })
-            } else if (pattern.mode === 'delete') {
-              this.patterns.splice(this.patterns.findIndex((pt) => pt.id === pattern.id), 1)
-              if(pattern.id === this.selected?.id) {
-                this.selected = undefined
+      data.forEach((style: { ref: string, update: any }) => {
+        if (style.ref === this.ref) {
+          this.isAbstract = style.update.isAbstract ?? this.isAbstract
+  
+          if (style.update.implementations) {
+            style.update.implementations.forEach((implementation: any) => {
+              if (implementation.mode === 'push') {
+                this.implementations.push(implementation.data)
+              } else if (implementation.mode === 'delete') {
+                this.implementations.splice(this.implementations.findIndex((imp) => imp.pack === implementation.pack && imp.location === implementation.location), 1)
               }
-            } else {
-              if(pattern.newId) {
-                this.patterns.find((pattern) => pattern.id === pattern.id)!.id = pattern.newId
-                if(this.selected && pattern.id === this.selected.id) {
-                  this.selected.id = pattern.newId
+              this.searchForImplementations()
+            })
+          }
+  
+          if (style.update.patterns) {
+            style.update.patterns.forEach((pattern: any) => {
+              if (pattern.mode === 'push') {
+                this.patterns.push({ id: pattern.id, type: pattern.data.type })
+              } else if (pattern.mode === 'delete') {
+                this.patterns.splice(this.patterns.findIndex((pt) => pt.id === pattern.id), 1)
+                if (pattern.id === this.selected?.id) {
+                  this.selected = undefined
+                }
+              } else if (pattern.data) {
+                if (pattern.data.id) {
+                  this.patterns.find((p) => p.id === pattern.id)!.id = pattern.data.id
+                  if (this.selected && pattern.id === this.selected.id) {
+                    this.selected.id = pattern.data.id
+                  }
+                }
+                if (pattern.data.type) {
+                  this.patterns.find((p) => p.id === pattern.id)!.type = pattern.data.type
+                  if (this.selected && pattern.id === this.selected.id) {
+                    this.selected.type = pattern.data.type
+                  }
+                }
+                if (pattern.data.materials && this.selected!.id === pattern.id) {
+                  this.updatePattern(pattern.id)
                 }
               }
-              if(pattern.type) {
-                this.patterns.find((pattern) => pattern.id === pattern.id)!.type = pattern.type
-                if(this.selected && pattern.id === this.selected.id) {
-                  this.selected.type = pattern.type
-                }
-              }
-              if (pattern.materials && this.selected?.id === pattern.id) {
-                this.ps.server.request('data-pack/styles/get-pattern', { ref: this.ref, pattern: pattern.id })
-              }
-            }
-          })
+            })
+          }
+          this.cdr.detectChanges()
         }
-        this.cdr.detectChanges()
-      }
+      })
     }, this.destroy$)
+  }
 
-    this.ps.server.listen('data-pack/styles/update-client', (data) => {
-      console.log('Update Client', data)
-      if (data.ref === this.ref) {
-        if (this.selected && data.client.materials) {
-          let totalWeight = 0
-          data.client.materials.forEach((material: any) => totalWeight += material.weight)
-          this.selected.materials = data.client.materials.map((material: any) => {
-            return {
-              id: material.id,
-              weight: material.weight,
-              size: material.size,
-              icon: `${architectsDir}\\${this.ps.architectData.identifier}\\resources\\materials\\${material.id}`,
-              percent: material.weight / totalWeight * 100
-            }
-          })
-          console.log(this.selected.materials)
+  async updatePattern(id: string) {
+    const data = await this.ps.server.request('data-pack/styles/get-pattern', { ref: this.ref, pattern: id })
+    if (this.selected && this.selected.id === id) {
+      let totalWeight = 0
+      data.materials.forEach((material: any) => totalWeight += material.weight)
+      this.selected.materials = data.materials.map((material: any) => {
+        return {
+          id: material.id,
+          weight: material.weight,
+          size: material.size,
+          icon: `${architectsDir}\\${this.ps.architectData.identifier}\\resources\\materials\\${material.id}`,
+          percent: material.weight / totalWeight * 100
         }
-        this.cdr.detectChanges()
-      }
-    }, this.destroy$)
+      })
+    }
+    this.cdr.detectChanges()
   }
 
   ngOnDestroy(): void {
@@ -220,8 +219,7 @@ export class StyleComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges()
     } else {
       this.selected = { id: pattern.id, type: pattern.type, materials: [] }
-      this.ps.server.request('data-pack/styles/get-pattern', { ref: this.ref, pattern: pattern.id })
-      this.cdr.detectChanges()
+      this.updatePattern(pattern.id)
     }
   }
 
@@ -245,7 +243,7 @@ export class StyleComponent implements OnInit, OnDestroy {
   }
 
   changeMaterial(index: number, material: Material | null) {
-    if(material === null) {
+    if (material === null) {
       this.deleteMaterial(index)
     } else {
       this.editMaterial(index, { id: material.id })

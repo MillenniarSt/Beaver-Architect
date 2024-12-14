@@ -64,27 +64,17 @@ export class SchematicComponent implements OnInit, OnDestroy {
 
     this.ps.server.listen('data-pack/schematics/update', (data) => {
       console.log('Update', data)
-      if (data.ref === this.ref) {
-        this.scene.update(data.updates)
-      }
-    }, this.destroy$)
-    this.ps.server.listen('data-pack/schematics/update-client', (data) => {
-      console.log('Update Client', data)
-      if (data.ref === this.ref) {
-        if (data.client.form) {
-          this.formDataInput = data.client.form
-          this.cdr.detectChanges()
+      data.forEach((schematic: { ref: string, update: any }) => {
+        if (schematic.ref === this.ref) {
+          this.scene.update(schematic.update.elements ?? [])
         }
-        if (data.client.editGraph) {
-          this.scene.updateEditGraph(data.client.editGraph)
-        }
-      }
+      })
     }, this.destroy$)
 
     this.scene.onUpdate((update) => {
       if (update.id === this.scene.selection[0]) {
         if (update.editGraph || update.form) {
-          this.ps.server.send('data-pack/schematics/selection-data', { ref: this.ref, selection: this.scene.selection, form: update.form, editGraph: update.editGraph })
+          this.getSelection(this.scene.selection, update.form, update.editGraph)
         }
       }
     })
@@ -96,14 +86,23 @@ export class SchematicComponent implements OnInit, OnDestroy {
       }
     }, 'delete')
 
-    this.scene.selectionMessage.subscribe((selection: string[]) => {
-      if (selection.length > 0) {
-        this.ps.server.send('data-pack/schematics/selection-data', { ref: this.ref, selection: selection, form: true, editGraph: true })
-      } else {
-        this.formDataInput = []
+    this.scene.selectionMessage.subscribe((selection: string[]) => this.getSelection(selection))
+  }
+
+  async getSelection(selection: string[], form: boolean = true, editGraph: boolean = true) {
+    if (selection.length > 0) {
+      const data = await this.ps.server.request('data-pack/schematics/selection-data', { ref: this.ref, selection: selection, form, editGraph })
+      if (data.form) {
+        this.formDataInput = data.form
         this.cdr.detectChanges()
       }
-    })
+      if (data.editGraph) {
+        this.scene.updateEditGraph(data.editGraph)
+      }
+    } else {
+      this.formDataInput = []
+      this.cdr.detectChanges()
+    }
   }
 
   ngOnDestroy(): void {

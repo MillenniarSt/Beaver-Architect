@@ -100,7 +100,7 @@ export class ProgressComponent implements OnInit {
           this.completed.push(data.index)
 
           if (this.autoClose && this.completed.length >= this.tasks.length) {
-            this.end()
+            setTimeout(() => this.end(), 1000)
           }
         } else {
           this.tasksTree[data.index].children![task.currentSubtask].type = 'progress'
