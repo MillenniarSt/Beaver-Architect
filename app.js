@@ -26,6 +26,7 @@ console.log = (...args) => {
 // Load windows
 
 const { createHomeWindow } = require('./src/app/home/window')
+require('./src/app/architect-util/three-image/window')
 require('./src/app/dialog/window')
 require('./src/app/project/window')
 require('./src/app/progress/window')

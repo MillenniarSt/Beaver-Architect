@@ -32,8 +32,6 @@ export class ProjectComponent {
 
   ngOnInit() {
     this.electron.ipcRenderer.once('project:get', async (e, { identifier, port }) => {
-      console.log(identifier, port)
-
       const process = `load_project:${identifier}`
       openProgress(process, {
         title: `Loading ${identifier}`,
@@ -89,6 +87,10 @@ export class ProjectComponent {
           progress: 1
         })
 
+        this.electron.ipcRenderer.on('server:send', (event, data) => {
+          this.ps.server.send(data.path, data.data)
+        })
+
         update({
           index: 1,
           progress: 0
@@ -102,7 +104,13 @@ export class ProjectComponent {
         })
 
         const materialsData = await this.ps.architect.request('data-pack/materials/get')
-        this.ps.materialGroups = materialsData.groups
+        this.ps.materialGroups = materialsData.groups.map((group: any) => {
+          return {
+            label: group.label,
+            icon: group.icon,
+            children: group.materials
+          }
+        })
         this.ps.materials = Object.fromEntries(materialsData.materials.map((material: Material) => [material.id, material]))
         update({
           index: 1,

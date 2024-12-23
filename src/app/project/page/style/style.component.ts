@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Material, MaterialGroup, ProjectService } from '../../../services/project.service';
-import { Subject } from 'rxjs';
+import { max, Subject } from 'rxjs';
 import { NgClass, NgFor, NgIf, NgStyle } from '@angular/common';
 import { architectsDir } from '../../../paths';
 import { SplitterModule } from 'primeng/splitter';
@@ -22,13 +22,16 @@ export type StyleImplementation = {
 
 export type Pattern = {
   id: string,
-  type: string
+  type: string,
+  fromImplementations: string[]
 }
 
 export type PatternItem = {
   id: string,
   type: string,
-  materials: MaterialItem[]
+  fromImplementations: string[],
+  materials: MaterialItem[],
+  preview?: string[][]
 }
 
 export type MaterialItem = {
@@ -52,6 +55,7 @@ export class StyleComponent implements OnInit, OnDestroy {
   readonly patternTypes = [
     { name: 'Basic', code: 'basic' }
   ]
+  materials: Material[]
 
   @Input() index!: number
   ref!: string
@@ -66,13 +70,16 @@ export class StyleComponent implements OnInit, OnDestroy {
 
   newPattern?: string
   selected?: PatternItem
+  zoom: number = 5
   editing?: {
     label: string
   }
 
   editingMaterialIndex?: number
 
-  constructor(private cdr: ChangeDetectorRef, private ps: ProjectService) { }
+  constructor(private cdr: ChangeDetectorRef, private ps: ProjectService) {
+    this.materials = Object.entries(this.ps.materials).map((entry) => entry[1])
+  }
 
   private destroy$ = new Subject<void>()
 
@@ -87,11 +94,10 @@ export class StyleComponent implements OnInit, OnDestroy {
     })
 
     this.ps.server.listen('data-pack/styles/update', (data) => {
-      console.log('Update', data)
       data.forEach((style: { ref: string, update: any }) => {
         if (style.ref === this.ref) {
           this.isAbstract = style.update.isAbstract ?? this.isAbstract
-  
+
           if (style.update.implementations) {
             style.update.implementations.forEach((implementation: any) => {
               if (implementation.mode === 'push') {
@@ -102,11 +108,11 @@ export class StyleComponent implements OnInit, OnDestroy {
               this.searchForImplementations()
             })
           }
-  
+
           if (style.update.patterns) {
             style.update.patterns.forEach((pattern: any) => {
               if (pattern.mode === 'push') {
-                this.patterns.push({ id: pattern.id, type: pattern.data.type })
+                this.patterns.push({ id: pattern.id, type: pattern.data.type, fromImplementations: pattern.data.fromImplementations })
               } else if (pattern.mode === 'delete') {
                 this.patterns.splice(this.patterns.findIndex((pt) => pt.id === pattern.id), 1)
                 if (pattern.id === this.selected?.id) {
@@ -138,7 +144,7 @@ export class StyleComponent implements OnInit, OnDestroy {
   }
 
   async updatePattern(id: string) {
-    const data = await this.ps.server.request('data-pack/styles/get-pattern', { ref: this.ref, pattern: id })
+    const data = await this.ps.server.request('data-pack/styles/get-pattern', { ref: this.ref, id: id })
     if (this.selected && this.selected.id === id) {
       let totalWeight = 0
       data.materials.forEach((material: any) => totalWeight += material.weight)
@@ -147,12 +153,23 @@ export class StyleComponent implements OnInit, OnDestroy {
           id: material.id,
           weight: material.weight,
           size: material.size,
-          icon: `${architectsDir}\\${this.ps.architectData.identifier}\\resources\\materials\\${material.id}`,
+          icon: this.ps.materials[material.id].icon,
           percent: material.weight / totalWeight * 100
         }
       })
+      this.cdr.detectChanges()
+
+      this.updatePatternPreview(id)
     }
-    this.cdr.detectChanges()
+  }
+
+  async updatePatternPreview(id: string | undefined = this.selected?.id) {
+    if (this.selected && this.selected.id === id) {
+      const previewData = await this.ps.server.request('data-pack/styles/generate-pattern', { ref: this.ref, pattern: id, size: [1, this.zoom, this.zoom * 4] })
+      const preview = await this.ps.architect.request('data-pack/materials/textures', { materials: previewData[0] })
+      this.selected.preview = preview
+      this.cdr.detectChanges()
+    }
   }
 
   ngOnDestroy(): void {
@@ -192,6 +209,20 @@ export class StyleComponent implements OnInit, OnDestroy {
     this.ps.server.send('data-pack/styles/delete-implementation', { ref: this.ref, implementation: { pack: implementation.pack, location: implementation.location } })
   }
 
+  setZoom(zoom: number) {
+    this.zoom = Math.max(zoom, 1)
+    this.updatePatternPreview()
+  }
+
+  textureOpacity(index: number): number {
+    if (index <= this.zoom) {
+      return 0
+    } else if (index >= this.zoom * 2.5) {
+      return 1
+    }
+    return (this.zoom * 1.5 / (index - this.zoom)) + ((Math.random() * 0.4) - 0.2)
+  }
+
   setNewPattern(value?: string) {
     this.newPattern = value
     this.cdr.detectChanges()
@@ -218,7 +249,7 @@ export class StyleComponent implements OnInit, OnDestroy {
       this.selected = undefined
       this.cdr.detectChanges()
     } else {
-      this.selected = { id: pattern.id, type: pattern.type, materials: [] }
+      this.selected = { id: pattern.id, type: pattern.type, fromImplementations: pattern.fromImplementations, materials: [] }
       this.updatePattern(pattern.id)
     }
   }
@@ -273,9 +304,5 @@ export class StyleComponent implements OnInit, OnDestroy {
 
   get groups(): MaterialGroup[] {
     return this.ps.materialGroups
-  }
-
-  get materials(): Material[] {
-    return Object.entries(this.ps.materials).map((entry) => entry[1])
   }
 }

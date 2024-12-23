@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, Input, OnInit } from "@angular/core"
 import { SceneObjectComponent } from "./object.component"
 import { NgFor } from "@angular/common"
-import { ElementView, SceneService, SceneUpdate } from "../services/scene.service"
+import { ElementView, SceneService, SceneUpdateData } from "../services/scene.service"
 
 @Component({
     selector: 'element',
@@ -17,12 +17,12 @@ export class ElementComponent implements OnInit {
 
     @Input() element!: ElementView
 
-    constructor(private scene: SceneService<SceneUpdate>, private cdr: ChangeDetectorRef) { }
+    constructor(private scene: SceneService<SceneUpdateData>, private cdr: ChangeDetectorRef) { }
 
     ngOnInit(): void {
         console.log('Init Element', this.element.id)
-        this.scene.onUpdate((update) => {
-            if (update.id === this.element.id) {
+        this.scene.onUpdate((update, id) => {
+            if (id === this.element.id) {
                 if (update.view) {
                     this.element = update.view
                     this.cdr.detectChanges()

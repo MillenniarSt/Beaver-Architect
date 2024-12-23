@@ -17,10 +17,7 @@ extend(THREE)
 extend({ OrbitControls })
 
 export type SchematicUpdate = {
-  id: string,
-  mode?: 'push' | 'delete',
   parent?: string,
-
   view?: ElementView,
   node?: ElementNode,
   editGraph?: boolean,
@@ -71,15 +68,15 @@ export class SchematicComponent implements OnInit, OnDestroy {
       })
     }, this.destroy$)
 
-    this.scene.onUpdate((update) => {
-      if (update.id === this.scene.selection[0]) {
+    this.scene.onUpdate((update, id) => {
+      if (id === this.scene.selection[0]) {
         if (update.editGraph || update.form) {
           this.getSelection(this.scene.selection, update.form, update.editGraph)
         }
       }
     })
-    this.scene.onUpdate((update) => {
-      if (update.id === this.scene.selection[0]) {
+    this.scene.onUpdate((update, id) => {
+      if (id === this.scene.selection[0]) {
         this.formDataInput = []
         this.scene.updateEditGraph(undefined)
         this.cdr.detectChanges()
@@ -160,8 +157,8 @@ class SceneGraph implements OnInit {
       }
     }, 'push')
 
-    this.scene.onUpdate((element) => {
-      this.elements.splice(this.elements.findIndex((e) => e.id === element.id), 1)
+    this.scene.onUpdate((element, id) => {
+      this.elements.splice(this.elements.findIndex((e) => e.id === id), 1)
       this.cdr.detectChanges()
     }, 'delete')
 

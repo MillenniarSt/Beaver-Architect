@@ -4,29 +4,42 @@
 
         <ng-template #pattern>
             <div class="flex flex-col w-full gap-3 m-2">
-                <div class="rounded-2xl h-44 flex pattern-preview relative">
+                <div class="rounded-2xl flex pattern-preview relative overflow-hidden" style="aspect-ratio: 4 / 1">
+                    <div *ngIf="selected!.preview != undefined" class="absolute h-full w-full flex flex-col">
+                        <div *ngFor="let row of selected!.preview; index as i" class="flex grow">
+                            <img *ngFor="let material of row" [src]="material" class="grow object-cover" style="image-rendering: pixelated">
+                        </div>
+                    </div>
                     <div class="absolute bottom-3 left-3 flex gap-2">
-                        <button class="h-4">
+                        <button class="h-4" (click)="updatePatternPreview()">
+                            <i class="pi pi-refresh"></i>
+                        </button>
+                        <button class="h-4" (click)="setZoom(zoom - 1)">
                             <i class="pi pi-search-plus"></i>
                         </button>
-                        <button class="h-4">
+                        <button class="h-4" (click)="setZoom(zoom + 1)">
                             <i class="pi pi-search-minus"></i>
                         </button>
                     </div>
-                    <div class="absolute top-4 left-6 right-6 flex items-center gap-4">
+                    <div class="absolute top-4 left-6 right-6 flex flex-col gap-2">
                         <ng-template *ngIf="editing !== undefined; then patternEdit else patternLabel" />
 
                         <ng-template #patternEdit>
-                            <button (click)="editPattern()">
-                                <i class="pi pi-check-circle text-2xl"></i>
-                            </button>
-                            <input [(ngModel)]="editing!.label" class="w-1/3 input-small" (keyup.enter)="editPattern()">
+                            <div class="flex gap-4 items-center">
+                                <button (click)="editPattern()">
+                                    <i class="pi pi-check-circle text-2xl"></i>
+                                </button>
+                                <input [(ngModel)]="editing!.label" class="w-1/3 input-small" (keyup.enter)="editPattern()">
+                            </div>
                         </ng-template>
                         <ng-template #patternLabel>
-                            <button (click)="startEditEditing()">
-                                <i class="pi pi-pencil text-lg"></i>
-                            </button>
-                            <span class="text-3xl font-semibold">{{displayId(selected!.id)}}</span>
+                            <div class="flex gap-4">
+                                <button (click)="startEditEditing()">
+                                    <i class="pi pi-pencil text-lg"></i>
+                                </button>
+                                <span class="text-3xl font-semibold">{{displayId(selected!.id)}}</span>
+                            </div>
+                            <span *ngIf="selected!.fromImplementations!.length > 0">By {{selected!.fromImplementations.join(', ')}}</span>
                         </ng-template>
                     </div>
                 </div>
@@ -145,7 +158,7 @@
                         <i class="pi pi-file"></i>
                         <span class="grow text-start">{{ displayId(pattern.id) }}</span>
                     </button>
-                    <button class="pattern-actions items-center">
+                    <button *ngIf="pattern.fromImplementations.length === 0" class="pattern-actions items-center">
                         <i class="pi pi-trash" (click)="deletePattern(pattern.id)"></i>
                     </button>
                 </div>

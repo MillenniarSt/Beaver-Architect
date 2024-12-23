@@ -6,6 +6,7 @@ import { InputDialogComponent } from './dialog/input/input.component';
 import { ProjectComponent } from './project/project/project.component';
 import { ProgressComponent } from './progress/progress.component';
 import { SettingsComponent } from './settings/settings.component';
+import { ThreeImageComponent } from './architect-util/three-image/three-image.component';
 
 export const routes: Routes = [
     { path: 'home', component: HomeComponent },
@@ -17,5 +18,7 @@ export const routes: Routes = [
 
     { path: 'dialog/base', component: BaseDialogComponent },
     { path: 'dialog/error', component: ErrorDialogComponent },
-    { path: 'dialog/input', component: InputDialogComponent }
+    { path: 'dialog/input', component: InputDialogComponent },
+
+    { path: 'util/three-image', component: ThreeImageComponent }
 ];

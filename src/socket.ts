@@ -1,5 +1,6 @@
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { v4 } from 'uuid';
+import { baseErrorDialog, openBaseDialog, openErrorDialog } from './app/dialog/dialogs';
 
 export type WebSocketMessage = {
   path?: string,
@@ -49,6 +50,7 @@ export class WebSocketServer {
 
           if(message.err) {
             console.error('Socket Error:', message.err)
+            openErrorDialog(message.err, message.path)
           }
 
           if(message.id) {
@@ -59,12 +61,14 @@ export class WebSocketServer {
               }
             } else {
               console.error('Invalid Response Id')
+              openBaseDialog(baseErrorDialog('Invalid Response', 'The Server tried to respond to a request with an unexpected id'))
             }
           } else {
             this.messageSubject.next(message)
           }
         } catch (error) {
           console.error('Invalid socket message', error)
+          openErrorDialog(error)
         }
       };
 
@@ -75,6 +79,7 @@ export class WebSocketServer {
 
       this.ws.onerror = (error) => {
         console.error('WebSocket Error: ', error)
+        openErrorDialog(error)
       }
     })
   }
@@ -93,7 +98,7 @@ export class WebSocketServer {
     })
   }
 
-  send(path: string, data: {}) {
+  send(path: string, data: {} = {}) {
     if(this.isOpen) {
       this.ws!.send(JSON.stringify({path, data}))
     } else {
@@ -101,12 +106,12 @@ export class WebSocketServer {
     }
   }
 
-  request(path: string, data?: {}): Promise<any> {
+  request(path: string, data: {} = {}): Promise<any> {
     return new Promise((resolve) => {
       if(this.isOpen) {
         const id = v4()
         this.openChannels.set(id, resolve)
-        this.ws!.send(JSON.stringify({path: path, id: id, data: data ?? {}}))
+        this.ws!.send(JSON.stringify({path: path, id: id, data: data}))
       } else {
         console.error('WebSocket Server connection not available')
         resolve(undefined)

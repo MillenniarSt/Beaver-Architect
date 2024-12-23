@@ -1,8 +1,9 @@
 import { Injectable, Type } from '@angular/core';
 import { Architect, Project } from '../types';
 import { ProjectType } from '../project/types';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { WebSocketServer } from '../../socket';
+import { ElectronService } from 'ngx-electron';
 
 export type MaterialGroup = {
   label: string,
@@ -48,6 +49,19 @@ export class ProjectService {
 
   private pagesMessageSource = new BehaviorSubject<PageMessage>({})
   pagesMessage = this.pagesMessageSource.asObservable()
+
+  private destroy$ = new Subject<void>()
+
+  constructor(private electron: ElectronService) {
+    this.architect.listen('util/generate-three-image', (data) => {
+      this.electron.ipcRenderer.invoke('generate-images', data)
+    }, this.destroy$)
+  }
+
+  close() {
+    this.destroy$.next()
+    this.destroy$.complete()
+  }
 
   openPage(page: Page) {
     const equal = this.pages.filter((iPage) => iPage.path === page.path && iPage.component === page.component)

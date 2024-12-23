@@ -49,24 +49,24 @@ export class SchematicTreeComponent implements OnInit {
       }
     }, 'push')
 
-    this.scene.onUpdate((update) => {
-      const parent = this.elementsMap.get(update.id)!.parent
+    this.scene.onUpdate((update, id) => {
+      const parent = this.elementsMap.get(id)!.parent
       if (parent) {
-        parent.children!.splice(parent.children!.findIndex((child) => child.data === update.id), 1)
+        parent.children!.splice(parent.children!.findIndex((child) => child.data === id), 1)
         this.cdr.detectChanges()
       } else {
-        const index = this.elementsTree.findIndex((child) => child.data === update.id)
+        const index = this.elementsTree.findIndex((child) => child.data === id)
         if(index !== -1) {
-          this.elementsTree.splice(this.elementsTree.findIndex((child) => child.data === update.id), 1)
+          this.elementsTree.splice(this.elementsTree.findIndex((child) => child.data === id), 1)
           this.cdr.detectChanges()
         }
       }
-      this.elementsMap.delete(update.id)
+      this.elementsMap.delete(id)
     }, 'delete')
 
-    this.scene.onUpdate((update) => {
+    this.scene.onUpdate((update, id) => {
       if (update.node) {
-        const node = this.elementsMap.get(update.id)!
+        const node = this.elementsMap.get(id)!
         node.label = update.node.label
         node.type = update.node.isGroup ? 'group' : 'element'
         node.data = update.node.id
@@ -74,7 +74,7 @@ export class SchematicTreeComponent implements OnInit {
         this.cdr.detectChanges()
       }
       if (update.parent !== undefined) {
-        const node = this.elementsMap.get(update.id)!
+        const node = this.elementsMap.get(id)!
         const oldParentChildren = node.parent?.children ?? this.elementsTree
         oldParentChildren.splice(oldParentChildren.indexOf(node), 1)
         const parentChildren = update.parent ? this.elementsMap.get(update.parent)!.children : this.elementsTree

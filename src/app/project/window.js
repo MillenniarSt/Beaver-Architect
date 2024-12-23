@@ -38,6 +38,13 @@ async function createWindow(identifier, port) {
                 ]
             },
             {
+                label: 'Edit',
+                submenu: [
+                    { label: 'Undo', click: () => win.webContents.send('server:send', { path: 'client/undo' }), accelerator: 'Ctrl+Z' },
+                    { label: 'Redo', click: () => win.webContents.send('server:send', { path: 'client/redo' }), accelerator: 'Ctrl+Shift+Z' }
+                ]
+            },
+            {
                 label: 'Dev',
                 submenu: [
                     { label: 'Tools', click: () => win.webContents.openDevTools(), accelerator: 'Ctrl+Shift+I' }

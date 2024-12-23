@@ -9,10 +9,10 @@
 
 <ng-template #display>
     <as-split direction="horizontal" class="h-full bg-back-1" [ngClass]="{'sidebar-collapsed': !isSidebarExtended}">
-        <as-split-area [size]="isSidebarExtended ? 25 : 0" [minSize]="15">
+        <as-split-area [size]="isSidebarExtended ? 20 : 0" [minSize]="15">
             <sidebars [bars]="sidebars()" [selectIndex]="sidebarIndex" [expanded]="true" (extend)="extendSidebar($event)"></sidebars>
         </as-split-area>
-        <as-split-area [size]="isSidebarExtended ? 75 : 100" [minSize]="40">
+        <as-split-area [size]="isSidebarExtended ? 80 : 100" [minSize]="40">
             <div class="flex h-full">
                 <sidebars *ngIf="!isSidebarExtended" [bars]="sidebars()" [expanded]="false" (extend)="extendSidebar($event)"></sidebars>
                 <pages class="grow"></pages>

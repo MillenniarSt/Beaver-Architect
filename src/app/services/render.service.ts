@@ -4,10 +4,10 @@ import { Material, MeshBasicMaterial, NearestFilter, SRGBColorSpace, Texture, Te
 @Injectable()
 export class RenderService {
 
-  private readonly loader = new TextureLoader()
+  protected readonly loader = new TextureLoader()
 
-  private models: Record<string, RenderModel> = {}
-  private textures: Record<string, Texture> = {}
+  protected models: Record<string, RenderModel> = {}
+  protected textures: Record<string, Texture> = {}
 
   clear() {
     this.models = {}

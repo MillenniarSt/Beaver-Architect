@@ -2,11 +2,12 @@ import { NgClass, NgComponentOutlet, NgFor, NgIf } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, Type } from '@angular/core';
 import { openBaseDialog } from '../../dialog/dialogs';
 import { Page, ProjectService } from '../../services/project.service';
+import { TabViewModule } from 'primeng/tabview';
 
 @Component({
   selector: 'pages',
   standalone: true,
-  imports: [NgIf, NgFor, NgClass, NgComponentOutlet],
+  imports: [NgIf, NgFor, NgClass, NgComponentOutlet, TabViewModule],
   templateUrl: './pages.component.html',
   styleUrl: './pages.component.css'
 })
@@ -22,6 +23,7 @@ export class PagesComponent implements OnInit {
 
   ngOnInit(): void {
     this.ps.pagesMessage.subscribe((message) => {
+      console.log(message)
       if(message.openPage) {
         this.ps.pages.push(message.openPage)
       }

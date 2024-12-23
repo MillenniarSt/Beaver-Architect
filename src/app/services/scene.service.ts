@@ -27,30 +27,34 @@ export type ElementNode = {
   children?: ElementNode[]
 }
 
-export type SceneUpdate = {
+export type SceneUpdate<Data extends SceneUpdateData> = {
   id: string,
   mode?: 'push' | 'delete'
 
+  data: Data
+}
+
+export type SceneUpdateData = {
   view?: ElementView
 }
 
 @Injectable()
-export class SceneService<Update extends SceneUpdate> {
+export class SceneService<UpdateData extends SceneUpdateData> {
 
   elements: ElementView[] = []
 
-  private updatesMessageSource = new BehaviorSubject<Update[]>([])
+  private updatesMessageSource = new BehaviorSubject<SceneUpdate<UpdateData>[]>([])
   updatesMessage = this.updatesMessageSource.asObservable()
 
-  update(updates: Update[]) {
+  update(updates: SceneUpdate<UpdateData>[]) {
     this.updatesMessageSource.next(updates)
   }
 
-  onUpdate(onUpdate: (element: Update) => void, mode?: 'push' | 'delete') {
+  onUpdate(onUpdate: (element: UpdateData, id: string) => void, mode?: 'push' | 'delete') {
     this.updatesMessage.subscribe((updates) => {
       updates.forEach((update) => {
         if(update.mode === mode) {
-          onUpdate(update)
+          onUpdate(update.data, update.id)
         }
       })
     })

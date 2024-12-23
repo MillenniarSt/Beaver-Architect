@@ -10,17 +10,21 @@
 </ng-template>
 
 <ng-template #display>
-    <div class="h-full flex flex-col p-2 pl-0 gap-2">
-        <div class="flex gap-2">
-            <di *ngFor="let page of pages; index as i" class="flex items-center gap-2 rounded-2xl px-3 py-[6px] cursor-pointer hover:bg-main-hover-tr" [ngClass]="{'bg-main-tr': selectedIndex === i}" (click)="select(i)">
-                <img [src]="page.icon" class="h-5 w-5">
-                <span>{{page.label}}</span>
-                <i *ngIf="selectedIndex === i" class="pi pi-times ml-1 cursor-pointer" style="font-size: 0.75rem" (click)="closePage(selectedIndex)"></i>
-            </di>
-        </div>
-    
-        <div class="grow border-solid border-2 border-fore-main rounded-2xl p-2">
-            <ng-container *ngComponentOutlet="pages[selectedIndex].component; inputs: { index: selectedIndex }"></ng-container>
-        </div>
-    </div>
+    <p-tabView [activeIndex]="selectedIndex" [scrollable]="true" class="h-full p-2 pl-0">
+        <p-tabPanel *ngFor="let page of pages; index as i" [header]="page.label">
+            <ng-template pTemplate="header">
+                <div class="flex items-center gap-1 rounded-lg px-2 py-1 cursor-pointer hover:bg-main-hover-tr"
+                    [ngClass]="{'bg-main-tr': selectedIndex === i}" (click)="select(i)">
+                    <img [src]="page.icon" class="h-4 w-4">
+                    <span class="text-sm">{{page.label}}</span>
+                    <i class="pi cursor-pointer" style="font-size: 0.75rem"
+                        [ngClass]="{'pi-times': selectedIndex === i, 'w-3': selectedIndex !== i}"
+                        (click)="closePage(selectedIndex)"></i>
+                </div>
+            </ng-template>
+            <div class="h-full border-solid border-2 border-fore-main rounded-2xl p-2">
+                <ng-container *ngComponentOutlet="page.component; inputs: { index: i }"></ng-container>
+            </div>
+        </p-tabPanel>
+    </p-tabView>
 </ng-template>
