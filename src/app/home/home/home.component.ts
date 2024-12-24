@@ -5,6 +5,7 @@ import { EditProjectComponent } from "../edit-project/edit-project.component";
 import { Project } from '../../types';
 import { ElectronService } from 'ngx-electron';
 import { getProjectDir } from '../../paths';
+import { openInputDialog } from '../../dialog/dialogs';
 
 @Component({
   selector: 'home',
@@ -45,6 +46,15 @@ export class HomeComponent implements OnInit {
   newProject() {
     this.interactive = HomeInteractive.NEW_PROJECT
     this.type = this.type ?? 'world'
+  }
+
+  async joinProject() {
+    const url = await openInputDialog({
+      icon: 'assets/icon/join.svg',
+      title: 'Join Project',
+      message: 'Enter the Public url of the server'
+    })
+    this.electron.ipcRenderer.invoke('project:open', { url: url })
   }
 
   editProject?: Project

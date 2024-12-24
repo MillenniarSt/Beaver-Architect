@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { getProjectDir } from '../../paths';
-import { ContextMenuComponent } from "../../components/context-menu/context-menu.component";
 import { NgIf } from '@angular/common';
 import { Project } from '../../types';
 import { ElectronService } from 'ngx-electron';
@@ -8,7 +7,7 @@ import { ElectronService } from 'ngx-electron';
 @Component({
   selector: 'project-tile',
   standalone: true,
-  imports: [ContextMenuComponent, NgIf],
+  imports: [NgIf],
   templateUrl: './project-tile.component.html',
   styleUrl: './project-tile.component.css'
 })
@@ -35,12 +34,15 @@ export class ProjectTileComponent {
     if(this.showMenu) {
       this.closeContextMenu()
     } else {
-      this.openProject()
+      this.openProject(false)
     }
   }
 
-  openProject() {
-    this.electron.ipcRenderer.invoke('project:open', this.project.identifier)
+  openProject(isPublic: boolean) {
+    this.electron.ipcRenderer.invoke('project:open', {
+      identifier: this.project.identifier,
+      isPublic: isPublic
+    })
   }
 
   contextMenu(event: MouseEvent) {

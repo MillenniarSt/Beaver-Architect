@@ -1,7 +1,10 @@
 <div class="glow-hover project-tile" (contextmenu)="contextMenu($event)" (click)="click()">
     <div *ngIf="showMenu" class="absolute w-full h-full rounded-3xl backdrop-blur-sm flex items-center justify-evenly">
-        <button class="w-16 h-16 rounded-full bg-overlay p-3">
+        <button class="w-16 h-16 rounded-full bg-overlay p-3" (click)="openProject(false)">
             <img src="assets/icon/load.svg">
+        </button>
+        <button class="w-16 h-16 rounded-full bg-overlay p-3" (click)="openProject(true)">
+            <img src="assets/icon/host.svg">
         </button>
         <button class="w-16 h-16 rounded-full bg-overlay p-3" (click)="editProject()">
             <img src="assets/icon/edit.svg">

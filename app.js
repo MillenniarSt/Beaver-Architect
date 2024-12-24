@@ -20,7 +20,27 @@ console.log('                             ')
 
 const log = console.log
 console.log = (...args) => {
-    log('[     Client     ] ', ...args)
+    log('\x1b[90m[     Server     ]', ...args, '\x1b[0m')
+}
+
+const info = console.info
+console.info = (...args) => {
+    info('[     Server     ] ', ...args)
+}
+
+const warn = console.warn
+console.warn = (...args) => {
+    warn('\x1b[33m[     Server     ] | WARN |', ...args, '\x1b[0m')
+}
+
+const error = console.error
+console.error = (...args) => {
+    error('\x1b[31m[     Server     ] | ERROR |', ...args, '\x1b[0m')
+}
+
+const debug = console.debug
+console.debug = (...args) => {
+    debug('[     Server     ] | DEBUG |', ...args)
 }
 
 // Load windows

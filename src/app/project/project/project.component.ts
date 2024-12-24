@@ -31,7 +31,7 @@ export class ProjectComponent {
   sidebarIndex: number = 0
 
   ngOnInit() {
-    this.electron.ipcRenderer.once('project:get', async (e, { identifier, port }) => {
+    this.electron.ipcRenderer.once('project:get', async (e, { identifier, url }) => {
       const process = `load_project:${identifier}`
       openProgress(process, {
         title: `Loading ${identifier}`,
@@ -72,7 +72,7 @@ export class ProjectComponent {
           progress: 0.5
         })
 
-        await this.ps.server.connectLocal(port)
+        await this.ps.server.connect(url)
         update({
           index: 0,
           progress: 0.8

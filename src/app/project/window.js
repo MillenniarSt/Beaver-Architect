@@ -8,7 +8,7 @@ const { default: getAppDataPath } = require('appdata-path')
 
 const projectsWin = new Map()
 
-async function createWindow(identifier, port) {
+async function createWindow(identifier, socketUrl) {
     return new Promise((resolve) => {
         const win = new BrowserWindow({
             width: 1200,
@@ -21,19 +21,23 @@ async function createWindow(identifier, port) {
                 contextIsolation: false
             }
         })
-    
+
         Menu.setApplicationMenu(Menu.buildFromTemplate([
             {
                 label: 'File',
                 submenu: [
                     { label: 'Settings', click: createSettingsWindow },
                     { type: 'separator' },
-                    { label: 'Open new Project', click: () => {
-                        createHomeWindow()
-                    } },
-                    { label: 'Return to Home', click: () => {
-                        createHomeWindow(() => close(identifier))
-                    } },
+                    {
+                        label: 'Open new Project', click: () => {
+                            createHomeWindow()
+                        }
+                    },
+                    {
+                        label: 'Return to Home', click: () => {
+                            createHomeWindow(() => close(identifier))
+                        }
+                    },
                     { label: 'Exit', click: () => close(identifier) }
                 ]
             },
@@ -51,22 +55,22 @@ async function createWindow(identifier, port) {
                 ]
             }
         ]))
-    
+
         win.maximize()
-    
+
         win.loadURL(url.format({
             pathname: path.resolve(__dirname, '..', '..', '..', 'dist', 'front-end', 'browser', 'index.html'),
             protocol: 'file:',
             slashes: true,
             hash: 'project'
         }))
-    
+
         win.webContents.on('did-finish-load', () => {
             closeHome()
-            win.webContents.send('project:get', { identifier, port })
+            win.webContents.send('project:get', { identifier, url: socketUrl })
             resolve(win)
         })
-    
+
         projectsWin.set(identifier, win)
     })
 }
@@ -76,21 +80,33 @@ function close(identifier) {
 }
 
 ipcMain.handle('project:open', async (e, data) => {
-    const port = await (await import('get-port')).default()
+    if (data.url) {
+        console.log(`Connecting to external Project Server url: ${data.url}`)
 
-    console.log(`Opening local Project Server ${data} on ${port}...`)
+        const win = await createWindow(data.url, data.url)
 
-    const win = await createWindow(data, port)
-
-    const process = fork(path.join(getAppDataPath('Beaver Architect'), 'server', 'src', 'index.js'), {
-        cwd: path.join(getAppDataPath('Beaver Architect'), 'server'),
-        stdio: 'inherit'
-    })
-    process.send(JSON.stringify({ identifier: data, port: port }))
-    process.on('message', () => {
-        console.log(`Opened project ${data} successfully`)
         win.webContents.send('project:open-server', {})
-    })
+    } else {
+        const identifier = data.identifier
+        const port = await (await import('get-port')).default()
+
+        console.log(`Opening local Project Server ${identifier} on ${port}...`)
+        if (data.isPublic) {
+            console.log('Project will be public')
+        }
+
+        const win = await createWindow(identifier, `ws://localhost:${port}`)
+
+        const process = fork(path.join(getAppDataPath('Beaver Architect'), 'server', 'src', 'index.js'), {
+            cwd: path.join(getAppDataPath('Beaver Architect'), 'server'),
+            stdio: 'inherit'
+        })
+        process.send(JSON.stringify({ identifier: identifier, port: port }))
+        process.on('message', () => {
+            console.log(`Opened project ${identifier} successfully`)
+            win.webContents.send('project:open-server', {})
+        })
+    }
 })
 
 ipcMain.handle('project:close', (e, data) => {

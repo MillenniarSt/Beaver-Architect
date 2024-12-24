@@ -1,6 +1,6 @@
 <div class="bg-back-1 flex h-full">
 
-  <div class="w-64 flex flex-col gap-6 py-5 pr-1 pl-4">
+  <div class="w-64 flex flex-col py-5 pr-1 pl-4">
     <div class="glow flex after:bg-back-2 after:rounded-2xl">
       <img class="w-[70px] h-[70px]" src="assets/logo.png">
       <div class="py-2">
@@ -8,14 +8,22 @@
         <em class="text-sm">By Millenniar</em>
       </div>
     </div>
-    <div class="decorated-label py-2 pt-14 pb-8 cursor-pointer" (click)="newProject()">
-      <div class="decorated-icon glow">
-        <img src="assets/icon/add.svg">
+    <div class="flex flex-col gap-3 pt-6">
+      <div class="decorated-label cursor-pointer" (click)="newProject()">
+        <div class="decorated-icon glow">
+          <img src="assets/icon/add.svg">
+        </div>
+        <span class="text-lg font-semibold">New Project</span>
       </div>
-      <span class="text-lg font-semibold">New Project</span>
+      <div class="decorated-label cursor-pointer" (click)="joinProject()">
+        <div class="decorated-icon glow">
+          <img src="assets/icon/join.svg">
+        </div>
+        <span class="text-lg font-semibold">Join Project</span>
+      </div>
     </div>
 
-    <div class="p-5 flex flex-col gap-3">
+    <div class="grow px-5 flex flex-col gap-3 justify-center">
       <button class="type-selector"
         [ngClass]="{'selected': isSelectedType('world'), 'unselected': !isSelectedType('world')}"
         (click)="selectType('world')">Worlds</button>
@@ -34,8 +42,7 @@
         (click)="selectType('data_pack')">Data Packs</button>
     </div>
 
-    <div class="grow"></div>
-    <div class="ml-3 mb-2 flex gap-3">
+    <div class="ml-3 my-2 flex gap-3">
       <img class="w-1/2" src="assets/credit/millenniar_title.svg">
       <div class="grow"></div>
       <button (click)="openSettings()">
