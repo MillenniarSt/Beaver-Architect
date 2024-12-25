@@ -107,6 +107,19 @@ ipcMain.handle('project:open', async (e, data) => {
     }
 })
 
+ipcMain.handle('project:open-architect', async (e, data) => {
+    return await new Promise((resolve) => {
+        const architectProcess = fork(path.join(getAppDataPath('Beaver Architect'), 'architects', data.identifier, 'src', 'index.js'), {
+            cwd: path.join(getAppDataPath('Beaver Architect'), 'architects', data.identifier),
+            stdio: 'inherit',
+        })
+    
+        architectProcess.send(JSON.stringify({ identifier: data.project, port: data.port }))
+
+        architectProcess.on('message', () => resolve())
+    })
+})
+
 ipcMain.handle('project:close', (e, data) => {
     close(data)
 })

@@ -100,7 +100,19 @@ export class ProjectComponent {
           index: 1,
           progress: 0
         })
+        if(!isLocal) {
+          this.electron.ipcRenderer.invoke('project:open-architect', { identifier: project.architect.identifier, project: project.identifier, port: project.architect.port })
+          update({
+            index: 1,
+            progress: 0.4
+          })
+        }
         await this.ps.architect.connectLocal(project.architect.port)
+        await this.ps.architect.request('define', { side: 'client' })
+        update({
+          index: 1,
+          progress: 0.6
+        })
 
         await this.ps.architect.request('open-project')
         update({
