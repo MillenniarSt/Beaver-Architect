@@ -10,7 +10,7 @@ export type WebSocketMessage = {
 export type WebSocketResponse = {
   path?: string,
   id?: string,
-  data?: {},
+  data?: any,
   err?: WebSocketError
 }
 
@@ -31,11 +31,11 @@ export class WebSocketServer {
 
   private openChannels: Map<string, (value: any) => boolean | void> = new Map()
 
-  connectLocal(port: number): Promise<void> {
-    return this.connect(`ws://localhost:${port}`)
+  connectLocal(port: number, beaverServer?: WebSocketServer): Promise<void> {
+    return this.connect(`ws://localhost:${port}`, beaverServer)
   }
 
-  connect(url: string): Promise<void> {
+  connect(url: string, beaverServer?: WebSocketServer): Promise<void> {
     return new Promise((resolve) => {
       console.log('Connecting to', url)
       this.ws = new WebSocket(url)
@@ -65,6 +65,11 @@ export class WebSocketServer {
               openBaseDialog(baseErrorDialog('Invalid Response', 'The Server tried to respond to a request with an unexpected id'))
             }
           } else {
+            if(message.path === 'server/send') {
+              beaverServer?.send(message.data.path, message.data.data)
+            } else if(message.path === 'server/request') {
+              beaverServer?.request(message.data.path, message.data.data).then((res) => this.ws!.send(JSON.stringify({ id: message.id, data: res})))
+            }
             this.messageSubject.next(message)
           }
         } catch (error) {
@@ -79,7 +84,7 @@ export class WebSocketServer {
       }
 
       this.ws.onerror = (error) => {
-        console.error('WebSocket Error: ', error)
+        console.error('WebSocket Error:', error)
         openErrorDialog(error)
       }
     })

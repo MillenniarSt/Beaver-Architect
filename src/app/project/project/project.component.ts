@@ -101,14 +101,22 @@ export class ProjectComponent {
           progress: 0
         })
         if(!isLocal) {
-          this.electron.ipcRenderer.invoke('project:open-architect', { identifier: project.architect.identifier, project: project.identifier, port: project.architect.port })
+          this.electron.ipcRenderer.invoke('project:open-architect', { 
+            identifier: project.architect.identifier, 
+            project: project.identifier, 
+            port: project.architect.port,
+            server: url
+          })
           update({
             index: 1,
             progress: 0.4
           })
         }
-        await this.ps.architect.connectLocal(project.architect.port)
+        await this.ps.architect.connectLocal(project.architect.port, isLocal ? undefined : this.ps.server)
         await this.ps.architect.request('define', { side: 'client' })
+        if(!isLocal) {
+          await this.ps.architect.request('define', { side: 'server', isRemote: true })
+        }
         update({
           index: 1,
           progress: 0.6

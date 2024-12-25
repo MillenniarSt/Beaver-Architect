@@ -43,6 +43,12 @@ console.debug = (...args) => {
     debug('[     Client     ] | DEBUG |', ...args)
 }
 
+// Execute first launch
+
+if(!fs.existsSync(getAppDataPath("Beaver Architect"))) {
+    fs.mkdirSync(path.join(getAppDataPath("Beaver Architect"), 'projects', { recursive: true }))
+}
+
 // Load windows
 
 const { createHomeWindow } = require('./src/app/home/window')
