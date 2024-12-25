@@ -8,7 +8,7 @@ const { default: getAppDataPath } = require('appdata-path')
 
 const projectsWin = new Map()
 
-async function createWindow(identifier, socketUrl) {
+async function createWindow(identifier, socketUrl, isLocal) {
     return new Promise((resolve) => {
         const win = new BrowserWindow({
             width: 1200,
@@ -67,7 +67,7 @@ async function createWindow(identifier, socketUrl) {
 
         win.webContents.on('did-finish-load', () => {
             closeHome()
-            win.webContents.send('project:get', { identifier, url: socketUrl })
+            win.webContents.send('project:get', { identifier, url: socketUrl, isLocal })
             resolve(win)
         })
 
@@ -83,9 +83,7 @@ ipcMain.handle('project:open', async (e, data) => {
     if (data.url) {
         console.log(`Connecting to external Project Server url: ${data.url}`)
 
-        const win = await createWindow(data.url, data.url)
-
-        win.webContents.send('project:open-server', {})
+        await createWindow(data.url, data.url, false)
     } else {
         const identifier = data.identifier
         const port = await (await import('get-port')).default()
@@ -95,13 +93,13 @@ ipcMain.handle('project:open', async (e, data) => {
             console.log('Project will be public')
         }
 
-        const win = await createWindow(identifier, `ws://localhost:${port}`)
+        const win = await createWindow(identifier, `ws://localhost:${port}`, true)
 
         const process = fork(path.join(getAppDataPath('Beaver Architect'), 'server', 'src', 'index.js'), {
             cwd: path.join(getAppDataPath('Beaver Architect'), 'server'),
             stdio: 'inherit'
         })
-        process.send(JSON.stringify({ identifier: identifier, port: port }))
+        process.send(JSON.stringify({ identifier: identifier, port: port, isPublic: data.isPublic }))
         process.on('message', () => {
             console.log(`Opened project ${identifier} successfully`)
             win.webContents.send('project:open-server', {})

@@ -31,7 +31,7 @@ export class ProjectComponent {
   sidebarIndex: number = 0
 
   ngOnInit() {
-    this.electron.ipcRenderer.once('project:get', async (e, { identifier, url }) => {
+    this.electron.ipcRenderer.once('project:get', async (e, { identifier, url, isLocal }) => {
       const process = `load_project:${identifier}`
       openProgress(process, {
         title: `Loading ${identifier}`,
@@ -41,8 +41,11 @@ export class ProjectComponent {
         {
           label: 'Starting Server',
           started: true,
-          subtasks: [
-            { label: 'Opening' }
+          subtasks: isLocal ? [
+            { label: 'Opening' },
+            { label: 'Connecting' }
+          ] : [
+            { label: 'Connecting' }
           ]
         },
         {
@@ -62,15 +65,17 @@ export class ProjectComponent {
           ]
         },
       ], async (update) => {
-        await new Promise<void>((resolve) => {
-          this.electron.ipcRenderer.once('project:open-server', () => {
-            resolve()
+        if(isLocal) {
+          await new Promise<void>((resolve) => {
+            this.electron.ipcRenderer.once('project:open-server', () => {
+              resolve()
+            })
           })
-        })
-        update({
-          index: 0,
-          progress: 0.5
-        })
+          update({
+            index: 0,
+            progress: 1
+          })
+        }
 
         await this.ps.server.connect(url)
         update({

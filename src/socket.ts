@@ -37,6 +37,7 @@ export class WebSocketServer {
 
   connect(url: string): Promise<void> {
     return new Promise((resolve) => {
+      console.log('Connecting to', url)
       this.ws = new WebSocket(url)
 
       this.ws.onopen = () => {
