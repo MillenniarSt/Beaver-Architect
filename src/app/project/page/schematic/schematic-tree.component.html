@@ -1,6 +1,18 @@
+<!--             _____
+             ___/     \___        |  |
+          ##/  _.- _.-    \##  -  |  |                       -
+          ##\#=_  '    _=#/##  |  |  |  /---\  |      |      |   ===\  |  __
+          ##   \\#####//   ##  |  |  |  |___/  |===\  |===\  |   ___|  |==/
+          ##       |       ##  |  |  |  |      |   |  |   |  |  /   |  |
+          ##       |       ##  |  \= \= \====  |   |  |   |  |  \___/  |
+          ##\___   |   ___/
+          ##    \__|__/
+-->
+
+
 <div class="h-full flex flex-col gap-2">
     <div class="flex gap-1">
-        <span class="grow font-semibold text-xl">{{title}}</span>
+        <span class="grow font-semibold">{{title}}</span>
     </div>
 
     <ng-template *ngIf="elementsTree.length === 0; then empty else tree"></ng-template>
@@ -20,14 +32,14 @@
                     (onDragStart)="dragStart(node)" (onDragEnd)="dragEnd()" pDroppable (onDrop)="drop(node)">
                     <button class="grow node-area flex gap-2.5 items-center" (click)="select(node.data)">
                         <i class="pi pi-folder"></i>
-                        <span class="grow text-start">{{ node.label }}</span>
+                        <span class="grow text-start text-sm">{{ node.label }}</span>
                     </button>
                     <div class="flex gap-3 node-actions">
                         <button>
-                            <i class="pi pi-folder-plus" (click)="inGroup(node)"></i>
+                            <i class="pi pi-folder-plus text-sm" (click)="inGroup(node)"></i>
                         </button>
                         <button>
-                            <i class="pi pi-trash" (click)="deleteElement(node)"></i>
+                            <i class="pi pi-trash text-sm" (click)="deleteElement(node)"></i>
                         </button>
                     </div>
                 </div>
@@ -37,12 +49,12 @@
                 <div class="flex px-1 node-hover" [ngClass]="{'node-selected': isSelected(node)}" pDraggable
                     (onDragStart)="dragStart(node)" (onDragEnd)="dragEnd()" pDroppable (onDrop)="drop(node)">
                     <button class="grow node-area flex gap-2 items-center" (click)="select(node.data)">
-                        <img src="assets/icon/element.svg" class="h-5">
-                        <span class="grow text-start">{{ node.label }}</span>
+                        <img src="assets/icon/element.svg" class="h-4">
+                        <span class="grow text-start text-sm">{{ node.label }}</span>
                     </button>
                     <button class="flex gap-3 node-actions items-center">
-                        <i class="pi pi-folder-plus" (click)="inGroup(node)"></i>
-                        <i class="pi pi-trash" (click)="deleteElement(node)"></i>
+                        <i class="pi pi-folder-plus text-sm" (click)="inGroup(node)"></i>
+                        <i class="pi pi-trash text-sm" (click)="deleteElement(node)"></i>
                     </button>
                 </div>
             </ng-template>
