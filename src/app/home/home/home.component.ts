@@ -9,34 +9,34 @@
 //      ##    \__|__/
 //
 
-import { NgClass, NgFor, NgIf } from '@angular/common';
+import { NgClass, NgIf } from '@angular/common';
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { ProjectsComponent } from "../projects/projects.component";
 import { EditProjectComponent } from "../edit-project/edit-project.component";
-import { Project } from '../../types';
-import { ElectronService } from 'ngx-electron';
-import { getProjectDir } from '../../paths';
 import { openInputDialog } from '../../dialog/dialogs';
+import { CardModule } from 'primeng/card';
+import { ButtonModule } from 'primeng/button';
+import { HomeService, Project } from '../../services/home.service';
+import { getClientSettingsGroups, openSettings } from '../../settings/settings';
 
 @Component({
   selector: 'home',
   standalone: true,
-  imports: [NgClass, NgFor, NgIf, ProjectsComponent, EditProjectComponent],
+  imports: [NgIf, NgClass, ProjectsComponent, EditProjectComponent, CardModule, ButtonModule],
+  providers: [HomeService],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit {
 
-  loading = true
+  loading = false
 
-  constructor(private cdr: ChangeDetectorRef, private electron: ElectronService) { }
+  constructor(private cdr: ChangeDetectorRef, private home: HomeService) { }
 
   ngOnInit(): void {
-    this.electron.ipcRenderer.invoke('architect:load-all').then(() => {
-      this.electron.ipcRenderer.invoke('project:load-all').then(() => {
-        this.loading = false
-        this.cdr.detectChanges()
-      })
+    this.home.load().then(() => {
+      this.loading = false
+      this.cdr.detectChanges()
     })
   }
 
@@ -49,7 +49,7 @@ export class HomeComponent implements OnInit {
   }
 
   selectType(type: string): void {
-    if(this.interactive === HomeInteractive.PROJECTS) {
+    if (this.interactive === HomeInteractive.PROJECTS) {
       this.type = this.type === type ? undefined : type
     }
   }
@@ -65,18 +65,15 @@ export class HomeComponent implements OnInit {
       title: 'Join Project',
       message: 'Enter the Public url of the server'
     })
-    this.electron.ipcRenderer.invoke('project:open', { url: url })
+    // TODO
   }
 
   editProject?: Project
-  editProjectInfo?: string
 
   doEditProject(identifier: string) {
-    this.electron.ipcRenderer.invoke('project:get', identifier).then((project) => {
-      this.editProject = project.data
-      this.editProjectInfo = project.info
-      this.changeInteractive(HomeInteractive.EDIT_PROJECT)
-    })
+    this.changeInteractive(HomeInteractive.EDIT_PROJECT)
+    this.editProject = this.home.getProject(identifier)
+    this.changeInteractive(HomeInteractive.EDIT_PROJECT)
   }
 
   changeInteractive(interactive: HomeInteractive) {
@@ -84,7 +81,9 @@ export class HomeComponent implements OnInit {
   }
 
   openSettings() {
-    this.electron.ipcRenderer.invoke('settings:open')
+    openSettings(getClientSettingsGroups(), (output) => {
+      console.log(output)
+    })
   }
 }
 

@@ -1,0 +1,95 @@
+<!--             _____
+             ___/     \___        |  |
+          ##/  _.- _.-    \##  -  |  |                       -
+          ##\#=_  '    _=#/##  |  |  |  /---\  |      |      |   ===\  |  __
+          ##   \\#####//   ##  |  |  |  |___/  |===\  |===\  |   ___|  |==/
+          ##       |       ##  |  |  |  |      |   |  |   |  |  /   |  |
+          ##       |       ##  |  \= \= \====  |   |  |   |  |  \___/  |
+          ##\___   |   ___/
+          ##    \__|__/
+-->
+
+
+<div class="h-full flex flex-col gap-2 p-2">
+    <div class="relative process h-6">
+        <p-progressBar class="absolute left-0 right-0" [showValue]="false" [value]="progress * 100" />
+        <div class="flex items-center pr-1 z-10 absolute left-0 right-0">
+            <div class="grow flex items-center gap-2 px-1" style="-webkit-app-region: drag">
+                <i class="pi pi-spin pi-spinner" style="font-size: 1rem"></i>
+                <span class="grow text-sm">> {{ process }}...</span>
+            </div>
+            <button *ngIf="cancellable" (click)="end()">
+                <i class="pi pi-times" style="font-size: 1rem"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="grow flex gap-3">
+        <p-panel class="grow" header="Tasks">
+            <ng-template #header></ng-template>
+            <p-tree class="md:w-30rem" [value]="tasksTree" (onNodeExpand)="nodeExpand($event)"
+                (onNodeCollapse)="nodeCollapse($event)">
+                <ng-template let-node pTemplate="undone">
+                    <div class="flex gap-2 items-center">
+                        <i class="pi pi-times-circle" style="color: #cf1010; font-size: 1.25rem"></i>
+                        <span>{{ node.label }}</span>
+                    </div>
+                </ng-template>
+                <ng-template let-node pTemplate="executing">
+                    <div class="flex gap-2 items-center">
+                        <i class="pi pi-spin pi-spinner" style="color: #a5a5a5; font-size: 1.25rem"></i>
+                        <span>{{ node.label }}</span>
+                    </div>
+                </ng-template>
+                <ng-template let-node pTemplate="completed">
+                    <div class="flex gap-2 items-center">
+                        <i class="pi pi-check-circle" style="color: #23cf10; font-size: 1.25rem"></i>
+                        <span>{{ node.label }}</span>
+                    </div>
+                </ng-template>
+            </p-tree>
+        </p-panel>
+
+        <div class="grow-[2] flex flex-col">
+            <div class="flex p-2">
+                <div class="grow flex flex-col">
+                    <span class="text-2xl font-semibold">{{title}}</span>
+                    <span>{{description}}</span>
+                </div>
+                <div class="w-40 h-16 flex items-center justify-center">
+                    <ng-template *ngIf="progress === 1; then done else loader"></ng-template>
+                    <ng-template #done>
+                        <p-button severity="success" (click)="end()">Done</p-button>
+                    </ng-template>
+                    <ng-template #loader>
+                        <div class="loader"></div>
+                    </ng-template>
+                </div>
+            </div>
+            <div class="grow flex flex-col gap-2">
+                <p-card *ngFor="let task of tasksTree; index as i" class="rounded-xl task">
+                    <div *ngIf="taskProgress[i] === null" class="flex items-center gap-3 m-1">
+                        <i class="pi pi-times-circle" style="color: #cf1010; font-size: 1.5rem"></i>
+                        <span class="grow text-lg font-semibold">{{task.label}}</span>
+                    </div>
+
+                    <div *ngIf="taskProgress[i] !== null && taskProgress[i]! < 1"
+                        class="flex flex-col gap-2 m-1 mb-1.5">
+                        <div class="flex items-center gap-3">
+                            <i class="pi pi-spin pi-spinner" style="color: #a5a5a5; font-size: 1.5rem"></i>
+                            <span class="grow text-lg font-semibold">{{task.label}}</span>
+                        </div>
+                        <p-progressBar [showValue]="taskProgress[i]! > 0.08"
+                            [mode]="taskProgress[i] == 0 ? 'indeterminate' : 'determinate'"
+                            [value]="displayTaskProgress(taskProgress[i]!)" />
+                    </div>
+
+                    <div *ngIf="taskProgress[i] && taskProgress[i]! >= 1" class="flex items-center gap-3 m-1">
+                        <i class="pi pi-check-circle" style="color: #23cf10; font-size: 1.5rem"></i>
+                        <span class="grow text-lg font-semibold">{{task.label}}</span>
+                    </div>
+                </p-card>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,73 @@
+/* PrimeNG */
+
+@import "primeicons/primeicons.css";
+
+/* Tailwind */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* HTML Adjust */
+
+img {
+    object-fit: cover;
+}
+
+input {
+    width: 100%;
+}
+
+hr {
+  border-color: var(--p-surface-400);
+}
+
+/* Quill Adjust */
+
+.p-editor-container {
+    height: calc(100% - 50px);
+}
+
+/* PrimeNG Adjust */
+
+.p-button {
+    width: 100%;
+}
+
+.p-card {
+    height: 100%;
+}
+.p-card-body {
+    height: 100%;
+}
+.p-card-content {
+    height: 100%;
+}
+
+.p-panel {
+    height: 100%;
+}
+
+.p-tabpanels {
+    height: 100%;
+}
+.p-tabview-panel {
+    height: 100%;
+}
+.p-tab-active {
+	border-radius: 0.75rem 0.75rem 0 0;
+}
+.p-tabpanels {
+    border-radius: 0.75rem;
+}
+.p-tablist-tab-list {
+    padding: 0 0.75rem;
+}
+
+.p-tooltip-text {
+    font-size: 0.85rem;
+}
+
+.p-tree-node-label {
+    width: 100%;
+}

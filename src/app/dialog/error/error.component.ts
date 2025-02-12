@@ -11,7 +11,8 @@
 
 import { NgIf } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { ElectronService } from 'ngx-electron';
+import { emit, once } from '@tauri-apps/api/event';
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 
 @Component({
   selector: 'dialog-error',
@@ -22,7 +23,7 @@ import { ElectronService } from 'ngx-electron';
 })
 export class ErrorDialogComponent implements OnInit {
 
-  constructor(private electron: ElectronService, private cdRef: ChangeDetectorRef) { }
+  constructor(private cdRef: ChangeDetectorRef) { }
 
   name: string = ''
   message: string = ''
@@ -34,8 +35,8 @@ export class ErrorDialogComponent implements OnInit {
   hasReport: boolean = false
 
   ngOnInit() {
-    this.electron.ipcRenderer.once('dialog:get', (e, data) => {
-      const { err, url } = data
+    once<any>('dialog:get', (event) => {
+      const { err, url } = event.payload
 
       this.name = err.name ?? 'Error'
       this.message = err.message ?? 'Un unexpected error occurred on the application'
@@ -45,7 +46,9 @@ export class ErrorDialogComponent implements OnInit {
       this.url = url
 
       this.cdRef.detectChanges()
-    });
+    })
+
+    emit('dialog:ready')
   }
 
   report() {
@@ -53,6 +56,7 @@ export class ErrorDialogComponent implements OnInit {
   }
 
   close() {
-    this.electron.ipcRenderer.invoke('dialog:close')
+    emit('dialog:close')
+    getCurrentWebviewWindow().close()
   }
 }

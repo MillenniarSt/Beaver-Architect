@@ -11,7 +11,8 @@
 
 import { NgIf } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { ElectronService } from 'ngx-electron';
+import { convertFileSrc } from '@tauri-apps/api/core';
+import { open } from '@tauri-apps/plugin-dialog';
 
 @Component({
   selector: 'image-picker',
@@ -27,10 +28,18 @@ export class ImagePickerComponent {
 
   @Output() changeImage = new EventEmitter<string>()
 
-  constructor(private electron: ElectronService) { }
+  get ImageSrc(): string | undefined {
+    return this.image ? convertFileSrc(this.image) : undefined
+  }
 
   async chooseImage(): Promise<void> {
-    this.image = (await this.electron.ipcRenderer.invoke('dialog:open-file', {name: 'Images', extensions: ['png', 'jpg', 'jpeg']})) ?? this.image
+    this.image = await open({
+      title: 'Choose an Image',
+      filters: [{
+        name: 'Images',
+        extensions: ['png', 'jpg', 'jpeg']
+      }]
+    }) ?? undefined
     this.changeImage.emit(this.image)
   }
 

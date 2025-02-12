@@ -10,13 +10,17 @@
 //
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
-import { ProjectBar } from '../types';
+import { ProjectBar } from '../display';
 import { NgClass, NgComponentOutlet, NgFor, NgIf } from '@angular/common';
+import { AvatarModule } from 'primeng/avatar';
+import { Project, ProjectService } from '../../services/project.service';
+import { PanelModule } from 'primeng/panel';
+import { CardModule } from 'primeng/card';
 
 @Component({
   selector: 'sidebars',
   standalone: true,
-  imports: [NgIf, NgFor, NgComponentOutlet, NgClass],
+  imports: [NgFor, NgComponentOutlet, NgClass, AvatarModule, PanelModule, CardModule],
   templateUrl: './sidebars.component.html',
   styleUrl: './sidebars.component.css'
 })
@@ -25,22 +29,15 @@ export class SidebarsComponent {
   @Input() bars: ProjectBar[] = []
 
   @Input() selectIndex: number = 0
-  @Input() expanded: boolean = true
 
-  @Output() extend = new EventEmitter<number>()
-
-  constructor(private cdr: ChangeDetectorRef) { }
+  constructor(private cdr: ChangeDetectorRef, private ps: ProjectService) { }
 
   select(index: number): void {
-    if (this.expanded) {
-      if (this.selectIndex === index) {
-        this.extend.emit(-1)
-      } else {
-        this.selectIndex = index
-        this.cdr.detectChanges()
-      }
-    } else {
-      this.extend.emit(index)
-    }
+    this.selectIndex = index
+    this.cdr.detectChanges()
+  }
+
+  get project(): Project {
+    return this.ps.project
   }
 }

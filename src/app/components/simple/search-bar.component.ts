@@ -10,19 +10,32 @@
 //
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { InputIconModule } from 'primeng/inputicon';
-import { IconFieldModule } from 'primeng/iconfield';
+import { FloatLabelModule } from "primeng/floatlabel"
+import { InputTextModule } from 'primeng/inputtext';
+import { InputGroupModule } from 'primeng/inputgroup';
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { FormsModule } from '@angular/forms';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'search-bar',
   standalone: true,
-  imports: [IconFieldModule, InputIconModule, FormsModule],
+  imports: [NgIf, FloatLabelModule, InputTextModule, InputGroupModule, InputGroupAddonModule, FormsModule],
   template: `
-    <p-iconField class="w-full" iconPosition="left">
-      <p-inputIcon styleClass="pi pi-search" />
-      <input type="text" pInputText [placeholder]="placeholder" [(ngModel)]="value" (keyup.enter)="onEnter()" (ngModelChange)="change()" />
-    </p-iconField>
+    <p-inputgroup class="w-full">
+      <p-inputgroup-addon>
+        <i class="pi pi-search"></i>
+      </p-inputgroup-addon>
+      <p-floatlabel class="grow" variant="on">
+        <input pInputText name="search" id="search" [(ngModel)]="value" (keyup.enter)="onEnter()" (ngModelChange)="change()"/>
+        <label for="search">{{placeholder}}</label>
+      </p-floatlabel>
+      <p-inputgroup-addon *ngIf="value.trim() !== ''">
+        <button (click)="clear()">
+          <i class="pi pi-times-circle"></i>
+        </button>
+      </p-inputgroup-addon>
+    </p-inputgroup>
   `
 })
 export class SearchBarComponent {
@@ -32,6 +45,11 @@ export class SearchBarComponent {
 
   @Input() value: string = ''
   @Input() placeholder: string = 'Search'
+
+  clear() {
+    this.value = ''
+    this.change()
+  }
 
   onEnter() {
     this.submit.emit(this.value)

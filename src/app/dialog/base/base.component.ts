@@ -9,53 +9,54 @@
 //      ##    \__|__/
 //
 
-import { NgClass, NgFor, NgIf } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { ElectronService } from 'ngx-electron';
+import { NgClass, NgFor, NgIf, NgStyle } from '@angular/common'
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core'
+import { ButtonModule } from 'primeng/button'
+import { emit, once } from '@tauri-apps/api/event'
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
+
+export type BaseDialog = {
+  icon?: string,
+  severity?: string
+  title: string,
+  message: string,
+  buttons?: DialogButton[],
+  hasReport?: boolean
+}
 
 export type DialogButton = {
   id?: number
-  name: string
-  color?: string
+  label: string
+  severity?: 'success' | 'info' | 'warn' | 'danger' | 'help' | 'primary' | 'secondary' | 'contrast'
+  variant?: 'text' | 'outlined'
+  icon?: string
   focus?: boolean
 }
 
 @Component({
   selector: 'dialog-base',
   standalone: true,
-  imports: [NgIf, NgFor, NgClass],
+  imports: [NgIf, NgFor, NgClass, ButtonModule],
   templateUrl: './base.component.html',
   styleUrl: './base.component.css'
 })
 export class BaseDialogComponent implements OnInit {
 
-  constructor(private electron: ElectronService, private cdRef: ChangeDetectorRef) { }
+  constructor(private cdRef: ChangeDetectorRef) { }
 
-  color: string = 'info'
-  icon: string = 'assets/icon/info.svg'
-  title: string = ''
-  message: string = ''
-
-  buttons: DialogButton[] = []
-
-  hasReport: boolean = false
+  data?: BaseDialog
 
   ngOnInit() {
-    this.electron.ipcRenderer.once('dialog:get', (e, data) => {
-      this.color = data.color ?? 'info'
-      this.icon = data.icon ?? 'assets/icon/info.svg'
-      this.title = data.title ?? 'Untitled'
-      this.message = data.message ?? ''
-      this.buttons = data.buttons ?? [{name: 'OK', focus: true}]
-      this.hasReport = data.hasReport ?? false
-
+    once<any>('dialog:get', (event) => {
+      this.data = event.payload
       this.cdRef.detectChanges()
-    });
+    })
+
+    emit('dialog:ready')
   }
 
-  getColorBtn(index: number): string {
-    console.log('btn-' + (this.buttons[index].color ?? (this.buttons[index].focus ? 'info' : 'empty')))
-    return 'btn-' + (this.buttons[index].color ?? (this.buttons[index].focus ? 'info' : 'empty'))
+  getBorder(): string {
+    return `border: solid 2px var(--p-button-${this.data!.severity ?? 'info'}-background)`
   }
 
   report() {
@@ -63,6 +64,7 @@ export class BaseDialogComponent implements OnInit {
   }
 
   click(id?: number) {
-    this.electron.ipcRenderer.invoke('dialog:close', id)
+    emit('dialog:close', id)
+    getCurrentWebviewWindow().close()
   }
 }

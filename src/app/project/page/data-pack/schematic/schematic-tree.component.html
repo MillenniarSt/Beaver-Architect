@@ -1,0 +1,57 @@
+<!--             _____
+             ___/     \___        |  |
+          ##/  _.- _.-    \##  -  |  |                       -
+          ##\#=_  '    _=#/##  |  |  |  /---\  |      |      |   ===\  |  __
+          ##   \\#####//   ##  |  |  |  |___/  |===\  |===\  |   ___|  |==/
+          ##       |       ##  |  |  |  |      |   |  |   |  |  /   |  |
+          ##       |       ##  |  \= \= \====  |   |  |   |  |  \___/  |
+          ##\___   |   ___/
+          ##    \__|__/
+-->
+
+
+<ng-template *ngIf="elementsTree.length === 0; then empty else tree"></ng-template>
+
+    <ng-template #empty>
+        <div class="h-full flex flex-col gap-3 items-center justify-center">
+            <i class="pi pi-file-plus text-3xl"></i>
+            <span class="text-lg">Create An Element</span>
+        </div>
+    </ng-template>
+
+    <ng-template #tree>
+        <p-tree class="h-full w-full md:w-30rem" [value]="elementsTree" (onNodeExpand)="nodeExpand($event)"
+            (onNodeCollapse)="nodeCollapse($event)">
+            <ng-template let-node pTemplate="group">
+                <div class="flex px-1 node-hover" [ngClass]="{'node-selected': isSelected(node)}" pDraggable
+                    (onDragStart)="dragStart(node)" (onDragEnd)="dragEnd()" pDroppable (onDrop)="drop(node)">
+                    <button class="grow node-area flex gap-2.5 items-center" (click)="select(node.data)">
+                        <i class="pi pi-folder"></i>
+                        <span class="grow text-start text-sm">{{ node.label }}</span>
+                    </button>
+                    <div class="flex gap-3 node-actions">
+                        <button>
+                            <i class="pi pi-folder-plus text-sm" (click)="inGroup(node)"></i>
+                        </button>
+                        <button>
+                            <i class="pi pi-trash text-sm" (click)="deleteElement(node)"></i>
+                        </button>
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template let-node pTemplate="element">
+                <div class="flex px-1 node-hover" [ngClass]="{'node-selected': isSelected(node)}" pDraggable
+                    (onDragStart)="dragStart(node)" (onDragEnd)="dragEnd()" pDroppable (onDrop)="drop(node)">
+                    <button class="grow node-area flex gap-2 items-center" (click)="select(node.data)">
+                        <img src="assets/icon/element.svg" class="h-4">
+                        <span class="grow text-start text-sm">{{ node.label }}</span>
+                    </button>
+                    <button class="flex gap-3 node-actions items-center">
+                        <i class="pi pi-folder-plus text-sm" (click)="inGroup(node)"></i>
+                        <i class="pi pi-trash text-sm" (click)="deleteElement(node)"></i>
+                    </button>
+                </div>
+            </ng-template>
+        </p-tree>
+    </ng-template>

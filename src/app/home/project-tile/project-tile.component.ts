@@ -10,10 +10,8 @@
 //
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { getProjectDir } from '../../paths';
 import { NgIf } from '@angular/common';
-import { Project } from '../../types';
-import { ElectronService } from 'ngx-electron';
+import { HomeService, Project } from '../../services/home.service';
 
 @Component({
   selector: 'project-tile',
@@ -24,8 +22,6 @@ import { ElectronService } from 'ngx-electron';
 })
 export class ProjectTileComponent {
 
-  constructor(private electron: ElectronService) { }
-
   @Input() project!: Project
 
   @Output() edit = new EventEmitter<Project>()
@@ -33,13 +29,7 @@ export class ProjectTileComponent {
 
   showMenu: boolean = false
 
-  getBackground(): string {
-    return `${getProjectDir(this.project.identifier)}\\background.png`
-  }
-
-  getImage() {
-    return `${getProjectDir(this.project.identifier)}\\image.png`
-  }
+  constructor(private home: HomeService) { }
 
   click() {
     if(this.showMenu) {
@@ -50,10 +40,7 @@ export class ProjectTileComponent {
   }
 
   openProject(isPublic: boolean) {
-    this.electron.ipcRenderer.invoke('project:open', {
-      identifier: this.project.identifier,
-      isPublic: isPublic
-    })
+    this.home.openProject(this.project.identifier, isPublic)
   }
 
   contextMenu(event: MouseEvent) {

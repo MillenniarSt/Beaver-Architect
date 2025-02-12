@@ -17,7 +17,7 @@
 .type {
   flex-grow: 1;
   border-radius: 25px;
-  background-color: theme('colors.back.3');
+  background-color: var(--p-surface-700);
   display: flex;
   position: relative;
   place-content: center;
@@ -26,7 +26,7 @@
 }
 
 .type-icon {
-  height: 60%;
+  height: 70%;
   opacity: 0.4;
 }
 
@@ -42,92 +42,7 @@
   padding: 10px 20px;
   gap: 15px;
   border-radius: 20px;
-  background-color: theme('colors.back.3');
+  background-color: var(--p-secondary-700);
   align-items: center;
   cursor: pointer;
-}
-
-/* Markdown Editor */
-
-md-editor .md-editor-container {
-  border: none !important;
-}
-
-md-editor .tool-bar {
-  background-color: theme('colors.back.3') !important;
-  border-radius: 20px;
-  padding: 0 10px;
-  margin-bottom: 20px;
-  display: flex;
-  gap: 15px;
-}
-
-md-editor .btn-group {
-  display: flex;
-  gap: 10px;
-}
-
-md-editor .btn-group:not(:empty):before {
-  background-color: transparent !important;
-}
-
-md-editor .pull-right {
-  display: none;
-}
-
-md-editor .ace-tm {
-  background-color: theme('colors.back.3') !important;
-  color: theme('colors.fore.1') !important;
-  border-radius: 20px;
-}
-
-md-editor .ace_gutter {
-  background-color: theme('colors.back.3') !important;
-  color: theme('colors.fore.1') !important;
-}
-
-md-editor .ace_gutter-active-line {
-  background-color: theme('colors.back.3') !important;
-}
-
-md-editor .preview-panel {
-  background-color: theme('colors.back.3') !important;
-  border-radius: 20px;
-  margin-left: 10px;
-}
-
-md-editor h1 {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-}
-
-md-editor h2 {
-  font-size: 1.25rem;
-  font-weight: 750;
-  margin-bottom: 0.5rem;
-}
-
-md-editor h2 {
-  font-size: 1rem;
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-}
-
-md-editor p {
-  font-size: 0.8rem;
-  margin-bottom: 0.5rem;
-}
-
-md-editor ul,
-md-editor ol {
-  margin-left: 1.5rem;
-  list-style-type: disc;
-}
-
-md-editor blockquote {
-  font-style: italic;
-  padding-left: 1rem;
-  border-left: 4px solid #ccc;
-  color: #6b7280;
 }

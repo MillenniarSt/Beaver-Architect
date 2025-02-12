@@ -9,17 +9,17 @@
           ##    \__|__/
 -->
 
-
-<div class='dialog-container'>
-    <div class="dialog" [ngClass]="color">
-        <span class="text-2xl font-semibold text-center">{{title}}</span>
-        <p class='grow'>{{message}}</p>
+<div *ngIf="data" class='dialog-container'>
+    <div class="dialog" [style]="getBorder()">
+        <span class="text-2xl font-semibold text-center">{{data.title}}</span>
+        <p class='grow'>{{data.message}}</p>
         <div class='dialog-button-region'>
-            <button *ngFor="let button of buttons; index as i" class="rounded-2xl grow" [ngClass]="getColorBtn(i)"
-                [ngClass]="{'glow': button.focus}" (click)="click(button.id)">{{button.name}}</button>
+            <p-button *ngFor="let button of data.buttons; index as i" class="grow" [variant]="button.variant"
+                [severity]="button.severity" [icon]="button.icon" [label]="button.label"
+                [ngClass]="{'glow': button.focus}" (click)="click(button.id)"></p-button>
         </div>
     </div>
-    <img [src]="icon" class="dialog-icon">
-    <img *ngIf="hasReport" src="assets/icon/report.svg"
+    <img [src]="data.icon" class="dialog-icon">
+    <img *ngIf="data.hasReport" src="assets/icon/report.svg"
         class='absolute top-[73px] right-[18px] h-10 w-10 cursor-pointer' (click)="report()">
 </div>

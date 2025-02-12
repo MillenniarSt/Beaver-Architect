@@ -10,11 +10,35 @@
 //
 
 import { Injectable, Type } from '@angular/core';
-import { Architect, Project } from '../types';
-import { ProjectType } from '../project/types';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { WebSocketServer } from '../../socket';
-import { ElectronService } from 'ngx-electron';
+import { BehaviorSubject } from 'rxjs';
+import { WebSocketServer } from '../socket';
+import { Command } from '@tauri-apps/plugin-shell'
+import { openErrorDialog } from '../dialog/dialogs';
+import { appDataDir } from '@tauri-apps/api/path';
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
+
+export type Project = {
+  identifier: string
+
+  type: string
+  architect: string
+
+  name: string
+  authors: string
+  description: string
+
+  image: string
+  background: string
+}
+
+export type Architect = {
+  identifier: string,
+  version: string,
+
+  name: string,
+  icon: string,
+  port: number
+}
 
 export type MaterialGroup = {
   label: string,
@@ -49,29 +73,46 @@ export class ProjectService {
   readonly server: WebSocketServer = new WebSocketServer()
   readonly architect: WebSocketServer = new WebSocketServer()
 
+  isLocal: boolean = true
+  isPublic: boolean = false
+
   _project?: Project
-  _projectType?: ProjectType
   _architectData?: Architect
 
   materialGroups: MaterialGroup[] = []
   materials: Record<string, Material> = {}
+
+  openServer(identifier: string, port: number): Promise<void> {
+    return new Promise(async (resolve) => {
+      const command = Command.create('run-server', [`${await appDataDir()}\\server\\src\\index.js`])
+
+      command.on('close', (data) => {
+        console.error(`Project Server ${identifier} closed with code ${data.code}`)
+      })
+      command.on('error', (error) => {
+        console.error(`Error in the Project Server ${identifier}`, error)
+        openErrorDialog(error)
+      })
+  
+      command.stdout.on('data', (line) => {
+        console.log('Server Output', line)
+      })
+  
+      command.stderr.on('data', (line) => {
+        console.error(`Error in the Project Server ${identifier} at line: ${line}`)
+      })
+
+      command.execute()
+    })
+  }
 
   pages: Page[] = []
 
   private pagesMessageSource = new BehaviorSubject<PageMessage>({})
   pagesMessage = this.pagesMessageSource.asObservable()
 
-  private destroy$ = new Subject<void>()
-
-  constructor(private electron: ElectronService) {
-    this.architect.listen('util/generate-three-image', (data) => {
-      this.electron.ipcRenderer.invoke('generate-images', data)
-    }, this.destroy$)
-  }
-
   close() {
-    this.destroy$.next()
-    this.destroy$.complete()
+    getCurrentWebviewWindow().close()
   }
 
   openPage(page: Page) {
@@ -94,10 +135,6 @@ export class ProjectService {
 
   get project(): Project {
     return this._project!
-  }
-
-  get projectType(): ProjectType {
-    return this._projectType!
   }
 
   get architectData(): Architect {

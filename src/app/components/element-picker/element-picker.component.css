@@ -19,9 +19,9 @@
 }
 
 .element-icon:hover {
-  background-color: theme('colors.main-hover.tr');
+  background-color: var(--p-primary-300);
 }
 
 .element-icon-selected {
-  background-color: theme('colors.main.tr');
+  background-color: var(--p-primary-700);
 }

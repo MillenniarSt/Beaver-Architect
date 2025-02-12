@@ -55,12 +55,12 @@ export class PagesComponent implements OnInit {
     if (page.isSaved === false && page.save) {
       openBaseDialog({
         icon: 'assets/icon/warning.svg',
-        color: 'info',
+        severity: 'info',
         title: 'Unsaved Changes',
         message: 'There are unsaved changes, do you want to save ',
         buttons: [
-          { name: 'Yes', color: 'info', focus: true, id: 1 },
-          { name: 'No' }
+          { label: 'Yes', severity: 'info', focus: true, id: 1 },
+          { label: 'No' }
         ]
       }).then((i) => {
         if (i) {

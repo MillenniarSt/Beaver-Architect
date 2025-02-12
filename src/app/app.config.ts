@@ -1,19 +1,18 @@
-//             _____
-//         ___/     \___        |  |
-//      ##/  _.- _.-    \##  -  |  |                       -
-//      ##\#=_  '    _=#/##  |  |  |  /---\  |      |      |   ===\  |  __
-//      ##   \\#####//   ##  |  |  |  |___/  |===\  |===\  |   ___|  |==/
-//      ##       |       ##  |  |  |  |      |   |  |   |  |  /   |  |
-//      ##       |       ##  |  \= \= \====  |   |  |   |  |  \___/  |
-//      ##\___   |   ___/
-//      ##    \__|__/
-//
-
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
-
-import { routes } from './app.routes';
+import { ApplicationConfig } from "@angular/core";
+import { provideRouter, withHashLocation } from "@angular/router";
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { providePrimeNG } from 'primeng/config';
+import { routes } from "./app.routes";
+import { BeaverTheme } from "./app.theme";
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes)]
-};
+  providers: [
+    provideRouter(routes, withHashLocation()),
+    provideAnimationsAsync(),
+    providePrimeNG({
+      theme: {
+        preset: BeaverTheme
+      }
+    })
+  ]
+}

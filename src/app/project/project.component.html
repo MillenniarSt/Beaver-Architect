@@ -1,0 +1,53 @@
+<!--             _____
+             ___/     \___        |  |
+          ##/  _.- _.-    \##  -  |  |                       -
+          ##\#=_  '    _=#/##  |  |  |  /---\  |      |      |   ===\  |  __
+          ##   \\#####//   ##  |  |  |  |___/  |===\  |===\  |   ___|  |==/
+          ##       |       ##  |  |  |  |      |   |  |   |  |  /   |  |
+          ##       |       ##  |  \= \= \====  |   |  |   |  |  \___/  |
+          ##\___   |   ___/
+          ##    \__|__/
+-->
+
+
+<div class="h-full flex flex-col">
+    <div class="flex bg-surface-950 items-center gap-1">
+        <p-menubar [model]="menuItems" class="text-sm">
+            <ng-template #start>
+                <p-avatar image="assets/logo.png" shape="square" class="pr-2" [style]="{'-webkit-app-region': 'drag'}"/>
+            </ng-template>
+        </p-menubar>
+        <div class="grow h-full" style="-webkit-app-region: drag"></div>
+        <button class="px-2 rounded-md cursor-auto hover:bg-surface-800" (click)="minimize()">
+            <i class="pi pi-minus" style="font-size: 14px"></i>
+        </button>
+        <button class="px-2 rounded-md cursor-auto hover:bg-surface-800" (click)="maximize()">
+            <i class="pi pi-expand" style="font-size: 14px"></i>
+        </button>
+        <button class="px-2 rounded-md cursor-auto hover:bg-red-600" (click)="close()">
+            <i class="pi pi-times" style="font-size: 14px"></i>
+        </button>
+    </div>
+
+    <ng-template *ngIf="isLoaded(); then display else loading"></ng-template>
+
+    <ng-template #loading>
+        <div class="grow flex justify-center items-center gap-2 flex-col bg-back-1">
+            <div class="loader"></div>
+            <span class="text-xl font-semibold">Loading...</span>
+        </div>
+    </ng-template>
+
+    <ng-template #display>
+        <p-splitter [panelSizes]="[20, 80]" [minSizes]="[15, 40]" [style]="{ height: '100%' }" class="grow p-2">
+            <ng-template #panel>
+                <sidebars [bars]="sidebars()" [selectIndex]="sidebarIndex" class="w-full"></sidebars>
+            </ng-template>
+            <ng-template #panel>
+                <pages class="grow"></pages>
+            </ng-template>
+        </p-splitter>
+    </ng-template>
+
+    <p-toast position="bottom-right"/>
+</div>

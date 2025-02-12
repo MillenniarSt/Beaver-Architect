@@ -1,27 +1,7 @@
-//             _____
-//         ___/     \___        |  |
-//      ##/  _.- _.-    \##  -  |  |                       -
-//      ##\#=_  '    _=#/##  |  |  |  /---\  |      |      |   ===\  |  __
-//      ##   \\#####//   ##  |  |  |  |___/  |===\  |===\  |   ___|  |==/
-//      ##       |       ##  |  |  |  |      |   |  |   |  |  /   |  |
-//      ##       |       ##  |  \= \= \====  |   |  |   |  |  \___/  |
-//      ##\___   |   ___/
-//      ##    \__|__/
-//
+import { bootstrapApplication } from "@angular/platform-browser";
+import { appConfig } from "./app/app.config";
+import { AppComponent } from "./app/app.component";
 
-import { bootstrapApplication } from '@angular/platform-browser'
-import { AppComponent } from './app/app.component'
-import { provideRouter, withHashLocation } from '@angular/router'
-import { routes } from './app/app.routes'
-import { ElectronService, NgxElectronModule } from 'ngx-electron'
-import { provideHttpClient } from '@angular/common/http'
-import { importProvidersFrom } from '@angular/core'
-
-bootstrapApplication(AppComponent, {
-  providers: [
-    provideRouter(routes, withHashLocation()),
-    provideHttpClient(),
-    importProvidersFrom(NgxElectronModule),
-    ElectronService
-  ]
-}).catch(err => console.error(err))
+bootstrapApplication(AppComponent, appConfig).catch((err) =>
+  console.error(err),
+);

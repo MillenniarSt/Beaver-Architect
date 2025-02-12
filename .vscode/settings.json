@@ -1,8 +1,10 @@
 {
-  "html.customData": [
-    "./node_modules/angular-three/metadata.json"
-  ],
-  "cSpell.words": [
-    "dragdrop"
-  ]
+    "cSpell.words": [
+        "cascadeselect",
+        "connectioncreate",
+        "floatlabel",
+        "inputgroup",
+        "minimizable",
+        "unmaximize"
+    ]
 }

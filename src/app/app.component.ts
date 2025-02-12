@@ -1,32 +1,16 @@
-//             _____
-//         ___/     \___        |  |
-//      ##/  _.- _.-    \##  -  |  |                       -
-//      ##\#=_  '    _=#/##  |  |  |  /---\  |      |      |   ===\  |  __
-//      ##   \\#####//   ##  |  |  |  |___/  |===\  |===\  |   ___|  |==/
-//      ##       |       ##  |  |  |  |      |   |  |   |  |  /   |  |
-//      ##       |       ##  |  \= \= \====  |   |  |   |  |  \___/  |
-//      ##\___   |   ___/
-//      ##    \__|__/
-//
-
-import { Component, OnInit } from '@angular/core'
-import { ElectronService } from 'ngx-electron'
-import { ensurePaths } from './paths'
-import { RouterOutlet } from '@angular/router'
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
-    selector: 'app-root',
-    standalone: true,
-    imports: [RouterOutlet],
-    template: `<router-outlet></router-outlet>`
+  standalone: true,
+  selector: 'app-root',
+  imports: [RouterOutlet],
+  template: `
+    <main class="h-full">
+      <router-outlet></router-outlet>
+    </main>
+  `
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
 
-    title = 'Beaver Architect'
-
-    constructor(private electron: ElectronService) { }
-
-    ngOnInit(): void {
-        ensurePaths(this.electron.ipcRenderer)
-    }
 }

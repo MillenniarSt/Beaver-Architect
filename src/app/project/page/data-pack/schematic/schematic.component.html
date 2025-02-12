@@ -1,0 +1,51 @@
+<!--             _____
+             ___/     \___        |  |
+          ##/  _.- _.-    \##  -  |  |                       -
+          ##\#=_  '    _=#/##  |  |  |  /---\  |      |      |   ===\  |  __
+          ##   \\#####//   ##  |  |  |  |___/  |===\  |===\  |   ___|  |==/
+          ##       |       ##  |  |  |  |      |   |  |   |  |  /   |  |
+          ##       |       ##  |  \= \= \====  |   |  |   |  |  \___/  |
+          ##\___   |   ___/
+          ##    \__|__/
+-->
+
+
+<ng-template *ngIf="isLoaded(); then display else loading"></ng-template>
+
+<ng-template #loading>
+    <div class="h-full flex justify-center items-center gap-2 flex-col bg-back-1">
+        <div class="loader"></div>
+        <span class="text-xl font-semibold">Loading...</span>
+    </div>
+</ng-template>
+
+<ng-template #display>
+    <div class="h-full w-full">
+        <p-splitter [panelSizes]="[80, 20]" [minSizes]="[30, 15]" [style]="{ height: '100%' }" class="w-full h-full">
+            <ng-template #panel>
+                <p-splitter layout="vertical" [panelSizes]="[80, 20]" [minSizes]="[40, 15]" [style]="{ height: '100%' }" class="w-full h-full">
+                    <ng-template #panel>
+                        <ngt-canvas [sceneGraph]="sceneGraph!" class="w-full h-full"/>
+                    </ng-template>
+                    <ng-template #panel>
+                        <p-panel class="w-full">
+
+                        </p-panel>
+                    </ng-template>
+                </p-splitter>
+            </ng-template>
+            <ng-template #panel>
+                <p-panel class="h-full w-full" header="View">
+                    <p-splitter layout="vertical" [panelSizes]="[40, 60]" [minSizes]="[25, 25]" [style]="{ height: '100%' }" class="h-full">
+                        <ng-template #panel>
+                            <form-util *ngIf="formDataInput !== null" [formData]="formDataInput" (edit)="editSelection($event)" class="my-1" />
+                        </ng-template>
+                        <ng-template #panel>
+                            <schematic-tree [ref]="ref" [title]="title" [nodes]="nodes"></schematic-tree>
+                        </ng-template>
+                    </p-splitter>
+                </p-panel>
+            </ng-template>
+        </p-splitter>
+    </div>
+</ng-template>

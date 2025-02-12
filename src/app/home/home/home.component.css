@@ -10,13 +10,18 @@
  *
 */
 
-.type-selector {
-    border-radius: 10px;
+.unselected,
+.selected {
+  width: 100%;
+  height: 35px;
+  border-radius: 10px;
 }
 
-.home-interactive {
-    background-color: theme('colors.back.2');
-    border-radius: 30px;
-    flex-grow: 1;
-    margin: 16px;
+.unselected:hover {
+  background-color: theme('colors.overlay.450');
+}
+
+.selected {
+  background-color: var(--p-primary-600);
+  outline: solid var(--p-primary-400) 2px;
 }

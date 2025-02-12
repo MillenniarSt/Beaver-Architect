@@ -10,6 +10,7 @@
 //
 
 import { Injectable } from '@angular/core';
+import { convertFileSrc } from '@tauri-apps/api/core';
 import { Material, MeshBasicMaterial, NearestFilter, SRGBColorSpace, Texture, TextureLoader } from 'three';
 
 @Injectable()
@@ -30,7 +31,7 @@ export class RenderService {
 
   async loadTexture(key: string, path: string): Promise<void> {
     return new Promise((resolve) => {
-      this.loader.load(path, (texture) => {
+      this.loader.load(convertFileSrc(path), (texture) => {
         texture.minFilter = NearestFilter
         texture.magFilter = NearestFilter
         texture.colorSpace = SRGBColorSpace

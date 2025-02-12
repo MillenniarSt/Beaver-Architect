@@ -1,46 +1,59 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./src/**/*.{html,ts}"],
+  plugins: [require('tailwindcss-primeui')],
   theme: {
     extend: {
       colors: {
-        'fore': {
-          DEFAULT: '#efefef',
-          1: '#efefef',
-          2: '#cfcfcf',
-          3: '#afafaf',
-          4: '#8f8f8f',
-          5: '#6f6f6f',
-          main: '#005fdd66'
-        },
-        'back': {
-          DEFAULT: '#1f1f1f',
-          1: '#1f1f1f',
-          2: '#2f2f2f',
-          3: '#3f3f3f',
-          4: '#4f4f4f',
-          5: '#5f5f5f',
-          main: '#005fdd11'
+        overlay: {
+          240: 'rgba(var(--p-primary-400), 0.5)',
+          250: '#3060f02f',
+          260: '#2443e02f',
+          270: '#1b33d12f',
+          280: '#1a27992f',
+          440: '#4983f54f',
+          450: '#3060f04f',
+          460: '#2443e04f',
+          470: '#1b33d14f',
+          480: '#1a27994f',
+          640: '#4983f56f',
+          650: '#3060f06f',
+          660: '#2443e06f',
+          670: '#1b33d16f',
+          680: '#1a27996f',
+          840: '#4983f58f',
+          850: '#3060f08f',
+          860: '#2443e08f',
+          870: '#1b33d18f',
+          880: '#1a27998f',
         },
 
-        'overlay': {
-          DEFAULT: '#00000099',
+        primary: {
+          50: 'var(--p-primary-50)',
+          100: 'var(--p-primary-100)',
+          200: 'var(--p-primary-200)',
+          300: 'var(--p-primary-300)',
+          400: 'var(--p-primary-400)',
+          500: 'var(--p-primary-500)',
+          600: 'var(--p-primary-600)',
+          700: 'var(--p-primary-700)',
+          800: 'var(--p-primary-800)',
+          900: 'var(--p-primary-900)',
+          950: 'var(--p-primary-950)'
         },
-
-        'main': {
-          DEFAULT: '#005fdd',
-          tr: '#005fdd99',
-        },
-        'main-hover': {
-          DEFAULT: '#0078e7',
-          tr: '#005fdd4d',
-        },
-        'main-focus': {
-          DEFAULT: '#0078e7',
-        },
-        'main-acc': {
-          DEFAULT: '#00abe7',
-          tr: '#00abe799',
+        surface: {
+          0: 'var(--p-surface-0)',
+          50: 'var(--p-surface-50)',
+          100: 'var(--p-surface-100)',
+          200: 'var(--p-surface-200)',
+          300: 'var(--p-surface-300)',
+          400: 'var(--p-surface-400)',
+          500: 'var(--p-surface-500)',
+          600: 'var(--p-surface-600)',
+          700: 'var(--p-surface-700)',
+          800: 'var(--p-surface-800)',
+          900: 'var(--p-surface-900)',
+          950: 'var(--p-surface-950)'
         },
 
         'warn': '#f28618',
@@ -52,8 +65,7 @@ module.exports = {
           z: '#0825db'
         }
       }
-    },
+    }
   },
   plugins: [],
 }
-

@@ -48,7 +48,7 @@
 /* Dialog Border Colors */
 
 .info {
-    border-color: theme('colors.main-acc.DEFAULT')
+    border-color: var(--p-primary-500)
 }
 
 .warn {
@@ -60,5 +60,5 @@
 }
 
 .empty {
-    border-color: theme('colors.back.3')
+    border-color: var(--p-surface-700)
 }

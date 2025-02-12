@@ -1,0 +1,49 @@
+/*             _____
+ *         ___/     \___        |  |
+ *      ##/  _.- _.-    \##  -  |  |                       -
+ *      ##\#=_  '    _=#/##  |  |  |  /---\  |      |      |   ===\  |  __
+ *      ##   \\#####//   ##  |  |  |  |___/  |===\  |===\  |   ___|  |==/
+ *      ##       |       ##  |  |  |  |      |   |  |   |  |  /   |  |
+ *      ##       |       ##  |  \= \= \====  |   |  |   |  |  \___/  |
+ *      ##\___   |   ___/
+ *      ##    \__|__/
+ *
+*/
+
+.p-treenode-content {
+    margin: 8px 0;
+    display: flex;
+    gap: 5px;
+}
+
+.p-treenode-children {
+    margin-left: 15px;
+}
+
+/* Progress Bar */
+
+.process .p-progressbar {
+    height: 24px;
+    border-radius: 8px;
+    background-color: var(--p-surface-700);
+}
+
+.process .p-progressbar-value {
+    border-radius: 8px;
+    background-color: var(--p-primary-600);
+}
+
+.task .p-progressbar {
+    height: 20px;
+    border-radius: 8px;
+    background-color: var(--p-surface-600);
+}
+
+.task .p-progressbar-value {
+    border-radius: 8px;
+    background-color: var(--p-primary-600);
+}
+
+.p-progressbar-determinate .p-progressbar-value-animate {
+    transition: width 0.1s ease-in-out;
+}

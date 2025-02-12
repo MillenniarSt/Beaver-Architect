@@ -15,7 +15,7 @@
 <ng-template #empty>
     <div class="h-full flex flex-col gap-3 justify-center items-center">
         <div class='big-decorated-icon glow'>
-            <img src="assets/icon/add.svg">
+            <i class="pi pi-plus p-3 border-solid border-4 border-[#ffffff6f] rounded-3xl" style="font-size: 40px"></i>
         </div>
         <span class="text-lg font-semibold">Open a page from the left panel</span>
     </div>
@@ -34,9 +34,7 @@
                         (click)="closePage(selectedIndex)"></i>
                 </div>
             </ng-template>
-            <div class="h-full border-solid border-2 border-fore-main rounded-2xl p-2">
-                <ng-container *ngComponentOutlet="page.component; inputs: { index: i }"></ng-container>
-            </div>
+            <ng-container *ngComponentOutlet="page.component; inputs: { index: i }"></ng-container>
         </p-tabPanel>
     </p-tabView>
 </ng-template>

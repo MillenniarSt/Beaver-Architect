@@ -10,11 +10,11 @@
 -->
 
 
-<div *ngIf="selectArchitect !== -1" class="h-full flex flex-col gap-5 p-3">
+<div *ngIf="selectArchitect !== -1" class="h-full flex flex-col gap-8 p-3">
     <div class="flex">
-        <img *ngIf="page > 0; else arrowEmpty" class="icon-button" src="assets/icon/left.svg" (click)="switchPage(-1)">
+        <i *ngIf="page > 0; else arrowEmpty" class="pi pi-angle-left cursor-pointer" style="font-size: 2rem" (click)="switchPage(-1)"></i>
         <span class="grow text-center font-semibold text-lg place-self-center">{{pages[page]}}</span>
-        <img *ngIf="page < 2; else arrowEmpty" class="icon-button" src="assets/icon/right.svg" (click)="switchPage(+1)">
+        <i *ngIf="page < pages.length -1; else arrowEmpty" class="pi pi-angle-right cursor-pointer" style="font-size: 2rem" (click)="switchPage(+1)"></i>
 
         <ng-template #arrowEmpty>
             <div class="w-[32px]"></div>
@@ -22,7 +22,7 @@
     </div>
 
 
-    <form #projectform="ngForm" class="grow flex flex-col gap-4">
+    <form #editingform="ngForm" class="grow flex flex-col gap-4">
         <div *ngIf="page === 0" class="page flex flex-col gap-6">
             <div class="flex gap-4 h-32">
                 <div [class]="'type' + (type === 'world' ? ' glow' : '')" (click)="setType('world')">
@@ -51,64 +51,79 @@
                 <img class="absolute -translate-y-8 h-3/5" [src]="getArchitectIcon()">
                 <span class="translate-y-8 font-semibold text-2xl">{{getArchitectName()}}</span>
                 <button *ngIf="selectArchitect > 0"
-                    class="absolute left-8 top-10 bottom-10 rounded-2xl hover:bg-back-3 flex items-center"
+                    class="absolute left-8 top-10 bottom-10 rounded-2xl flex items-center"
                     (click)="setArchitect(selectArchitect -1)">
-                    <img class="icon" src="assets/icon/left.svg">
+                    <i class="pi pi-angle-left" style="font-size: 2rem"></i>
                 </button>
                 <button *ngIf="selectArchitect < architects.length -1"
-                    class="absolute right-8 top-10 bottom-10 rounded-2xl hover:bg-back-3 flex items-center"
+                    class="absolute right-8 top-10 bottom-10 rounded-2xl flex items-center"
                     (click)="setArchitect(selectArchitect +1)">
-                    <img class="icon" src="assets/icon/right.svg">
+                    <i class="pi pi-angle-right" style="font-size: 2rem"></i>
                 </button>
-                <div class="absolute bottom-0 rounded-2xl h-14 p-2 bg-back-3 flex gap-3">
-                    <img *ngFor="let architect of architects; index as i" class="cursor-pointer" [src]="getArchitectIcon(i)" (click)="setArchitect(i)">
+                <div class="absolute bottom-0 rounded-2xl h-14 p-2 flex gap-3">
+                    <img *ngFor="let architect of architects; index as i" class="cursor-pointer"
+                        [src]="getArchitectIcon(i)" (click)="setArchitect(i)">
                 </div>
             </div>
         </div>
 
         <div *ngIf="page === 1" class="page flex flex-col gap-3">
             <div class="flex gap-4">
-                <div class="grow">
-                    <label for="name">Name</label>
-                    <input id="name" name="name" [(ngModel)]="project.name" #nameInput="ngModel" required
-                        [ngClass]="{'invalid': nameInput.invalid && nameInput.touched}">
-                </div>
-                <div class="grow">
-                    <label for="identifier">Identifier</label>
-                    <input id="identifier" name="identifier" [(ngModel)]="project.identifier" #identifierInput="ngModel"
-                        required [ngClass]="{'invalid': identifierInput.invalid && identifierInput.touched}">
-                </div>
+                <p-inputgroup class="grow">
+                    <p-floatlabel class="grow" variant="on">
+                        <input pInputText name="name" id="name" [(ngModel)]="editing.data.name" (ngModelChange)="changeName()" [ngClass]="{'ng-invalid': !isNameValid}" />
+                        <label for="name">Name</label>
+                    </p-floatlabel>
+                    <p-inputgroup-addon *ngIf="isNameDifferent" pTooltip="Sync Name" tooltipPosition="bottom">
+                        <button (click)="editing.data.name = this.syncName()">
+                            <i class="pi pi-sync"></i>
+                        </button>
+                    </p-inputgroup-addon>
+                </p-inputgroup>
+                <p-inputgroup class="grow">
+                    <p-inputgroup-addon pTooltip="Should be lowercase.no.space" tooltipPosition="bottom">ID</p-inputgroup-addon>
+                    <p-floatlabel class="grow" variant="on">
+                        <input pInputText name="id" id="id" [(ngModel)]="editing.identifier" (ngModelChange)="changeId()" [ngClass]="{'ng-invalid': !isIdValid}" />
+                        <label for="id">Identifier</label>
+                    </p-floatlabel>
+                    <p-inputgroup-addon *ngIf="shouldUpdateIdentifier" pTooltip="Identifier is changed" tooltipPosition="bottom">
+                        <i class="pi pi-exclamation-circle text-warn"></i>
+                    </p-inputgroup-addon>
+                </p-inputgroup>
             </div>
-            <div>
-                <label for="authors">Authors</label>
-                <input id="authors" name="authors" [(ngModel)]="project.authors" #authorsInput="ngModel"
-                    [ngClass]="{'invalid': authorsInput.invalid && authorsInput.touched}">
-            </div>
-            <div>
+
+            <p-inputgroup>
+                <p-inputgroup-addon>
+                    <i class="pi pi-users"></i>
+                </p-inputgroup-addon>
+                <p-floatlabel class="grow" variant="on">
+                    <input pInputText name="authors" id="authors" [(ngModel)]="editing.data.authors"/>
+                    <label for="authors">Authors</label>
+                </p-floatlabel>
+            </p-inputgroup>
+            <p-floatlabel variant="in">
+                <input pInputText name="description" id="description" [(ngModel)]="editing.data.description"/>
                 <label for="description">Description</label>
-                <input id="description" name="description" [(ngModel)]="project.description" #descriptionInput="ngModel"
-                    [ngClass]="{'invalid': descriptionInput.invalid && descriptionInput.touched}">
-            </div>
+            </p-floatlabel>
             <div></div>
             <div class="grow flex gap-4">
-                <image-picker title="Image" [image]="image" class="grow" (changeImage)="image = $event"></image-picker>
-                <image-picker title="Background" [image]="background" class="grow"
-                    (changeImage)="background = $event"></image-picker>
+                <image-picker title="Image" [image]="editing.image" class="grow"
+                    (changeImage)="editing.image = $event"></image-picker>
+                <image-picker title="Background" [image]="editing.background" class="grow"
+                    (changeImage)="editing.background = $event"></image-picker>
             </div>
         </div>
 
         <div *ngIf="page === 2" class="page">
-            <md-editor name="Content" [(ngModel)]="info" [height]="'100%'">
-                <slot custom-btns></slot>
-            </md-editor>
+            <p-editor name="info" [(ngModel)]="editing.info"/>
         </div>
 
 
         <hr class="mx-3">
         <div class="flex flex-row-reverse gap-2">
-            <button [class]="isNew && page !== 2 ? 'secondary-button' : 'decorated-button glow'" (click)="submit()"
-                [disabled]="(isNew && page !== 2) || !projectform.valid">{{isNew ? 'Create' : 'Apply'}}</button>
-            <button class="secondary-button" (click)="close()">Cancel</button>
+            <p-button [label]="isNew ? 'Create' : 'Apply'" (click)="submit()"
+                [disabled]="(isNew && page !== 2) || !isFormValid"></p-button>
+            <p-button label="Cancel" severity="secondary" (click)="close()"></p-button>
         </div>
     </form>
 </div>

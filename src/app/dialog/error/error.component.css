@@ -41,7 +41,7 @@
     padding: 5px 10px;
     border: solid 1px #2f2f2f;
     background-color: rgba(50, 0, 0, 0.2);
-    color: theme('colors.fore.3');
+    color: var(--p-surface-400);
     border-radius: 10px;
     font-size: 12px;
     white-space: pre;

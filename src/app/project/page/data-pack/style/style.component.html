@@ -1,0 +1,184 @@
+<!--             _____
+             ___/     \___        |  |
+          ##/  _.- _.-    \##  -  |  |                       -
+          ##\#=_  '    _=#/##  |  |  |  /---\  |      |      |   ===\  |  __
+          ##   \\#####//   ##  |  |  |  |___/  |===\  |===\  |   ___|  |==/
+          ##       |       ##  |  |  |  |      |   |  |   |  |  /   |  |
+          ##       |       ##  |  \= \= \====  |   |  |   |  |  \___/  |
+          ##\___   |   ___/
+          ##    \__|__/
+-->
+
+
+<p-splitter [panelSizes]="[75, 25]" [minSizes]="[40, 15]" [style]="{ height: '100%' }">
+    <ng-template pTemplate>
+        <ng-template *ngIf="selected; then pattern else style" />
+
+        <ng-template #pattern>
+            <div class="flex flex-col w-full gap-3 m-2">
+                <div class="rounded-2xl flex pattern-preview relative overflow-hidden" style="aspect-ratio: 4 / 1">
+                    <div *ngIf="selected!.preview != undefined" class="absolute h-full w-full flex flex-col">
+                        <div *ngFor="let row of selected!.preview; index as i" class="flex grow">
+                            <img *ngFor="let material of row" [src]="material" class="grow object-cover" style="image-rendering: pixelated">
+                        </div>
+                    </div>
+                    <div class="absolute bottom-3 left-3 flex gap-2">
+                        <button class="h-4" (click)="updatePatternPreview()">
+                            <i class="pi pi-refresh"></i>
+                        </button>
+                        <button class="h-4" (click)="setZoom(zoom - 1)">
+                            <i class="pi pi-search-plus"></i>
+                        </button>
+                        <button class="h-4" (click)="setZoom(zoom + 1)">
+                            <i class="pi pi-search-minus"></i>
+                        </button>
+                    </div>
+                    <div class="absolute top-4 left-6 right-6 flex flex-col gap-2">
+                        <ng-template *ngIf="editing !== undefined; then patternEdit else patternLabel" />
+
+                        <ng-template #patternEdit>
+                            <div class="flex gap-4 items-center">
+                                <button (click)="editPattern()">
+                                    <i class="pi pi-check-circle text-2xl"></i>
+                                </button>
+                                <input [(ngModel)]="editing!.label" class="w-1/3 input-small" (keyup.enter)="editPattern()">
+                            </div>
+                        </ng-template>
+                        <ng-template #patternLabel>
+                            <div class="flex gap-4">
+                                <button (click)="startEditEditing()">
+                                    <i class="pi pi-pencil text-lg"></i>
+                                </button>
+                                <span class="text-3xl font-semibold">{{displayId(selected!.id)}}</span>
+                            </div>
+                            <span *ngIf="selected!.fromImplementations!.length > 0">By {{selected!.fromImplementations.join(', ')}}</span>
+                        </ng-template>
+                    </div>
+                </div>
+                <div class="flex-grow flex flex-col gap-2">
+                    <div *ngFor="let material of selected!.materials; trackBy: trackByFn; index as i"
+                        class="flex flex-col gap-1">
+                        <div class="w-full flex gap-3">
+                            <div class="grow relative flex gap-2 rounded-lg border-solid border-2 border-surface-700 items-center cursor-pointer"
+                                (click)="clickMaterial(i)">
+                                <div class="absolute h-full material-weight rounded-md"
+                                    [ngStyle]="{ width: material.percent + '%' }"></div>
+                                <img [src]="material.icon" class="ml-2 h-5 w-5 z-10">
+                                <span class="grow text-fore-2 z-10">{{materialLabel(material.id)}}</span>
+                                <span class="text-fore-4 mr-2 z-10">{{material.percent.toFixed(1)}}%</span>
+                            </div>
+                            <p-inputNumber [(ngModel)]="material.weight" mode="decimal" [min]="0" [showButtons]="true"
+                                class="w-20" (ngModelChange)="editMaterial(i, { id: 'weight', value: toNumber($event), isValid: true })" />
+                        </div>
+                        <element-picker *ngIf="editingMaterialIndex === i" class="h-52 rounded-lg bg-surface-800 p-2"
+                            [groups]="groups" [elements]="materials" [value]="material.id" [nullable]="true"
+                            (pick)="changeMaterial(i, $event)" />
+                    </div>
+                    <button class="w-full h-8 rounded-md bg-primary-300 hover:bg-primary-600" (click)="addMaterial()">
+                        <i class="pi pi-plus text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template #style>
+            <div class="flex flex-col p-3 gap-4 w-full">
+                <div class="flex gap-5 cursor-pointer">
+                    <div class="flex flex-col" [ngClass]="{'text-fore-4': !isAbstract}">
+                        <div class="flex gap-2">
+                            <i class="pi pi-check-circle"></i>
+                            <span class="text-sm">Can have undefined</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <i class="pi pi-times-circle"></i>
+                            <span class="text-sm">Can not be used</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <i class="pi pi-check-circle"></i>
+                            <span class="text-sm">Can be implemented</span>
+                        </div>
+                    </div>
+                    <div class="grow h-full flex rounded-xl border-solid border-2 border-primary-300 p-2 gap-2"
+                        (click)="edit({ isAbstract: !isAbstract })">
+                        <div class="h-full grow flex items-center justify-center rounded-xl"
+                            [ngClass]="{'bg-primary-300': isAbstract}">Abstract</div>
+                        <div class="h-full grow flex items-center justify-center rounded-xl"
+                            [ngClass]="{'bg-primary-300': !isAbstract}">Concrete</div>
+                    </div>
+                    <div class="flex flex-col" [ngClass]="{'text-fore-4': isAbstract}">
+                        <div class="flex gap-2">
+                            <i class="pi pi-times-circle"></i>
+                            <span class="text-sm">Can not have undefined</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <i class="pi pi-check-circle"></i>
+                            <span class="text-sm">Can be used</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <i class="pi pi-check-circle"></i>
+                            <span class="text-sm">Can be implemented</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 px-4 mt-2">
+                    <hr class="grow">
+                    <span class="text-fore-2">Implementations</span>
+                    <hr class="grow">
+                </div>
+                <div class="flex flex-col rounded-xl border-solid border-2 border-primary-300 p-2 gap-2 justify-center">
+                    <span *ngIf="implementations.length === 0" class="text-fore-3">No Implementations installed</span>
+                    <div *ngFor="let implementation of implementations"
+                        class="flex px-3 py-1 gap-3 rounded-xl hover:bg-primary-300 items-center implementation">
+                        <img src="assets/icon/style.svg" class="h-5">
+                        <span *ngIf="implementation.pack" class="text-fore-3 text-sm">{{implementation.pack}}</span>
+                        <span class="grow">{{displayId(implementation.location)}}</span>
+                        <button class="implementation-actions" (click)="deleteImplementation(implementation)">
+                            <i class="pi pi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="grow min-h-[30%] flex flex-col gap-2">
+                    <search-bar [value]="implementationResearch" (edit)="searchForImplementations($event)"></search-bar>
+                    <div *ngIf="possibleImplementations.length === 0" class="grow flex items-center justify-center">
+                        <span class="text-fore-3">No possible Implementations found</span>
+                    </div>
+                    <div *ngFor="let implementation of possibleImplementations"
+                        class="flex px-3 py-1 gap-3 rounded-xl hover:bg-primary-300 items-center cursor-pointer implementation"
+                        (click)="pushImplementation(implementation)">
+                        <img src="assets/icon/style.svg" class="h-5">
+                        <span *ngIf="implementation.pack" class="text-fore-3 text-sm">{{implementation.pack}}</span>
+                        <span class="grow">{{displayId(implementation.location)}}</span>
+                        <i class="pi pi-plus-circle implementation-actions"></i>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+    </ng-template>
+
+    <ng-template pTemplate>
+        <p-panel class="h-full w-full panel flex flex-col gap-2">
+            <ng-template #header>
+                <div class="flex w-full">
+                    <span class="flex-grow font-semibold text-lg">Patterns</span>
+                    <button>
+                        <i class="pi pi-plus-circle" (click)="setNewPattern('')"></i>
+                    </button>
+                </div>
+            </ng-template>
+            <div class="flex flex-grow flex-col gap-1">
+                <div *ngFor="let pattern of patterns" class="flex px-1 pattern"
+                    [ngClass]="{'pattern-selected': isSelected(pattern.id)}">
+                    <button class="grow node-area flex gap-2.5 items-center" (click)="select(pattern)">
+                        <i class="pi pi-file"></i>
+                        <span class="grow text-start">{{ displayId(pattern.id) }}</span>
+                    </button>
+                    <button *ngIf="pattern.fromImplementations.length === 0" class="pattern-actions items-center">
+                        <i class="pi pi-trash" (click)="deletePattern(pattern.id)"></i>
+                    </button>
+                </div>
+                <hidden-input *ngIf="newPattern !== undefined" [value]="newPattern" (submit)="createPattern($event)"
+                    (clickOutside)="setNewPattern(undefined)"></hidden-input>
+            </div>
+        </p-panel>
+    </ng-template>
+</p-splitter>

@@ -13,10 +13,11 @@ import { ChangeDetectorRef, Component, OnInit, Type, ViewEncapsulation } from '@
 import { ProjectService } from '../../../services/project.service';
 import { TreeNode } from 'primeng/api';
 import { TreeModule } from 'primeng/tree';
-import { SchematicComponent } from '../../page/schematic/schematic.component';
+import { SchematicComponent } from '../../page/data-pack/schematic/schematic.component';
 import { baseErrorDialog, openBaseDialog, openInputDialog } from '../../../dialog/dialogs';
 import { NgClass, NgFor } from '@angular/common';
-import { StyleComponent } from '../../page/style/style.component';
+import { StyleComponent } from '../../page/data-pack/style/style.component';
+import { StructureComponent } from '../../page/data-pack/structure/structure.component';
 
 type File = {
   name: string,
@@ -43,10 +44,10 @@ export class DataPackComponent implements OnInit {
 
   folders: FolderType[] = [
     {
-      title: 'Schematics',
-      folder: 'schematics',
-      icon: 'assets/icon/schematic.svg',
-      component: SchematicComponent
+      title: 'Structures',
+      folder: 'structures',
+      icon: 'assets/icon/structure.svg',
+      component: StructureComponent
     },
     {
       title: 'Styles',
@@ -68,7 +69,7 @@ export class DataPackComponent implements OnInit {
   load(): void {
     const mainDir = `data_pack\\${this.selectedFolder.folder}`
 
-    this.ps.server.request('file/map-dir', { path: mainDir }).then((data) => {
+    this.ps.server.request('file/map-dir', { path: mainDir }).then((data: any) => {
       this.tree = [{
         label: this.selectedFolder.title,
         icon: 'pi pi-folder',
@@ -139,11 +140,12 @@ export class DataPackComponent implements OnInit {
   }
 
   async newFile(node: TreeNode, folder: string) {
-    let file = await openInputDialog({
+    let file = (await openInputDialog({
       title: 'New File',
       message: 'The file will be saved as lower_case_no_space.json',
       placeholder: 'new_file'
-    })
+    })).value
+    console.log(file)
 
     file = this.fileName(file, '.json')
     const path = `${folder}\\${file}`
@@ -160,11 +162,11 @@ export class DataPackComponent implements OnInit {
   }
 
   async newDir(node: TreeNode, parentFolder: string) {
-    let folder = await openInputDialog({
+    let folder = (await openInputDialog({
       title: 'New Folder',
       message: 'The folder will be saved as lower_case_no_space',
       placeholder: 'New Folder'
-    })
+    })).value
 
     folder = this.fileName(folder)
     const path = `${parentFolder}\\${folder}`

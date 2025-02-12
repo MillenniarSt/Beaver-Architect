@@ -1,0 +1,98 @@
+/* Tailwind */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Default Styles */
+
+:root {
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+
+  color: theme('colors.fore.1');
+  background-color: theme('colors.back.1');
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+:focus-visible {
+  outline: none;
+}
+
+span {
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+p {
+  white-space: pre-line;
+  overflow-y: auto;
+}
+
+img {
+  object-fit: cover;
+  background-position: center;
+}
+
+button {
+  cursor: pointer;
+}
+
+hr {
+  border-color: theme('colors.fore.4');
+}
+
+input,
+textarea {
+  background-color: transparent;
+  width: 100%;
+  font-size: theme('fontSize.sm');
+}
+
+input.invalid,
+textarea.invalid {
+  border: solid 2px theme('colors.error');
+  color: theme('colors.error');
+}
+
+textarea {
+  white-space: pre;
+}
+
+/* WebKit */
+
+::-webkit-scrollbar {
+  width: theme('spacing.2');
+  height: theme('spacing.2');
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: theme('colors.fore.5');
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: theme('colors.fore.4');
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

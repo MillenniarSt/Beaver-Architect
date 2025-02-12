@@ -12,18 +12,16 @@
 
 .dialog-container {
     height: 100%;
-    padding: 60px 3px 12px 3px;
+    padding-top: 60px;
 }
 
 .dialog {
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.5);
     border-radius: 20px;
-    border: solid 3px theme('colors.error');
     height: 100%;
     display: flex;
     flex-direction: column;
     gap: 8px;
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.6);
     padding: 45px 15px 10px 15px;
 }
 
@@ -43,40 +41,4 @@
     flex-direction: row-reverse;
     place-content: space-between;
     gap: 10px;
-}
-
-/* Dialog Border Colors */
-
-.info {
-    border-color: theme('colors.main-acc.DEFAULT')
-}
-
-.warn {
-    border-color: theme('colors.warn')
-}
-
-.error {
-    border-color: theme('colors.error')
-}
-
-.empty {
-    border-color: theme('colors.back.3')
-}
-
-/* Buttons Colors */
-
-.btn-info {
-    background-color: theme('colors.main-acc.DEFAULT')
-}
-
-.btn-warn {
-    background-color: theme('colors.warn')
-}
-
-.btn-error {
-    background-color: theme('colors.error')
-}
-
-.btn-empty {
-    background-color: theme('colors.back.3')
 }

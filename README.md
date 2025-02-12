@@ -3,9 +3,9 @@
 > Desktop app: Windows, Mac and Linux
 
 Made with:
-- Electron (JavaScript + Node.js)
-- Angular (Typescript + HTML)
-- Tailwind (CSS)
+- Tauri (Desktop app Manager)
+- Angular (Framework)
+- Tailwind (CSS Style)
 - PrimeNG (HTML util)
 - Three.js (3D Render)
 

@@ -9,16 +9,10 @@
 //      ##    \__|__/
 //
 
-import { DialogButton } from "./base/base.component"
-
-type BaseDialog = {
-    icon?: string,
-    color?: string
-    title: string,
-    message: string,
-    buttons?: DialogButton[],
-    hasReport?: boolean
-}
+import { Effect, WindowOptions } from "@tauri-apps/api/window"
+import { BaseDialog, DialogButton } from "./base/base.component"
+import { getCurrentWebviewWindow, WebviewWindow } from '@tauri-apps/api/webviewWindow'
+import { WebviewOptions } from "@tauri-apps/api/webview"
 
 type InputDialog = {
     icon?: string,
@@ -32,22 +26,22 @@ type InputDialog = {
 export function infoDialog(title: string, message: string): BaseDialog {
     return {
         icon: 'assets/icon/info.svg',
-        color: 'info',
+        severity: 'info',
         title,
         message,
-        buttons: [{name: 'OK', color: 'info', focus: true}]
+        buttons: [{ label: 'OK', severity: 'info', focus: true }]
     }
 }
 
 export function warnDialog(title: string, message: string): BaseDialog {
     return {
         icon: 'assets/icon/warning.svg',
-        color: 'warn',
+        severity: 'warn',
         title,
         message,
         buttons: [
-            {name: 'Proceed', color: 'warn', id: 1},
-            {name: 'Cancel'}
+            { label: 'Proceed', severity: 'warn', id: 1 },
+            { label: 'Cancel', severity: 'secondary' }
         ]
     }
 }
@@ -55,62 +49,73 @@ export function warnDialog(title: string, message: string): BaseDialog {
 export function baseErrorDialog(title: string, message: string): BaseDialog {
     return {
         icon: 'assets/icon/error.svg',
-        color: 'error',
+        severity: 'error',
         title,
         message,
-        buttons: [{name: 'OK', color: 'error'}],
+        buttons: [{ label: 'OK', severity: 'danger' }],
         hasReport: true
     }
 }
 
-export function openBaseDialog(dialog: BaseDialog, width?: number, height?: number): Promise<number> {
-    return new Promise((resolve) => {
-        const { ipcRenderer } = window.require('electron')
-
-        ipcRenderer.invoke('dialog:open', {
-            type: 'base',
-            width: width ?? 500,
-            height: height ?? 400,
-            display: dialog
-        })
-
-        ipcRenderer.once('dialog:result', (e, data) => {
-            resolve(data)
-        })
-    })
+export function openBaseDialog(dialog: BaseDialog, width: number = 500, height: number = 300): Promise<number> {
+    return open('base', {
+        title: dialog.title,
+        center: true,
+        width, height,
+        resizable: false,
+        minimizable: false,
+        closable: false,
+        decorations: false,
+        transparent: true,
+        skipTaskbar: true,
+        shadow: true
+    }, dialog)
 }
 
-export function openErrorDialog(err: any, url?: string, width?: number, height?: number): Promise<void> {
-    return new Promise((resolve) => {
-        const { ipcRenderer } = window.require('electron')
-
-        ipcRenderer.invoke('dialog:open', {
-            type: 'error',
-            width: width ?? 500,
-            height: height ?? 600,
-            resizable: true,
-            display: { err, url }
-        })
-
-        ipcRenderer.once('dialog:result', () => {
-            resolve()
-        })
-    })
+export function openErrorDialog(err: any, url?: string, width: number = 500, height: number = 400): Promise<void> {
+    return open('error', {
+        title: 'Error',
+        width, height,
+        center: true,
+        minimizable: false,
+        decorations: false,
+        transparent: true,
+        skipTaskbar: true,
+        shadow: true
+    }, { err, url })
 }
 
-export function openInputDialog(dialog: InputDialog, width?: number, height?: number): Promise<string> {
+export function openInputDialog(dialog: InputDialog, width: number = 500, height: number = 250): Promise<{
+    value: string
+}> {
+    return open('input', {
+        title: dialog.title,
+        width, height,
+        center: true,
+        resizable: false,
+        minimizable: false,
+        closable: false,
+        decorations: false,
+        transparent: true,
+        skipTaskbar: true,
+        shadow: true
+    }, dialog)
+}
+
+function open<T>(hash: string, options: WindowOptions, data?: any): Promise<T> {
     return new Promise((resolve) => {
-        const { ipcRenderer } = window.require('electron')
+        (options as WebviewOptions).url = `index.html#/dialog-${hash}`
+        options.parent = getCurrentWebviewWindow()
+        const dialog = new WebviewWindow('dialog', options)
 
-        ipcRenderer.invoke('dialog:open', {
-            type: 'input',
-            width: width ?? 500,
-            height: height ?? 400,
-            display: dialog
+        dialog.once('tauri://created', () => {
+            dialog.once('dialog:ready', () => dialog.emit('dialog:get', data ?? {}))
         })
 
-        ipcRenderer.once('dialog:result', (e, data) => {
-            resolve(data)
+        dialog.once('tauri://error', (e) => {
+            console.error('Dialog Error:', e)
         })
+
+        dialog.once<T>('dialog:close', (data) => resolve(data.payload))
     })
 }

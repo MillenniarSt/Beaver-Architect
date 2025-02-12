@@ -9,49 +9,76 @@
 //      ##    \__|__/
 //
 
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { ServerService } from '../services/server.service';
 import { NgClass, NgFor, NgIf } from '@angular/common';
-
-type Settings = Record<string, {
-  name: string,
-  settings: {}
-}>
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { TreeNode } from 'primeng/api';
+import { TreeModule } from 'primeng/tree';
+import { emit, once } from '@tauri-apps/api/event';
+import { CardModule } from 'primeng/card';
+import { PanelModule } from 'primeng/panel';
+import { ButtonModule } from 'primeng/button';
+import { getCurrentWebview } from '@tauri-apps/api/webview';
+import { Setting, SettingGroup } from './settings';
+import { SplitterModule } from 'primeng/splitter';
+import { FormComponent } from "../components/form/form.component";
+import { FormDataInput } from '../components/form/inputs/inputs';
 
 @Component({
-  selector: 'app-settings',
+  selector: 'app-process',
   standalone: true,
-  imports: [NgClass, NgFor, NgIf],
+  imports: [TreeModule, ButtonModule, CardModule, PanelModule, SplitterModule, NgClass, NgIf, FormComponent],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.css'
 })
 export class SettingsComponent implements OnInit {
 
-  settings: Settings | undefined
+  groups: TreeNode<Setting[]>[] = []
+  selectedGroup?: TreeNode<Setting[]> = undefined
 
-  selectedGroup: string = 'appearance'
-
-  constructor(private cdr: ChangeDetectorRef, private server: ServerService) { }
+  constructor(private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
-    this.server.get('settings').then(({data}) => {
-      this.settings = data
+    once<{ groups: SettingGroup[] }>('settings:get', (event) => {
+      this.groups = this.mapGroups(event.payload.groups)
+      this.selectedGroup = this.groups[0]
 
       this.cdr.detectChanges()
     })
+
+    emit('settings:ready')
   }
 
-  get groups(): { id: string, name: string }[] {
-    return Object.entries(this.settings!).map((group) => {
+  mapGroups(groups: SettingGroup[]): TreeNode<Setting[]>[] {
+    return groups.map((group) => {
       return {
-        id: group[0],
-        name: group[1].name
+        label: group.label,
+        icon: group.icon,
+        children: group.groups ? this.mapGroups(group.groups) : undefined,
+        data: group.settings ?? []
       }
     })
   }
 
-  selectGroup(id: string) {
-    this.selectedGroup = id
+  selectGroup(group: TreeNode<Setting[]>) {
+    this.selectedGroup = group
+    this.cdr.detectChanges()
+  }
+
+  getFormData(): FormDataInput {
+    return FormDataInput.fromJson({ inputs: this.selectedGroup!.data }, (output) => {
+      emit('settings:edit', output)
+    })
+  }
+
+  close() {
+    getCurrentWebview().close()
+  }
+
+  nodeExpand(event: any) {
+    this.cdr.detectChanges()
+  }
+
+  nodeCollapse(event: any) {
     this.cdr.detectChanges()
   }
 }
