@@ -4,7 +4,7 @@ import { GetSchemes, NodeEditor } from "rete";
 import { BuilderNode } from "./nodes/builder";
 import { StructureEngineerNode } from "./nodes/engineer";
 import { Connection } from "./connection";
-import { BuilderSocket } from "./sockets";
+import { BuilderSocket, MaterialSocket, OptionSocket } from "./sockets";
 import { getConnectionSockets } from "./utils";
 
 export function connectionPreset(editor: NodeEditor<Schemes>, connection: ConnectionPlugin<Schemes, AngularArea2D<Schemes>>): Preset<Schemes> {
@@ -59,6 +59,8 @@ export function renderPreset(): RenderPreset<Schemes, AngularArea2D<Schemes>> {
 
 export type Sockets =
     | BuilderSocket
+    | MaterialSocket
+    | OptionSocket
 
 export type NodeProps =
     | StructureEngineerNode

@@ -1,6 +1,8 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Injector, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ProjectService } from '../../../../services/project.service';
 import { StructureEngineerEditor } from './rete/editor';
+import { BuilderNode } from './rete/nodes/builder';
+import { getBuilderType } from './types';
 
 @Component({
   imports: [],
@@ -31,5 +33,9 @@ export class StructureComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.editor.area.destroy()
+  }
+
+  addBuilder() {
+    this.editor.addBuilder(new BuilderNode(getBuilderType('flexPrism')))
   }
 }

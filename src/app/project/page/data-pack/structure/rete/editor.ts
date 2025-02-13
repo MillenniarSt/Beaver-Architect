@@ -4,10 +4,10 @@ import { AreaExtensions, AreaPlugin } from "rete-area-plugin"
 import { ConnectionPlugin } from "rete-connection-plugin"
 import { AngularArea2D, AngularPlugin } from "rete-angular-plugin/19"
 import { Injector } from "@angular/core"
-import { ControlFlowEngine, DataflowEngine } from "rete-engine"
 import { getConnectionSockets } from "./utils"
 import { StructureEngineerNode } from "./nodes/engineer"
 import { BuilderNode } from "./nodes/builder"
+import { getObject3 } from "../types"
 
 export class StructureEngineerEditor {
 
@@ -15,10 +15,8 @@ export class StructureEngineerEditor {
     readonly area: AreaPlugin<Schemes, AngularArea2D<Schemes>>
     readonly connection: ConnectionPlugin<Schemes, AngularArea2D<Schemes>>
     readonly render: AngularPlugin<Schemes, AngularArea2D<Schemes>>
-    readonly dataflow: DataflowEngine<Schemes>
-    readonly engine: ControlFlowEngine<Schemes>
 
-    readonly baseNode: StructureEngineerNode
+    readonly engineerNode!: StructureEngineerNode
 
     constructor(
         protected readonly container: HTMLElement,
@@ -28,8 +26,6 @@ export class StructureEngineerEditor {
         this.area = new AreaPlugin<Schemes, AngularArea2D<Schemes>>(this.container)
         this.connection = new ConnectionPlugin<Schemes, AngularArea2D<Schemes>>()
         this.render = new AngularPlugin<Schemes, AngularArea2D<Schemes>>({ injector })
-        this.dataflow = new DataflowEngine<Schemes>()
-        this.engine = new ControlFlowEngine<Schemes>()
 
         AreaExtensions.selectableNodes(this.area, AreaExtensions.selector(), {
             accumulating: AreaExtensions.accumulateOnCtrl(),
@@ -38,8 +34,6 @@ export class StructureEngineerEditor {
         this.render.addPreset(renderPreset())
         this.connection.addPreset(connectionPreset(this.editor, this.connection))
 
-        this.editor.use(this.engine)
-        this.editor.use(this.dataflow)
         this.editor.use(this.area)
         this.area.use(this.connection)
         this.area.use(this.render)
@@ -60,14 +54,16 @@ export class StructureEngineerEditor {
             return context
         })
 
-        this.baseNode = new StructureEngineerNode()
+        this.engineerNode = new StructureEngineerNode(getObject3('prism'))
     }
 
     async setup() {
-        await this.editor.addNode(this.baseNode)
-
-        
+        await this.editor.addNode(this.engineerNode)
 
         AreaExtensions.zoomAt(this.area, this.editor.getNodes())
+    }
+
+    async addBuilder(builder: BuilderNode) {
+        await this.editor.addNode(builder)
     }
 }

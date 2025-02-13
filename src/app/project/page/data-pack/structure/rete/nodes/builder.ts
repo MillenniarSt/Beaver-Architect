@@ -1,5 +1,6 @@
 import { ClassicPreset } from "rete";
 import { BuilderSocket, MaterialSocket, OptionSocket } from "../sockets";
+import { BuilderType } from "../../types";
 
 export class BuilderNode extends ClassicPreset.Node<
     { parent: BuilderSocket },
@@ -20,25 +21,4 @@ export class BuilderNode extends ClassicPreset.Node<
         })
         this.addOutput('material', new ClassicPreset.Output(new MaterialSocket(), 'Material'))
     }
-
-    execute(_: never, forward: (output: string) => void) {
-        forward('builder')
-    }
-
-    data() {
-        return { }
-    }
-}
-
-export type BuilderType = {
-    label: string
-    object?: string
-    options: { id: string, label: string }[]
-    outputs: { id: string, label: string, multiple: boolean }[]
-}
-
-export const builderTypes: Record<string, BuilderType> = {
-    empty: { label: 'Empty Builder', options: [], outputs: [] },
-
-    flexPrism: { label: 'Flex Prism Builder', object: 'prism', options: [], outputs: [{ id: 'children', label: 'Children', multiple: true }] }
 }

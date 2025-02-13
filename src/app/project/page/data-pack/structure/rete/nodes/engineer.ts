@@ -1,5 +1,6 @@
 import { ClassicPreset } from "rete";
 import { BuilderSocket } from "../sockets";
+import { Object3Type } from "../../types";
 
 export class StructureEngineerNode extends ClassicPreset.Node<
     {},
@@ -8,17 +9,9 @@ export class StructureEngineerNode extends ClassicPreset.Node<
 > {
 
     constructor(
-        protected baseType?: string
+        protected baseType: Object3Type | null = null
     ) {
         super('Engineer')
         this.addOutput('builder', new ClassicPreset.Output(new BuilderSocket(baseType), 'Builder'))
-    }
-
-    execute(_: never, forward: (output: 'builder') => void) {
-        forward('builder')
-    }
-
-    data() {
-        return { }
     }
 }

@@ -1,5 +1,6 @@
 import { ClassicPreset } from "rete";
 import { idToLabel } from "../../../../../util";
+import { BuilderType, Object3Type } from "../types";
 
 export class MaterialSocket extends ClassicPreset.Socket {
 
@@ -32,16 +33,12 @@ export const optionTypes: Record<string, OptionType> = {}
 export class BuilderSocket extends ClassicPreset.Socket {
 
     constructor(
-        readonly object?: string
+        readonly object: Object3Type | null
     ) {
         super('Parent')
     }
 
     isCompatibleWith(socket: ClassicPreset.Socket) {
-        return socket instanceof BuilderSocket && (!this.object || !socket.object || builderObjects[this.object].compatibles.includes(socket.object))
+        return socket instanceof BuilderSocket && !(this.object === null && socket.object !== null) && (this.object?.isCompatibleWith(socket.object) ?? true)
     }
 }
-
-export type BuilderObject = { label: string, compatibles: string[] }
-
-export const builderObjects: Record<string, BuilderObject> = {}

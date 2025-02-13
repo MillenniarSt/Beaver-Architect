@@ -1,12 +1,12 @@
 import { ClassicPreset, NodeEditor } from "rete";
-import { Schemes, Sockets } from "./preset";
+import { ConnProps, Schemes, Sockets } from "./preset";
 
 type Input = ClassicPreset.Input<Sockets>
 type Output = ClassicPreset.Output<Sockets>
 
 export function getConnectionSockets(
   editor: NodeEditor<Schemes>,
-  connection: Schemes["Connection"]
+  connection: ConnProps
 ) {
   const source = editor.getNode(connection.source)
   const target = editor.getNode(connection.target)
