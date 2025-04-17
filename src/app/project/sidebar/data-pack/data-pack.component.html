@@ -25,10 +25,10 @@
                 <span class="grow folder">{{ node.label }}</span>
                 <div class="gap-2 createFiles">
                     <button>
-                        <i class="pi pi-file-plus" (click)="newFile(node, node.data.path)"></i>
+                        <i class="pi pi-file-plus" (click)="newFile(node, node.data.ref)"></i>
                     </button>
                     <button>
-                        <i class="pi pi-folder-plus" (click)="newDir(node, node.data.path)"></i>
+                        <i class="pi pi-folder-plus" (click)="newDir(node, node.data.ref)"></i>
                     </button>
                 </div>
             </div>

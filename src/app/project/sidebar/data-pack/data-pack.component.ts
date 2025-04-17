@@ -13,24 +13,22 @@ import { ChangeDetectorRef, Component, OnInit, Type, ViewEncapsulation } from '@
 import { ProjectService } from '../../../services/project.service';
 import { TreeNode } from 'primeng/api';
 import { TreeModule } from 'primeng/tree';
-import { SchematicComponent } from '../../page/data-pack/schematic/schematic.component';
 import { baseErrorDialog, openBaseDialog, openInputDialog } from '../../../dialog/dialogs';
 import { NgClass, NgFor } from '@angular/common';
 import { StyleComponent } from '../../page/data-pack/style/style.component';
 import { StructureComponent } from '../../page/data-pack/structure/structure.component';
-
-type File = {
-  name: string,
-  path: string,
-  children?: File[]
-}
+import { MappedResourceReference, ResourceReference } from '../../../../client/project/engineer/engineer';
+import { idToLabel } from '../../../../client/util';
 
 type FolderType = {
   title: string,
-  folder: string,
+  label: string,
+  id: string,
   icon: string,
   component: Type<any>
 }
+
+type DataPackTreeNode = TreeNode<{ ref: ResourceReference }>
 
 @Component({
   selector: 'app-data-pack',
@@ -45,20 +43,22 @@ export class DataPackComponent implements OnInit {
   folders: FolderType[] = [
     {
       title: 'Structures',
-      folder: 'structures',
+      label: 'Structure',
+      id: 'structure',
       icon: 'assets/icon/structure.svg',
       component: StructureComponent
     },
     {
       title: 'Styles',
-      folder: 'styles',
+      label: 'Style',
+      id: 'style',
       icon: 'assets/icon/style.svg',
       component: StyleComponent
     }
   ]
   selectedFolder: FolderType = this.folders[0]
 
-  tree: TreeNode[] = []
+  tree: DataPackTreeNode[] = []
 
   constructor(private cdr: ChangeDetectorRef, private ps: ProjectService) { }
 
@@ -67,37 +67,29 @@ export class DataPackComponent implements OnInit {
   }
 
   load(): void {
-    const mainDir = `data_pack\\${this.selectedFolder.folder}`
-
-    this.ps.server.request('file/map-dir', { path: mainDir }).then((data: any) => {
+    this.ps.project.server.request(`data-pack/${this.selectedFolder.id}/get-all`).then((data: string[]) => {
       this.tree = [{
         label: this.selectedFolder.title,
         icon: 'pi pi-folder',
         expanded: true,
-        data: {
-          name: this.selectedFolder.folder,
-          path: mainDir
-        },
+        data: { ref: new ResourceReference('') },
         type: 'dir',
-        children: this.loadDir(data)
+        children: this.loadDir(ResourceReference.map(data.map((ref) => new ResourceReference(ref))))
       }]
 
       this.cdr.detectChanges()
     })
   }
 
-  loadDir(files: File[]): TreeNode[] {
-    files = files.sort((a, b) => a.children ? -1 : 1)
-    return files.map((file) => {
+  loadDir(references: MappedResourceReference[]): DataPackTreeNode[] {
+    references = references.sort((a, b) => a.children ? -1 : 1)
+    return references.map((reference) => {
       return {
-        label: this.displayName(file.name),
-        icon: file.children !== undefined ? 'pi pi-folder' : undefined,
-        data: {
-          name: file.name,
-          path: file.path
-        },
-        type: file.children !== undefined ? 'dir' : 'file',
-        children: file.children !== undefined ? this.loadDir(file.children) : undefined
+        label: idToLabel(reference.name),
+        icon: reference.children !== null ? 'pi pi-folder' : undefined,
+        data: { ref: reference.ref },
+        type: reference.children !== null ? 'dir' : 'file',
+        children: reference.children !== null ? this.loadDir(reference.children) : undefined
       }
     })
   }
@@ -106,8 +98,8 @@ export class DataPackComponent implements OnInit {
     return name.charAt(0).toLocaleUpperCase() + name.substring(1, name.lastIndexOf('.')).replace('_', ' ')
   }
 
-  fileName(name: string, extension: string = ''): string {
-    return name.trim().toLowerCase().replace(' ', '_') + extension
+  buildRef(folder: ResourceReference, name: string): ResourceReference {
+    return new ResourceReference(`${folder.location}/${name.trim().toLowerCase().replace(' ', '_')}`)
   }
 
   title(): string {
@@ -120,79 +112,66 @@ export class DataPackComponent implements OnInit {
   }
 
   nodeExpand(event: any) {
-    this.cdr.detectChanges();
+    this.cdr.detectChanges()
   }
 
   nodeCollapse(event: any) {
-    this.cdr.detectChanges();
+    this.cdr.detectChanges()
   }
 
-  openFile(node: TreeNode) {
+  openFile(node: DataPackTreeNode) {
     this.ps.openPage({
-      path: node.data.path,
+      path: `${this.selectedFolder.id}:${node.data!.ref.location}`,
       icon: this.selectedFolder.icon,
       label: node.label!,
       data: {
-        path: node.data.path
+        ref: node.data!.ref
       },
       component: this.selectedFolder.component
     })
   }
 
-  async newFile(node: TreeNode, folder: string) {
+  async newFile(node: DataPackTreeNode, folder: ResourceReference) {
     let file = (await openInputDialog({
-      title: 'New File',
+      title: `new ${this.selectedFolder.label}`,
       message: 'The file will be saved as lower_case_no_space.json',
-      placeholder: 'new_file'
+      placeholder: `new_${this.selectedFolder.id}`
     })).value
     console.log(file)
 
-    file = this.fileName(file, '.json')
-    const path = `${folder}\\${file}`
+    const ref = this.buildRef(folder, file)
 
-    if(!(await this.ps.server.request('file/exists', { path: path }))) {
-      await this.ps.server.request(`data-pack/${this.selectedFolder.folder}/create`, { ref: path.substring(`data_pack\\${this.selectedFolder.folder}`.length, path.lastIndexOf('.')) })
-      this.addFile(node, {
-        name: file,
-        path: path
-      })
+    if(!(await this.ps.project.server.request(`data-pack/${this.selectedFolder.id}/exists`, { ref: ref.toJson() }))) {
+      await this.ps.project.server.request(`data-pack/${this.selectedFolder.id}/create`, { ref: ref.toJson() })
+      this.addFile(node, { ref: ref, name: idToLabel(ref.location), children: null })
     } else {
-      openBaseDialog(baseErrorDialog('File Exists', `Could not create new file ${file}, it already exists in the folder ${folder}`))
+      openBaseDialog(baseErrorDialog('File Exists', `Could not create new ${this.selectedFolder.id} '${file}', it already exists in the folder ${folder.location}`))
     }
   }
 
-  async newDir(node: TreeNode, parentFolder: string) {
+  async newDir(node: DataPackTreeNode, parentFolder: ResourceReference) {
     let folder = (await openInputDialog({
       title: 'New Folder',
       message: 'The folder will be saved as lower_case_no_space',
       placeholder: 'New Folder'
     })).value
 
-    folder = this.fileName(folder)
-    const path = `${parentFolder}\\${folder}`
+    const ref = this.buildRef(parentFolder, folder)
 
-    if(!(await this.ps.server.request('file/exists', { path: path }))) {
-      this.ps.server.send('file/mkdirs', { path: path })
-      this.addFile(node, {
-        name: folder,
-        path: path,
-        children: []
-      })
-    } else {
-      openBaseDialog(baseErrorDialog('Folder Exists', `Could not create new folder ${folder}, it already exists in the folder ${parentFolder}`))
-    }
+    this.addFile(node, {
+      ref: ref,
+      name: idToLabel(ref.location),
+      children: []
+    })
   }
 
-  addFile(node: TreeNode, file: File) {
+  addFile(node: DataPackTreeNode, mapped: MappedResourceReference) {
     node.children = [...node.children ?? [], {
-      label: this.displayName(file.name),
-      icon: file.children !== undefined ? 'pi pi-folder' : undefined,
-      data: {
-        name: file.name,
-        path: file.path
-      },
-      type: file.children !== undefined ? 'dir' : 'file',
-      children: file.children !== undefined ? this.loadDir(file.children) : undefined
+      label: this.displayName(mapped.name),
+      icon: mapped.children !== null ? 'pi pi-folder' : undefined,
+      data: { ref: mapped.ref },
+      type: mapped.children !== null ? 'dir' : 'file',
+      children: mapped.children !== null ? this.loadDir(mapped.children) : undefined
     }]
     this.cdr.detectChanges()
   }

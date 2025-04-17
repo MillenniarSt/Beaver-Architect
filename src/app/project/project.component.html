@@ -29,7 +29,7 @@
         </button>
     </div>
 
-    <ng-template *ngIf="isLoaded(); then display else loading"></ng-template>
+    <ng-template *ngIf="isLoaded; then display else loading"></ng-template>
 
     <ng-template #loading>
         <div class="grow flex justify-center items-center gap-2 flex-col bg-back-1">

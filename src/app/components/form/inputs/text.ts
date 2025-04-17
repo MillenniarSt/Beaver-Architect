@@ -3,7 +3,7 @@ import { SingleFormInput, TypedInput } from "./inputs"
 import { Component, Input, Type } from "@angular/core"
 import { InputTextModule } from 'primeng/inputtext'
 import { FloatLabelModule } from "primeng/floatlabel"
-import { idToLabel } from "../../../util"
+import { idToLabel } from "../../../../client/util"
 
 export type TextInputDisplay = {
     label?: string

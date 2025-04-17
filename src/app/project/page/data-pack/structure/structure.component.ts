@@ -27,8 +27,6 @@ export class StructureComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.editor = new StructureEngineerEditor(this.container.nativeElement, this.injector)
-
-    this.editor.setup()
   }
 
   ngOnDestroy(): void {

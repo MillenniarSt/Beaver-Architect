@@ -13,9 +13,10 @@ import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angu
 import { ProjectBar } from '../display';
 import { NgClass, NgComponentOutlet, NgFor, NgIf } from '@angular/common';
 import { AvatarModule } from 'primeng/avatar';
-import { Project, ProjectService } from '../../services/project.service';
+import { ProjectService } from '../../services/project.service';
 import { PanelModule } from 'primeng/panel';
 import { CardModule } from 'primeng/card';
+import { Project } from '../../../client/project/project';
 
 @Component({
   selector: 'sidebars',

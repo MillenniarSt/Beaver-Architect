@@ -1,5 +1,5 @@
 import { ClassicPreset } from "rete";
-import { idToLabel } from "../../../../../util";
+import { idToLabel } from "../../../../../../client/util";
 import { BuilderType, Object3Type } from "../types";
 
 export class MaterialSocket extends ClassicPreset.Socket {

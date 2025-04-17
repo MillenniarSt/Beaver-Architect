@@ -9,9 +9,9 @@ export class StructureEngineerNode extends ClassicPreset.Node<
 > {
 
     constructor(
-        protected baseType: Object3Type | null = null
+        public baseType: Object3Type | null = null
     ) {
         super('Engineer')
-        this.addOutput('builder', new ClassicPreset.Output(new BuilderSocket(baseType), 'Builder'))
+        this.addOutput('builder', new ClassicPreset.Output(new BuilderSocket(baseType), 'Builder', false))
     }
 }

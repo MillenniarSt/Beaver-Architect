@@ -16,8 +16,9 @@ import { EditProjectComponent } from "../edit-project/edit-project.component";
 import { openInputDialog } from '../../dialog/dialogs';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
-import { HomeService, Project } from '../../services/home.service';
+import { HomeService } from '../../services/home.service';
 import { getClientSettingsGroups, openSettings } from '../../settings/settings';
+import { ProjectInstance } from '../../../client/instance/project';
 
 @Component({
   selector: 'home',
@@ -34,7 +35,7 @@ export class HomeComponent implements OnInit {
   constructor(private cdr: ChangeDetectorRef, private home: HomeService) { }
 
   ngOnInit(): void {
-    this.home.load().then(() => {
+    this.home.init().then(() => {
       this.loading = false
       this.cdr.detectChanges()
     })
@@ -68,7 +69,7 @@ export class HomeComponent implements OnInit {
     // TODO
   }
 
-  editProject?: Project
+  editProject?: ProjectInstance
 
   doEditProject(identifier: string) {
     this.changeInteractive(HomeInteractive.EDIT_PROJECT)

@@ -1,8 +1,3 @@
-// Paths
-
-export const projectsDir = 'projects'
-export const architectsDir = 'architects'
-
 // String Utils ID -> Label : Label -> ID
 
 export function idToLabel(id: string): string {

@@ -2,7 +2,7 @@ import { FormGroup, ReactiveFormsModule } from "@angular/forms"
 import { SingleFormInput, TypedInput } from "./inputs"
 import { Component, Input, Type } from "@angular/core"
 import { Checkbox } from 'primeng/checkbox'
-import { idToLabel } from "../../../util"
+import { idToLabel } from "../../../../client/util"
 
 export type CheckboxInputDisplay = {
     label?: string

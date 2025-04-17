@@ -3,7 +3,7 @@ import { SingleFormInput, TypedInput } from "./inputs"
 import { Component, Input, Type } from "@angular/core"
 import { FloatLabelModule } from "primeng/floatlabel"
 import { Select } from 'primeng/select'
-import { idToLabel } from "../../../util"
+import { idToLabel } from "../../../../client/util"
 
 export type SelectInputOptions = {
     nullable?: boolean

@@ -23,47 +23,23 @@
 
 
     <form #editingform="ngForm" class="grow flex flex-col gap-4">
-        <div *ngIf="page === 0" class="page flex flex-col gap-6">
-            <div class="flex gap-4 h-32">
-                <div [class]="'type' + (type === 'world' ? ' glow' : '')" (click)="setType('world')">
-                    <img class="type-icon" src="assets/icon/world.svg">
-                    <span class="type-title">World</span>
-                </div>
-                <div [class]="'type' + (type === 'structure' ? ' glow' : '')" (click)="setType('structure')">
-                    <img class="type-icon" src="assets/icon/structure.svg">
-                    <span class="type-title">Structure</span>
-                </div>
-                <div [class]="'type' + (type === 'terrain' ? ' glow' : '')" (click)="setType('terrain')">
-                    <img class="type-icon" src="assets/icon/terrain.svg">
-                    <span class="type-title">Terrain</span>
-                </div>
-                <div [class]="'type' + (type === 'biome' ? ' glow' : '')" (click)="setType('biome')">
-                    <img class="type-icon" src="assets/icon/biome.svg">
-                    <span class="type-title">Biome</span>
-                </div>
-                <div [class]="'type' + (type === 'data_pack' ? ' glow' : '')" (click)="setType('data_pack')">
-                    <img class="type-icon" src="assets/icon/data-pack.svg">
-                    <span class="type-title">Data Pack</span>
-                </div>
-            </div>
-            <div class="grow relative flex place-content-center items-center">
-                <img class="absolute -translate-y-8 h-full blur-3xl" [src]="getArchitectIcon()">
-                <img class="absolute -translate-y-8 h-3/5" [src]="getArchitectIcon()">
-                <span class="translate-y-8 font-semibold text-2xl">{{getArchitectName()}}</span>
-                <button *ngIf="selectArchitect > 0"
-                    class="absolute left-8 top-10 bottom-10 rounded-2xl flex items-center"
-                    (click)="setArchitect(selectArchitect -1)">
-                    <i class="pi pi-angle-left" style="font-size: 2rem"></i>
-                </button>
-                <button *ngIf="selectArchitect < architects.length -1"
-                    class="absolute right-8 top-10 bottom-10 rounded-2xl flex items-center"
-                    (click)="setArchitect(selectArchitect +1)">
-                    <i class="pi pi-angle-right" style="font-size: 2rem"></i>
-                </button>
-                <div class="absolute bottom-0 rounded-2xl h-14 p-2 flex gap-3">
-                    <img *ngFor="let architect of architects; index as i" class="cursor-pointer"
-                        [src]="getArchitectIcon(i)" (click)="setArchitect(i)">
-                </div>
+        <div *ngIf="page === 0" class="page relative flex place-content-center items-center">
+            <img class="absolute -translate-y-8 h-full blur-3xl" [src]="getArchitectIcon()">
+            <img class="absolute -translate-y-8 h-3/5" [src]="getArchitectIcon()">
+            <span class="translate-y-8 font-semibold text-2xl">{{getArchitectName()}}</span>
+            <button *ngIf="selectArchitect > 0"
+                class="absolute left-8 top-10 bottom-10 rounded-2xl flex items-center"
+                (click)="setArchitect(selectArchitect -1)">
+                <i class="pi pi-angle-left" style="font-size: 2rem"></i>
+            </button>
+            <button *ngIf="selectArchitect < architects.length -1"
+                class="absolute right-8 top-10 bottom-10 rounded-2xl flex items-center"
+                (click)="setArchitect(selectArchitect +1)">
+                <i class="pi pi-angle-right" style="font-size: 2rem"></i>
+            </button>
+            <div class="absolute bottom-0 rounded-2xl h-14 p-2 flex gap-3">
+                <img *ngFor="let architect of architects; index as i" class="cursor-pointer"
+                    [src]="getArchitectIcon(i)" (click)="setArchitect(i)">
             </div>
         </div>
 
@@ -71,11 +47,11 @@
             <div class="flex gap-4">
                 <p-inputgroup class="grow">
                     <p-floatlabel class="grow" variant="on">
-                        <input pInputText name="name" id="name" [(ngModel)]="editing.data.name" (ngModelChange)="changeName()" [ngClass]="{'ng-invalid': !isNameValid}" />
+                        <input pInputText name="name" id="name" [(ngModel)]="editing.name" (ngModelChange)="changeName()" [ngClass]="{'ng-invalid': !isNameValid}" />
                         <label for="name">Name</label>
                     </p-floatlabel>
                     <p-inputgroup-addon *ngIf="isNameDifferent" pTooltip="Sync Name" tooltipPosition="bottom">
-                        <button (click)="editing.data.name = this.syncName()">
+                        <button (click)="editing.name = this.syncName()">
                             <i class="pi pi-sync"></i>
                         </button>
                     </p-inputgroup-addon>
@@ -97,12 +73,12 @@
                     <i class="pi pi-users"></i>
                 </p-inputgroup-addon>
                 <p-floatlabel class="grow" variant="on">
-                    <input pInputText name="authors" id="authors" [(ngModel)]="editing.data.authors"/>
+                    <input pInputText name="authors" id="authors" [(ngModel)]="editing.authors"/>
                     <label for="authors">Authors</label>
                 </p-floatlabel>
             </p-inputgroup>
             <p-floatlabel variant="in">
-                <input pInputText name="description" id="description" [(ngModel)]="editing.data.description"/>
+                <input pInputText name="description" id="description" [(ngModel)]="editing.description"/>
                 <label for="description">Description</label>
             </p-floatlabel>
             <div></div>

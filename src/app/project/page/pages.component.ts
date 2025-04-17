@@ -10,7 +10,7 @@
 //
 
 import { NgClass, NgComponentOutlet, NgFor, NgIf } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit, Type } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { openBaseDialog } from '../../dialog/dialogs';
 import { Page, ProjectService } from '../../services/project.service';
 import { TabViewModule } from 'primeng/tabview';

@@ -1,11 +1,12 @@
-import { ClassicFlow, ConnectionPlugin, Presets as ConnectionPresets, getSourceTarget, Preset } from "rete-connection-plugin";
+import { ClassicFlow, ConnectionPlugin, getSourceTarget, Preset } from "rete-connection-plugin";
 import { AngularArea2D, RenderPreset, Presets as RetePreset } from "rete-angular-plugin/19";
-import { GetSchemes, NodeEditor } from "rete";
+import { ClassicPreset, GetSchemes, NodeEditor } from "rete";
 import { BuilderNode } from "./nodes/builder";
 import { StructureEngineerNode } from "./nodes/engineer";
-import { Connection } from "./connection";
 import { BuilderSocket, MaterialSocket, OptionSocket } from "./sockets";
 import { getConnectionSockets } from "./utils";
+import { BuilderConnection, BuilderOptionsConnection, EngineerBuilderConnection } from "./connection";
+import { BuilderOptionsNode } from "./nodes/options";
 
 export function connectionPreset(editor: NodeEditor<Schemes>, connection: ConnectionPlugin<Schemes, AngularArea2D<Schemes>>): Preset<Schemes> {
     return () => new ClassicFlow({
@@ -16,7 +17,7 @@ export function connectionPreset(editor: NodeEditor<Schemes>, connection: Connec
 
             const sockets = getConnectionSockets(
                 editor,
-                new Connection(
+                new ClassicPreset.Connection(
                     editor.getNode(source.nodeId)!,
                     source.key as never,
                     editor.getNode(target.nodeId)!,
@@ -39,7 +40,7 @@ export function connectionPreset(editor: NodeEditor<Schemes>, connection: Connec
 
             if (source && target) {
                 editor.addConnection(
-                    new Connection(
+                    new ClassicPreset.Connection(
                         editor.getNode(source.nodeId)!,
                         source.key as never,
                         editor.getNode(target.nodeId)!,
@@ -54,7 +55,19 @@ export function connectionPreset(editor: NodeEditor<Schemes>, connection: Connec
 }
 
 export function renderPreset(): RenderPreset<Schemes, AngularArea2D<Schemes>> {
-    return RetePreset.classic.setup()
+    return RetePreset.classic.setup(/*{
+        customize: {
+            node(context) {
+                if(context.payload instanceof BuilderNode) {
+                    return BuilderComponent
+                } else if(context.payload instanceof StructureEngineerNode) {
+                    return BuilderComponent
+                }
+                console.error('Invalid Node type')
+                return null
+            }
+        }
+    }*/)
 }
 
 export type Sockets =
@@ -65,9 +78,11 @@ export type Sockets =
 export type NodeProps =
     | StructureEngineerNode
     | BuilderNode
+    | BuilderOptionsNode
 
 export type ConnProps =
-    | Connection<StructureEngineerNode, BuilderNode>
-    | Connection<BuilderNode, BuilderNode>
+    | EngineerBuilderConnection
+    | BuilderConnection
+    | BuilderOptionsConnection
 
 export type Schemes = GetSchemes<NodeProps, ConnProps>

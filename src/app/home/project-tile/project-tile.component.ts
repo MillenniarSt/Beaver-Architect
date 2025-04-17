@@ -11,7 +11,8 @@
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NgIf } from '@angular/common';
-import { HomeService, Project } from '../../services/home.service';
+import { HomeService } from '../../services/home.service';
+import { ProjectInstance } from '../../../client/instance/project';
 
 @Component({
   selector: 'project-tile',
@@ -22,9 +23,9 @@ import { HomeService, Project } from '../../services/home.service';
 })
 export class ProjectTileComponent {
 
-  @Input() project!: Project
+  @Input() project!: ProjectInstance
 
-  @Output() edit = new EventEmitter<Project>()
+  @Output() edit = new EventEmitter<ProjectInstance>()
   @Output() delete = new EventEmitter<string>()
 
   showMenu: boolean = false

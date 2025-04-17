@@ -9,7 +9,7 @@ export class BuilderNode extends ClassicPreset.Node<
 > {
 
     constructor(
-        protected type: BuilderType
+        public type: BuilderType
     ) {
         super(type.label)
         this.addInput('parent', new ClassicPreset.Input(new BuilderSocket(type.object)))
@@ -17,7 +17,7 @@ export class BuilderNode extends ClassicPreset.Node<
             this.addOutput(option.id, new ClassicPreset.Output(new OptionSocket(option.id), option.label))
         })
         type.outputs.forEach((output) => {
-            this.addOutput(output.id, new ClassicPreset.Output(new BuilderSocket(type.object), output.label, output.multiple))
+            this.addOutput(output.id, new ClassicPreset.Output(new BuilderSocket(output.object), output.label, output.multiple))
         })
         this.addOutput('material', new ClassicPreset.Output(new MaterialSocket(), 'Material'))
     }

@@ -7,7 +7,9 @@ import { Injector } from "@angular/core"
 import { getConnectionSockets } from "./utils"
 import { StructureEngineerNode } from "./nodes/engineer"
 import { BuilderNode } from "./nodes/builder"
-import { getObject3 } from "../types"
+import { getBuilderType, getObject3 } from "../types"
+import { BuilderConnection, BuilderOptionsConnection, EngineerBuilderConnection } from "./connection"
+import { BuilderOptionsNode } from "./nodes/options"
 
 export class StructureEngineerEditor {
 
@@ -16,7 +18,7 @@ export class StructureEngineerEditor {
     readonly connection: ConnectionPlugin<Schemes, AngularArea2D<Schemes>>
     readonly render: AngularPlugin<Schemes, AngularArea2D<Schemes>>
 
-    readonly engineerNode!: StructureEngineerNode
+    readonly engineerNode: StructureEngineerNode
 
     constructor(
         protected readonly container: HTMLElement,
@@ -54,16 +56,52 @@ export class StructureEngineerEditor {
             return context
         })
 
-        this.engineerNode = new StructureEngineerNode(getObject3('prism'))
+        this.engineerNode = new StructureEngineerNode()
     }
 
-    async setup() {
+    async setup(json: any) {
+        this.engineerNode.baseType = getObject3(json.objectType)
         await this.editor.addNode(this.engineerNode)
+
+        // Nodes
+        for(let i = 0; i < json.nodes.builders.length; i++) {
+            const builder = json.nodes.builders[i]
+            const node = new BuilderNode(getBuilderType(builder.type))
+            await this.editor.addNode(node)
+            await this.area.translate(node.id, { x: builder.x, y: builder.y })
+        }
+        for(let i = 0; i < json.nodes.options.length; i++) {
+            const options = json.nodes.options[i]
+            const node = new BuilderOptionsNode(options.options)
+            await this.editor.addNode(node)
+            await this.area.translate(node.id, { x: options.x, y: options.y })
+        }
+
+        // Connections
+        if(json.baseBuilder) {
+            await this.editor.addConnection(new EngineerBuilderConnection(this.engineerNode, this.getBuilderNode(json.baseBuilder)))
+        }
+        for(let i = 0; i < json.connections.builders.length; i++) {
+            const connection = json.connections.builders[i]
+            await this.editor.addConnection(new BuilderConnection(this.getBuilderNode(connection.a), connection.port, this.getBuilderNode(connection.b)))
+        }
+        for(let i = 0; i < json.connections.options.length; i++) {
+            const connection = json.connections.options[i]
+            await this.editor.addConnection(new BuilderOptionsConnection(this.getBuilderNode(connection.a), connection.port, this.getOptionsNode(connection.b)))
+        }
 
         AreaExtensions.zoomAt(this.area, this.editor.getNodes())
     }
 
     async addBuilder(builder: BuilderNode) {
         await this.editor.addNode(builder)
+    }
+
+    getBuilderNode(id: string): BuilderNode {
+        return this.editor.getNode(id) as BuilderNode
+    }
+
+    getOptionsNode(id: string): BuilderOptionsNode {
+        return this.editor.getNode(id) as BuilderOptionsNode
     }
 }

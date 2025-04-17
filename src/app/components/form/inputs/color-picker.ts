@@ -1,7 +1,7 @@
 import { FormGroup, ReactiveFormsModule } from "@angular/forms"
 import { SingleFormInput, TypedInput } from "./inputs"
 import { Component, Input, Type } from "@angular/core"
-import { idToLabel } from "../../../util"
+import { idToLabel } from "../../../../client/util"
 import { ColorPickerModule } from 'primeng/colorpicker'
 
 export type ColorPickerInputOptions = {

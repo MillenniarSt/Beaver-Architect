@@ -1,4 +1,4 @@
-import { idToLabel } from "../../../../util"
+import { idToLabel } from "../../../../../client/util"
 
 export class Object3Type {
 

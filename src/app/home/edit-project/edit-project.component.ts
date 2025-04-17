@@ -20,10 +20,14 @@ import { InputTextModule } from 'primeng/inputtext';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { Editor } from 'primeng/editor';
-import { idToLabel, labelToId } from '../../util';
+import { idToLabel, labelToId } from '../../../client/util';
 import { Tooltip } from 'primeng/tooltip';
-import { Architect, HomeService, Project } from '../../services/home.service';
+import { HomeService, ProjectInstanceEdit } from '../../services/home.service';
 import '../../components/form/inputs/import'
+import { ProjectInstance } from '../../../client/instance/project';
+import { architects, getLocalUser } from '../../../client/instance/instance';
+import { Version } from '../../../client/instance/version';
+import { ArchitectInstance } from '../../../client/instance/architect';
 
 @Component({
   selector: 'edit-project',
@@ -37,97 +41,89 @@ export class EditProjectComponent implements OnInit {
 
   @Input() isNew: boolean = true
 
-  @Input() type: string = 'world'
+  @Input() project: ProjectInstance = new ProjectInstance(
+    `${labelToId(getLocalUser().publicData.name)}.new_project`, Version.FIRST, [],
+    architects[0],
+    'New project', getLocalUser().publicData.name, 'My beautiful project',
+    'New Project\nA new beautiful project'
+  )
 
-  @Input() project: Project = {
-    identifier: 'user.new_project',
-    data: {
-      type: this.type,
-      architect: 'minecraft',
-      name: 'New project',
-      authors: 'User',
-      description: 'My beautiful project'
-    },
-    info: 'New Project\nA new beautiful project'
-  }
-
-  editing!: Project
+  editing!: ProjectInstanceEdit
 
   @Output() changeInteractive = new EventEmitter<HomeInteractive>()
 
   selectArchitect: number = 0
 
-  pages = ['Type', 'Project', 'Info']
+  pages = ['Architect', 'Project', 'Info']
   page: number = 0
 
   constructor(private cdr: ChangeDetectorRef, private home: HomeService) { }
 
   ngOnInit(): void {
-    this.editing = this.home.cloneProject(this.project)
+    this.editing = {
+      identifier: this.project.identifier,
+      version: this.project.version,
+      architect: this.project.architect,
+      name: this.project.name,
+      authors: this.project.authors,
+      description: this.project.description,
+      info: this.project.info
+    }
   }
-
-  user: string = 'user'
 
   switchPage(f: number): void {
     this.page += f
   }
 
-  setType(type: string): void {
-    if (this.isNew) {
-      this.type = type
-      this.editing.data.type = type
-    }
-  }
-
-  get architects(): Architect[] {
-    return this.home.architects
+  get architects(): ArchitectInstance[] {
+    return architects
   }
 
   getArchitectName(architect: number = this.selectArchitect): string {
-    return this.home.architects[architect].name
+    return architects[architect].name
   }
 
   getArchitectIcon(architect: number = this.selectArchitect): string {
-    return this.home.architects[architect].icon
+    return architects[architect].icon
   }
 
   get convertArchitect(): boolean {
-    return !this.isNew && this.project.data.architect !== this.editing.data.architect
+    return !this.isNew && this.editing.architect !== this.project.architect
   }
   setArchitect(index: number): void {
     this.selectArchitect = index
-    this.editing.data.architect = this.home.architects[this.selectArchitect].identifier
+    this.editing.architect = architects[this.selectArchitect]
     this.cdr.detectChanges()
   }
 
   nameTouched = !this.isNew
   get isNameValid(): boolean {
-    return this.editing.data.name.trim() !== ''
+    return this.editing.name.trim() !== ''
   }
   get isNameDifferent(): boolean {
-    return this.editing.data.name !== this.syncName()
+    return this.editing.name !== this.syncName()
   }
   changeName() {
     if (!this.idTouched) {
-      this.editing.identifier = `${this.user}.${labelToId(this.editing.data.name)}`
+      this.editing.identifier = `${labelToId(getLocalUser().publicData.name)}.${labelToId(this.project.name)}`
     }
     this.nameTouched = true
     this.cdr.detectChanges()
   }
   syncName(): string {
-    return idToLabel(this.editing.identifier.substring(this.editing.identifier.lastIndexOf('.') + 1))
+    return idToLabel(this.project.identifier.substring(this.project.identifier.lastIndexOf('.') + 1))
   }
 
   idTouched = !this.isNew
   get isIdValid(): boolean {
-    return this.home.isValidProjectIdentifier(this.editing.identifier, this.project)
+    return this.home.isValidProjectIdentifier(this.project.identifier, this.project)
   }
   get shouldUpdateIdentifier(): boolean {
-    return !this.isNew && this.project.identifier !== this.editing.identifier
+    return !this.isNew && this.editing.identifier !== this.project.identifier
   }
   changeId() {
     if (!this.nameTouched) {
-      this.editing.data.name = this.syncName()
+      this.editing.name = this.syncName()
     }
     this.idTouched = true
     this.cdr.detectChanges()
@@ -145,7 +141,7 @@ export class EditProjectComponent implements OnInit {
     if (this.isNew) {
       await this.home.createProject(this.editing)
     } else {
-      await this.home.editProject(this.project.identifier, this.editing)
+      await this.home.editProject(this.editing.identifier, this.editing)
     }
     this.close()
   }

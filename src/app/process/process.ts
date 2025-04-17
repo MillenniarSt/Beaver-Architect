@@ -10,7 +10,7 @@
 //
 
 import { getCurrentWebviewWindow, WebviewWindow } from "@tauri-apps/api/webviewWindow"
-import { WebSocketServer } from "../socket"
+import { Server } from "../../client/connection/server"
 
 export type ProgressOptions = {
     title: string
@@ -175,7 +175,7 @@ export class Process {
     }
 }
 
-export abstract class Task<T extends {}> {
+export abstract class Task<T extends {} = {}> {
 
     protected _progress: number | null = null
 
@@ -272,11 +272,11 @@ export class ForEachTask<T extends {}, I> extends SimpleTask<T> {
 
 export class ChannelTask<T extends {}> extends SimpleTask<T> {
 
-    readonly socket: WebSocketServer
+    readonly socket: Server
     readonly path: string
     readonly getData?: (data: T) => any
 
-    constructor(label: string, weight: number, socket: WebSocketServer, path: string, getData?: (data: T) => any) {
+    constructor(label: string, weight: number, socket: Server, path: string, getData?: (data: T) => any) {
         super(label, weight)
         this.socket = socket
         this.path = path

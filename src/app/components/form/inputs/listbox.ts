@@ -2,7 +2,7 @@ import { FormControl, FormGroup, ReactiveFormsModule } from "@angular/forms"
 import { FormInputData, SingleFormInput, TypedInput } from "./inputs"
 import { Component, Input, Type } from "@angular/core"
 import { FloatLabelModule } from "primeng/floatlabel"
-import { idToLabel } from "../../../util"
+import { idToLabel } from "../../../../client/util"
 import { ListboxModule } from 'primeng/listbox'
 
 export type ListboxInputOptions = {

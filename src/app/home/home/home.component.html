@@ -37,19 +37,7 @@
       </button>
     </div>
 
-    <div class="grow px-5 flex flex-col gap-3 justify-center">
-      <button [ngClass]="{'selected': isSelectedType('world'), 'unselected': !isSelectedType('world')}"
-        (click)="selectType('world')">Worlds</button>
-      <button [ngClass]="{'selected': isSelectedType('structure'), 'unselected': !isSelectedType('structure')}"
-        (click)="selectType('structure')">Structures</button>
-      <button [ngClass]="{'selected': isSelectedType('terrain'), 'unselected': !isSelectedType('terrain')}"
-        (click)="selectType('terrain')">Terrains</button>
-      <button [ngClass]="{'selected': isSelectedType('biome'), 'unselected': !isSelectedType('biome')}"
-        (click)="selectType('biome')">Biomes</button>
-      <hr class="my-4 mx-7">
-      <button [ngClass]="{'selected': isSelectedType('data_pack'), 'unselected': !isSelectedType('data_pack')}"
-        (click)="selectType('data_pack')">Data Packs</button>
-    </div>
+    <div class="grow"></div>
 
     <div class="ml-3 my-2 flex gap-3">
       <img class="w-1/2" src="assets/credit/millenniar_title.svg">
@@ -61,11 +49,11 @@
   </div>
 
   <p-card class="grow m-4">
-    <projects *ngIf="interactive === 'projects' && !loading" [type]="type" class="h-full"
+    <projects *ngIf="interactive === 'projects' && !loading" class="h-full"
       (editProject)="doEditProject($event)"></projects>
-    <edit-project *ngIf="interactive === 'new_project' && !loading" [type]="type ?? 'world'" class="h-full"
+    <edit-project *ngIf="interactive === 'new_project' && !loading" class="h-full"
       (changeInteractive)="changeInteractive($event)"></edit-project>
     <edit-project *ngIf="interactive === 'edit_project' && !loading" [isNew]="false" class="h-full"
-      (changeInteractive)="changeInteractive($event)" [type]="editProject!.data.type" [project]="editProject!"></edit-project>
+      (changeInteractive)="changeInteractive($event)" [project]="editProject!"></edit-project>
   </p-card>
 </div>

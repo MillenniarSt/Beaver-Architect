@@ -2,7 +2,7 @@ import { FormGroup, ReactiveFormsModule } from "@angular/forms"
 import { SingleFormInput, TypedInput } from "./inputs"
 import { Component, Input, Type } from "@angular/core"
 import { FloatLabelModule } from "primeng/floatlabel"
-import { idToLabel } from "../../../util"
+import { idToLabel } from "../../../../client/util"
 import { InputNumber } from 'primeng/inputnumber'
 
 export type TextInputDisplay = {

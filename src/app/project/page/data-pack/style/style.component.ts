@@ -97,7 +97,7 @@ export class StyleComponent implements OnInit, OnDestroy {
     const path = this.ps.getPage(this.index).data.path
     this.ref = path.substring(17, path.lastIndexOf('.'))
     this.ps.server.request('data-pack/styles/get', { ref: this.ref }).then((data: any) => {
-      this.patterns = data.patterns
+      this.patterns = data.materials
       this.implementations = data.implementations
       this.isAbstract = data.isAbstract
       this.searchForImplementations()
@@ -154,17 +154,17 @@ export class StyleComponent implements OnInit, OnDestroy {
   }
 
   async updatePattern(id: string) {
-    const data = await this.ps.server.request('data-pack/styles/get-pattern', { ref: this.ref, id: id })
+    const data = await this.ps.server.request('data-pack/styles/get-material', { ref: this.ref, id: id })
     if (this.selected && this.selected.id === id) {
       let totalWeight = 0
-      data.materials.forEach((material: any) => totalWeight += material.weight)
-      this.selected.materials = data.materials.map((material: any) => {
+      data.paints.forEach((paint: any) => totalWeight += paint.weight)
+      this.selected.materials = data.paints.map((paint: any) => {
         return {
-          id: material.id,
-          weight: material.weight,
-          size: material.size,
-          icon: this.ps.materials[material.id].icon,
-          percent: material.weight / totalWeight * 100
+          id: paint.id,
+          weight: paint.weight,
+          size: paint.size,
+          icon: this.ps.materials[paint.id].icon,
+          percent: paint.weight / totalWeight * 100
         }
       })
       this.cdr.detectChanges()
@@ -175,7 +175,7 @@ export class StyleComponent implements OnInit, OnDestroy {
 
   async updatePatternPreview(id: string | undefined = this.selected?.id) {
     if (this.selected && this.selected.id === id) {
-      const previewData: string[][][] = await this.ps.server.request('data-pack/styles/generate-pattern', { ref: this.ref, pattern: id, size: [1, this.zoom, this.zoom * 4] })
+      const previewData: string[][][] = await this.ps.server.request('data-pack/styles/preview', { ref: this.ref, material: id, size: [1, this.zoom, this.zoom * 4] })
       //const preview = await this.ps.architect.request('data-pack/materials/textures', { materials: previewData[0] })
       //this.selected.preview = preview
       this.selected.preview = previewData[0].map((i: string[]) => i.map((j: string) => this.ps.materials[j].icon))
@@ -241,17 +241,17 @@ export class StyleComponent implements OnInit, OnDestroy {
 
   createPattern(id: string) {
     this.setNewPattern(undefined)
-    this.ps.server.send('data-pack/styles/create-pattern', { ref: this.ref, id: this.idName(id) })
+    this.ps.server.send('data-pack/styles/create-material', { ref: this.ref, id: this.idName(id) })
   }
 
   editPattern() {
-    this.ps.server.send('data-pack/styles/edit-pattern', { ref: this.ref, id: this.selected!.id, changes: { id: this.idName(this.editing!.label) } })
+    this.ps.server.send('data-pack/styles/edit-material', { ref: this.ref, id: this.selected!.id, changes: { id: this.idName(this.editing!.label) } })
     this.editing = undefined
     this.cdr.detectChanges()
   }
 
   deletePattern(id: string) {
-    this.ps.server.send('data-pack/styles/delete-pattern', { ref: this.ref, id: id })
+    this.ps.server.send('data-pack/styles/delete-material', { ref: this.ref, id: id })
   }
 
   select(pattern?: Pattern) {
@@ -281,7 +281,7 @@ export class StyleComponent implements OnInit, OnDestroy {
   }
 
   addMaterial() {
-    this.ps.server.send('data-pack/styles/add-material', { ref: this.ref, pattern: this.selected!.id })
+    this.ps.server.send('data-pack/styles/add-paint', { ref: this.ref, material: this.selected!.id })
   }
 
   changeMaterial(index: number, material: Material | null) {
@@ -293,11 +293,11 @@ export class StyleComponent implements OnInit, OnDestroy {
   }
 
   editMaterial(index: number, changes: FormOutput<any>) {
-    this.ps.server.send('data-pack/styles/edit-material', { ref: this.ref, pattern: this.selected!.id, index: index, changes: changes })
+    this.ps.server.send('data-pack/styles/edit-paint', { ref: this.ref, material: this.selected!.id, index: index, changes: changes })
   }
 
   deleteMaterial(index: number) {
-    this.ps.server.send('data-pack/styles/delete-material', { ref: this.ref, pattern: this.selected!.id, index: index })
+    this.ps.server.send('data-pack/styles/delete-paint', { ref: this.ref, material: this.selected!.id, index: index })
   }
 
   clickMaterial(index: number) {
