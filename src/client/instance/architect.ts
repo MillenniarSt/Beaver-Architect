@@ -1,4 +1,4 @@
-import { architectsDir, fullPath, joinPath, read } from "../file"
+import { architectsDir, assetPath, joinPath, read } from "../file"
 import { Version } from "./version"
 
 export class ArchitectInstance {
@@ -10,8 +10,19 @@ export class ArchitectInstance {
     ) { }
 
     static async load(identifier: string): Promise<ArchitectInstance> {
-        const data = await read(joinPath(architectsDir, identifier, 'architect.json'))
-        return new ArchitectInstance(data.identifier, data.name, data.version)
+        return ArchitectInstance.fromJson(await read(joinPath(architectsDir, identifier, 'architect.json')))
+    }
+
+    static fromJson(json: any): ArchitectInstance {
+        return new ArchitectInstance(json.identifier, json.name, json.version)
+    }
+
+    toJson() {
+        return {
+            identifier: this.identifier,
+            version: this.version.toString(),
+            name: this.name
+        }
     }
 
     get dir(): string {
@@ -23,6 +34,6 @@ export class ArchitectInstance {
     }
 
     get icon(): string {
-        return fullPath(this.dir, 'icon.png')
+        return assetPath(this.dir, 'icon.png')
     }
 }

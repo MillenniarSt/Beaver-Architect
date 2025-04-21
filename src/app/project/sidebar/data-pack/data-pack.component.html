@@ -22,23 +22,30 @@
     <p-tree class="grow w-full md:w-30rem" [value]="tree" (onNodeExpand)="nodeExpand($event)" (onNodeCollapse)="nodeCollapse($event)">
         <ng-template let-node pTemplate="dir">
             <div class="flex">
-                <span class="grow folder">{{ node.label }}</span>
-                <div class="gap-2 createFiles">
+                <span class="grow nodeLabel">{{ node.label }}</span>
+                <div class="gap-2 nodeActions">
                     <button>
-                        <i class="pi pi-file-plus" (click)="newFile(node, node.data.ref)"></i>
+                        <i class="pi pi-file-plus" (click)="newEngineer(node.data.ref)"></i>
                     </button>
                     <button>
-                        <i class="pi pi-folder-plus" (click)="newDir(node, node.data.ref)"></i>
+                        <i class="pi pi-folder-plus" (click)="newDir(node.data.ref)"></i>
                     </button>
                 </div>
             </div>
         </ng-template>
 
         <ng-template let-node pTemplate="file">
-            <button class="w-full flex gap-2 items-center" (click)="openFile(node)">
-                <img [src]="selectedFolder.icon" class="h-4">
-                <span class="grow text-start text-sm">{{ node.label }}</span>
-            </button>
+            <div class="flex">
+                <button class="w-full flex gap-2 items-center nodeLabel" (click)="openFile(node)">
+                    <img [src]="selectedFolder.icon" class="h-4">
+                    <span class="grow text-start">{{ node.label }}</span>
+                </button>
+                <div class="gap-2 nodeActions">
+                    <button>
+                        <i class="pi pi-trash" (click)="deleteEngineer(node.data.ref)"></i>
+                    </button>
+                </div>
+            </div>
         </ng-template>
     </p-tree>
 </div>

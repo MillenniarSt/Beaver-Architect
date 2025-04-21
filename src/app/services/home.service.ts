@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { openBaseDialog, warnDialog } from "../dialog/dialogs";
-import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { getCurrentWebviewWindow, WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { createProject, deleteProject, getArchitectInstance, getProjectInstance, initInstance, projects } from "../../client/instance/instance";
 import { ProjectInstance } from "../../client/instance/project";
 import { ArchitectInstance } from "../../client/instance/architect";
@@ -49,24 +49,28 @@ export class HomeService {
             center: true,
             maximized: true,
             decorations: false
-          })
-        
-          newWindow.once('tauri://created', () => {
-            newWindow.once('project:ready', () => newWindow.emit('project:get', {
-                identifier: identifier,
-                isPublic: isPublic
-            }))
-          })
-        
-          newWindow.once('tauri://error', (e) => {
+        })
+
+        newWindow.once('tauri://created', () => {
+            newWindow.once('project:ready', () => {
+                newWindow.emit('project:get', {
+                    identifier: identifier,
+                    isPublic: isPublic
+                })
+                getCurrentWebviewWindow().close()
+            })
+        })
+
+        newWindow.once('tauri://error', (e) => {
             console.error(e)
-          })
+        })
     }
 
     cloneProject(project: ProjectInstance): ProjectInstance {
         return new ProjectInstance(
             project.identifier, project.version, [...project.dependencies],
             project.architect,
+            project.url,
             project.name, project.authors, project.description,
             project.info
         )
@@ -78,7 +82,7 @@ export class HomeService {
 
     async editProject(identifier: string, edit: ProjectInstanceEdit) {
         const project = this.getProject(identifier)
-        
+
         project.version = edit.version
         project.name = edit.name
         project.authors = edit.authors
@@ -86,17 +90,17 @@ export class HomeService {
         project.info = project.info
         await project.save()
 
-        if(edit.image) {
-            await copyFromPc(edit.image, project.image)
+        if (edit.image) {
+            await project.changeImage(edit.image)
         }
-        if(edit.background) {
-            await copyFromPc(edit.background, project.background)
+        if (edit.background) {
+            await project.changeBackground(edit.background)
         }
 
-        if(edit.identifier !== project.identifier) {
+        if (edit.identifier !== project.identifier) {
             await project.rename(edit.identifier)
         }
-        if(edit.architect !== project.architect) {
+        if (edit.architect !== project.architect) {
             await project.setArchitect(edit.architect)
         }
     }
@@ -105,25 +109,31 @@ export class HomeService {
         const project = new ProjectInstance(
             edit.identifier, edit.version, [],
             edit.architect,
+            undefined,
             edit.name, edit.authors, edit.description,
             edit.info
         )
 
         await createProject(project)
 
-        if(edit.image) {
-            await copyFromPc(edit.image, project.image)
+        if (edit.image) {
+            await project.changeImage(edit.image)
         }
-        if(edit.background) {
-            await copyFromPc(edit.background, project.background)
+        if (edit.background) {
+            await project.changeImage(edit.background)
         }
+    }
+
+    async joinProject(url: string) {
+        const project = await ProjectInstance.join(url)
+        await createProject(project)
     }
 
     async deleteProject(identifier: string) {
         const project = this.getProject(identifier)
-        if(await openBaseDialog(warnDialog(
+        if (await openBaseDialog(warnDialog(
             'Delete Project',
-            `Are you sure to delete permanently the project "${project.name}"?\nThe process can not be reverted!` 
+            `Are you sure to delete permanently the project "${project.name}"?\nThe process can not be reverted!`
         ))) {
             await deleteProject(identifier)
         }

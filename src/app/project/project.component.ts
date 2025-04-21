@@ -21,11 +21,12 @@ import { SplitterModule } from 'primeng/splitter'
 import { MenuItem, MessageService } from 'primeng/api';
 import { Menubar } from 'primeng/menubar';
 import { AvatarModule } from 'primeng/avatar';
-import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
+import { getCurrentWebviewWindow, WebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { ToastModule } from 'primeng/toast';
 import '../components/form/inputs/import'
 import { Project } from '../../client/project/project';
 import { getProjectInstance, initInstance } from '../../client/instance/instance';
+import { baseErrorDialog, openBaseDialog } from '../dialog/dialogs';
 
 @Component({
 	selector: 'project',
@@ -41,7 +42,6 @@ export class ProjectComponent {
 	constructor(
 		private cdRef: ChangeDetectorRef,
 		private ps: ProjectService,
-		private render: RenderService,
 		private message: MessageService
 	) { }
 
@@ -55,8 +55,8 @@ export class ProjectComponent {
 				{ label: 'Project Settings' },
 				{ separator: true },
 				{ label: 'Open new Project' },
-				{ label: 'Return to Home' },
-				{ label: 'Exit' }
+				{ label: 'Return to Home', command: () => this.returnToHome()},
+				{ label: 'Exit', command: () => this.close() }
 			]
 		},
 		{
@@ -78,21 +78,40 @@ export class ProjectComponent {
 	public isLoaded: boolean = false
 
 	ngOnInit() {
-		this.ps.project.server.listen('message', (message: any) => {
-			this.showMessage(message.severity, message.summary, message.detail)
-		})
-
 		once<{ identifier: string, url?: string, isPublic: boolean }>('project:get', async (event) => {
 			await initInstance()
 
 			const project = event.payload.url ?
 				await Project.fromRemoteInstance(getProjectInstance(event.payload.identifier), event.payload.url) :
-				await Project.fromLocalInstance(getProjectInstance(event.payload.identifier))
+				await Project.fromInstance(getProjectInstance(event.payload.identifier))
+
+			this.ps._project = project
+			project.server.onClose = async () => {
+				await openBaseDialog(baseErrorDialog('Server Closed', 'Connection with the Server closed, the Project will be closed'))
+				this.returnToHome()
+			}
+			project.server.onError = async () => {
+				await openBaseDialog(baseErrorDialog('Connection Failed', 'Unexpected error encountered in the Server connection, the Project will be closed'))
+				this.returnToHome()
+			}
+			project.architect.server.onClose = async () => {
+				await openBaseDialog(baseErrorDialog('Architect Closed', 'Connection with the Architect closed, the Project will be closed'))
+				this.returnToHome()
+			}
+			project.architect.server.onError = async () => {
+				await openBaseDialog(baseErrorDialog('Architect Connection Failed', 'Unexpected error encountered in the Architect connection, the Project will be closed'))
+				this.returnToHome()
+			}
+
+			this.ps.project.server.listen('message', (message: any) => {
+				this.showMessage(message.severity, message.summary, message.detail)
+			})
 
 			if (await project.load()) {
 				this.isLoaded = true
+				this.cdRef.detectChanges()
 			} else {
-				this.ps.close()
+				this.returnToHome()
 			}
 		})
 
@@ -126,5 +145,15 @@ export class ProjectComponent {
 
 	close() {
 		this.ps.close()
+	}
+
+	returnToHome() {
+		const home = new WebviewWindow('main', {
+			title: 'Beaver Architect',
+			width: 900,
+			height: 600,
+			center: true
+		})
+		home.once('tauri://created', () => this.close())
 	}
 }

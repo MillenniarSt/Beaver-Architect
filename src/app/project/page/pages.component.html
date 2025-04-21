@@ -34,7 +34,7 @@
                         (click)="closePage(selectedIndex)"></i>
                 </div>
             </ng-template>
-            <ng-container *ngComponentOutlet="page.component; inputs: { index: i }"></ng-container>
+            <ng-container *ngComponentOutlet="page.component; inputs: { page: page }"></ng-container>
         </p-tabPanel>
     </p-tabView>
 </ng-template>

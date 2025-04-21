@@ -10,12 +10,12 @@
  *
 */
 
-.createFiles {
+.nodeActions {
   display: none;
 }
 
-.folder:hover + .createFiles,
-.createFiles:hover {
+.nodeLabel:hover + .nodeActions,
+.nodeActions:hover {
   display: flex;
 }
 

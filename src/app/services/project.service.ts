@@ -14,11 +14,11 @@ import { BehaviorSubject } from 'rxjs';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { Project } from '../../client/project/project';
 
-export type Page = {
+export type Page<T = any> = {
   path: string,
   icon: string,
   label: string,
-  data?: any,
+  data: T,
   isSaved?: boolean,
   save?: () => void,
   component: Type<any>

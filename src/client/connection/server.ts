@@ -74,19 +74,27 @@ export abstract class Server {
                     console.error('Invalid socket message', error)
                     openErrorDialog(error)
                 }
-            };
+            }
 
-            this.ws.onclose = () => {
-                console.warn('Connection WebSocket closed, trying to reconnect in 3s')
-                setTimeout(() => this.connect(), 3000)
+            this.ws.onclose = (event) => {
+                console.warn('Connection WebSocket closed')
+                if(this.onClose) {
+                    this.onClose(event)
+                }
             }
 
             this.ws.onerror = (error) => {
                 console.error('WebSocket Error:', error)
-                openBaseDialog(baseErrorDialog('Server Error', 'An unexpected Error occurred in the Web Socket Server'))
+                if(this.onError) {
+                    this.onError(error)
+                }
             }
         })
     }
+
+    onClose: ((event: CloseEvent) => void) | undefined
+
+    onError: ((event: Event) => void) | undefined
 
     disconnect() {
         if (this.isOpen) {

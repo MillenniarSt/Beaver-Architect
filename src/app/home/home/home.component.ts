@@ -23,7 +23,7 @@ import { ProjectInstance } from '../../../client/instance/project';
 @Component({
   selector: 'home',
   standalone: true,
-  imports: [NgIf, NgClass, ProjectsComponent, EditProjectComponent, CardModule, ButtonModule],
+  imports: [NgIf, ProjectsComponent, EditProjectComponent, CardModule, ButtonModule],
   providers: [HomeService],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
@@ -35,6 +35,7 @@ export class HomeComponent implements OnInit {
   constructor(private cdr: ChangeDetectorRef, private home: HomeService) { }
 
   ngOnInit(): void {
+    console.log('Init')
     this.home.init().then(() => {
       this.loading = false
       this.cdr.detectChanges()
@@ -66,7 +67,7 @@ export class HomeComponent implements OnInit {
       title: 'Join Project',
       message: 'Enter the Public url of the server'
     })
-    // TODO
+    await this.home.joinProject(url.value)
   }
 
   editProject?: ProjectInstance

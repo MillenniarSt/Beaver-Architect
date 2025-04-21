@@ -23,26 +23,26 @@
   background: linear-gradient(90deg, var(--p-primary-50) 60%, var(--p-primary-300) 100%);
 }
 
-.pattern-preview {
+.rule-preview {
   background: linear-gradient(90deg, rgba(18,71,190,1) 40%, rgba(0,0,0,0) 110%);
 }
 
-.pattern-actions {
+.rule-actions {
   display: none;
 }
 
-.pattern:hover > .pattern-actions,
-.pattern-actions:hover, 
-.pattern-selected > .pattern-actions {
+.rule:hover > .rule-actions,
+.rule-actions:hover, 
+.rule-selected > .rule-actions {
   display: flex;
 }
 
-.pattern:hover {
+.rule:hover {
   background-color: var(--p-primary-300);
   border-radius: 5px;
 }
 
-.pattern-selected {
+.rule-selected {
   background-color: var(--p-primary-900);
   border-radius: 5px;
 }

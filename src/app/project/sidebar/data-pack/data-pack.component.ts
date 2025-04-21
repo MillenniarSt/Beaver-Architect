@@ -9,7 +9,7 @@
 //      ##    \__|__/
 //
 
-import { ChangeDetectorRef, Component, OnInit, Type, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit, Type, ViewEncapsulation } from '@angular/core';
 import { ProjectService } from '../../../services/project.service';
 import { TreeNode } from 'primeng/api';
 import { TreeModule } from 'primeng/tree';
@@ -17,8 +17,10 @@ import { baseErrorDialog, openBaseDialog, openInputDialog } from '../../../dialo
 import { NgClass, NgFor } from '@angular/common';
 import { StyleComponent } from '../../page/data-pack/style/style.component';
 import { StructureComponent } from '../../page/data-pack/structure/structure.component';
-import { MappedResourceReference, ResourceReference } from '../../../../client/project/engineer/engineer';
+import { ListUpdateObject, MappedResourceReference, ResourceReference } from '../../../../client/project/engineer/engineer';
 import { idToLabel } from '../../../../client/util';
+import { Project } from '../../../../client/project/project';
+import { Subject } from 'rxjs';
 
 type FolderType = {
   title: string,
@@ -38,7 +40,9 @@ type DataPackTreeNode = TreeNode<{ ref: ResourceReference }>
   styleUrl: './data-pack.component.css',
   encapsulation: ViewEncapsulation.None
 })
-export class DataPackComponent implements OnInit {
+export class DataPackComponent implements OnInit, OnDestroy {
+
+  @Input() selectedProject!: Project
 
   folders: FolderType[] = [
     {
@@ -60,19 +64,43 @@ export class DataPackComponent implements OnInit {
 
   tree: DataPackTreeNode[] = []
 
+  get treeRoot(): DataPackTreeNode {
+    return this.tree[0]
+  }
+
   constructor(private cdr: ChangeDetectorRef, private ps: ProjectService) { }
+
+  private destroy$ = new Subject<void>()
 
   ngOnInit(): void {
     this.load()
+
+    this.folders.forEach((folder) => {
+      this.ps.project.server.listenUntil(`data-pack/${folder.id}/update`, (data: ListUpdateObject[]) => data.forEach((update) => {
+        console.log('root', this.treeRoot)
+        if(folder === this.selectedFolder) {
+          if(update.mode === 'push') {
+            this.addFile(new ResourceReference(update.id))
+          } else if(update.mode === 'delete') {
+            this.removeFile(new ResourceReference(update.id))
+          }
+        }
+      }), this.destroy$)
+    })
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next()
+    this.destroy$.complete()
   }
 
   load(): void {
-    this.ps.project.server.request(`data-pack/${this.selectedFolder.id}/get-all`).then((data: string[]) => {
+    this.ps.project.server.request(`data-pack/${this.selectedFolder.id}/get-all`, { project: this.selectedProject.identifier }).then((data: string[]) => {
       this.tree = [{
         label: this.selectedFolder.title,
         icon: 'pi pi-folder',
         expanded: true,
-        data: { ref: new ResourceReference('') },
+        data: { ref: new ResourceReference({ pack: this.selectedProject.identifier, location: '' }) },
         type: 'dir',
         children: this.loadDir(ResourceReference.map(data.map((ref) => new ResourceReference(ref))))
       }]
@@ -99,7 +127,27 @@ export class DataPackComponent implements OnInit {
   }
 
   buildRef(folder: ResourceReference, name: string): ResourceReference {
-    return new ResourceReference(`${folder.location}/${name.trim().toLowerCase().replace(' ', '_')}`)
+    return new ResourceReference({ pack: folder.pack, location: `${folder.location === '' ? '' : `${folder.location}/`}${name.trim().toLowerCase().replace(' ', '_')}` })
+  }
+
+  getParentNode(ref: ResourceReference): DataPackTreeNode {
+    if(ref.location.includes('/')) {
+      return this.getFolderNode(ref.folder)
+    } else {
+      return this.treeRoot
+    }
+  }
+
+  getNode(ref: ResourceReference): DataPackTreeNode {
+    return this.getParentNode(ref).children!.find((node) => node.data!.ref.equals(ref) && node.type === 'file')!
+  }
+
+  getFolderNode(ref: ResourceReference): DataPackTreeNode {
+    let folder = this.getParentNode(ref).children!.find((node) => node.data!.ref.equals(ref) && node.type === 'dir')
+    if(!folder) {
+      folder = this.addDir(ref)
+    }
+    return folder
   }
 
   title(): string {
@@ -131,7 +179,7 @@ export class DataPackComponent implements OnInit {
     })
   }
 
-  async newFile(node: DataPackTreeNode, folder: ResourceReference) {
+  async newEngineer(folder: ResourceReference) {
     let file = (await openInputDialog({
       title: `new ${this.selectedFolder.label}`,
       message: 'The file will be saved as lower_case_no_space.json',
@@ -143,13 +191,12 @@ export class DataPackComponent implements OnInit {
 
     if(!(await this.ps.project.server.request(`data-pack/${this.selectedFolder.id}/exists`, { ref: ref.toJson() }))) {
       await this.ps.project.server.request(`data-pack/${this.selectedFolder.id}/create`, { ref: ref.toJson() })
-      this.addFile(node, { ref: ref, name: idToLabel(ref.location), children: null })
     } else {
       openBaseDialog(baseErrorDialog('File Exists', `Could not create new ${this.selectedFolder.id} '${file}', it already exists in the folder ${folder.location}`))
     }
   }
 
-  async newDir(node: DataPackTreeNode, parentFolder: ResourceReference) {
+  async newDir(parentFolder: ResourceReference) {
     let folder = (await openInputDialog({
       title: 'New Folder',
       message: 'The folder will be saved as lower_case_no_space',
@@ -158,21 +205,42 @@ export class DataPackComponent implements OnInit {
 
     const ref = this.buildRef(parentFolder, folder)
 
-    this.addFile(node, {
-      ref: ref,
-      name: idToLabel(ref.location),
-      children: []
-    })
+    this.addDir(ref)
   }
 
-  addFile(node: DataPackTreeNode, mapped: MappedResourceReference) {
-    node.children = [...node.children ?? [], {
-      label: this.displayName(mapped.name),
-      icon: mapped.children !== null ? 'pi pi-folder' : undefined,
-      data: { ref: mapped.ref },
-      type: mapped.children !== null ? 'dir' : 'file',
-      children: mapped.children !== null ? this.loadDir(mapped.children) : undefined
-    }]
+  async deleteEngineer(ref: ResourceReference) {
+    this.ps.project.server.send(`data-pack/${this.selectedFolder.id}/delete`, { ref: ref })
+  }
+
+  addFile(ref: ResourceReference): DataPackTreeNode {
+    const parent = this.getParentNode(ref)
+    const file: DataPackTreeNode = {
+      label: ref.name,
+      data: { ref: ref },
+      type: 'file'
+    }
+    parent.children = [...parent.children!, file]
+    this.cdr.detectChanges()
+    return file
+  }
+
+  addDir(ref: ResourceReference): DataPackTreeNode {
+    const parent = this.getParentNode(ref)
+    const dir: DataPackTreeNode = {
+      label: ref.name,
+      icon: 'pi pi-folder',
+      data: { ref: ref },
+      type: 'dir',
+      children: []
+    }
+    parent.children = [...parent.children!, dir]
+    this.cdr.detectChanges()
+    return dir
+  }
+
+  removeFile(ref: ResourceReference) {
+    const parent = this.getParentNode(ref)
+    parent.children!.splice(parent.children!.findIndex((child) => child.data!.ref.equals(ref) && child.children === undefined), 1)
     this.cdr.detectChanges()
   }
 }

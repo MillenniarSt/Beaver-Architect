@@ -34,7 +34,6 @@ export class PagesComponent implements OnInit {
 
   ngOnInit(): void {
     this.ps.pagesMessage.subscribe((message) => {
-      console.log(message)
       if(message.openPage) {
         this.ps.pages.push(message.openPage)
       }

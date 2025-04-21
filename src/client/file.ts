@@ -1,5 +1,4 @@
 import { convertFileSrc } from "@tauri-apps/api/core"
-import { appDataDir } from "@tauri-apps/api/path"
 import { BaseDirectory, exists as fs_exists, mkdir as fs_mkdir, remove as fs_remove, readTextFile as fs_readText, writeTextFile as fs_writeText, copyFile as fs_copyFile, readDir as fs_readDir, rename as fs_rename } from "@tauri-apps/plugin-fs"
 import { appDir } from "./instance/instance"
 
@@ -12,8 +11,12 @@ export function joinPath(...names: string[]): string {
     return names.join(separator)
 }
 
-export function fullPath(...names: string[]): string {
+export function assetPath(...names: string[]): string {
     return convertFileSrc(joinPath(appDir(), ...names))
+}
+
+export function fullPath(...names: string[]): string {
+    return joinPath(appDir(), ...names)
 }
 
 export async function read(path: string) {
@@ -74,5 +77,6 @@ export function copy(path: string, dest: string) {
 }
 
 export function copyFromPc(path: string, dest: string) {
+    console.log(path)
     return fs_copyFile(path, dest, { toPathBaseDir: BaseDirectory.AppData })
 }

@@ -13,8 +13,8 @@
 <p-panel class="h-full">
     <ng-template #header>
         <div class="flex gap-2 items-center p-2 w-full rounded-lg bg-surface-900 border-solid border-[1px] border-primary-600">
-            <img class="h-7 w-7 rounded-lg" [src]="project.image"/>
-            <span class="grow">{{project.name}}</span>
+            <img class="h-7 w-7 rounded-lg" [src]="selectedProject.image"/>
+            <span class="grow">{{selectedProject.name}}</span>
             <div class="flex gap-1">
                 <img *ngFor="let bar of bars; index as i" class="bar-icon"
                     [ngClass]="{'bar-icon-selected': i === selectIndex}" [src]="bar.icon" (click)="select(i)">
@@ -23,6 +23,6 @@
     </ng-template>
 
     <div class="grow my-2 panel">
-        <ng-container *ngComponentOutlet="bars[selectIndex].component" class="h-full"></ng-container>
+        <ng-container *ngComponentOutlet="bars[selectIndex].component; inputs: { selectedProject: selectedProject }" class="h-full"></ng-container>
     </div>
 </p-panel>

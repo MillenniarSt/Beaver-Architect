@@ -44,8 +44,9 @@ export class EditProjectComponent implements OnInit {
   @Input() project: ProjectInstance = new ProjectInstance(
     `${labelToId(getLocalUser().publicData.name)}.new_project`, Version.FIRST, [],
     architects[0],
+    undefined,
     'New project', getLocalUser().publicData.name, 'My beautiful project',
-    'New Project\nA new beautiful project'
+    'A new beautiful project'
   )
 
   editing!: ProjectInstanceEdit

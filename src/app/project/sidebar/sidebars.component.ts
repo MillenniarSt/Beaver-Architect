@@ -31,14 +31,17 @@ export class SidebarsComponent {
 
   @Input() selectIndex: number = 0
 
+  selectedProject: Project = this.ps.project
+
   constructor(private cdr: ChangeDetectorRef, private ps: ProjectService) { }
+
+  selectProject(project: Project): void {
+    this.selectedProject = project
+    this.cdr.detectChanges()
+  }
 
   select(index: number): void {
     this.selectIndex = index
     this.cdr.detectChanges()
-  }
-
-  get project(): Project {
-    return this.ps.project
   }
 }

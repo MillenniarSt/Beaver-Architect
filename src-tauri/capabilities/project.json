@@ -13,23 +13,23 @@
     "opener:default",
     "dialog:default",
     "fs:default",
+    "shell:default",
     {
       "identifier": "fs:scope",
-      "allow": [
-        "**/*"
-      ]
+      "allow": ["**/*"]
     },
     {
-      "identifier": "shell:allow-execute",
+      "identifier": "shell:allow-spawn",
       "allow": [
         {
           "name": "run-server",
-          "cmd": "node",
-          "args": [
-            {
-              "validator": "\\S+"
-            }
-          ]
+          "cmd": "C:\\Users\\Ange\\AppData\\Roaming\\io.github.MillenniarSt.Beaver-Architect\\server.exe",
+          "args": true
+        },
+        {
+          "name": "run-minecraft-architect",
+          "cmd": "C:\\Users\\Ange\\AppData\\Roaming\\io.github.MillenniarSt.Beaver-Architect\\architects\\minecraft\\architect.exe",
+          "args": true
         }
       ]
     }

@@ -137,7 +137,7 @@ export class Process {
         if (this.state === ProcessState.DONE) {
             this.exeClose(false, new Array(this.tasks.length).fill(true))
         } else if (this.state === ProcessState.EXECUTING) {
-            if (this.options.cancellable) {
+            if (this.options.cancellable !== false) {
                 this.exeClose(true, this.tasks.map((task) => task.progress === 1))
             } else {
                 console.warn('Can not close an executing process that is not cancellable')

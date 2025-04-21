@@ -4,7 +4,7 @@ import { getFreePort, LocalServer, RemoteServer, Server } from "../connection/se
 import { ProjectInstance } from "../instance/project";
 import { Version } from "../instance/version";
 import { Architect } from "./architect";
-import { fullPath, joinPath, projectsDir } from "../file";
+import { assetPath, fullPath, joinPath, projectsDir } from "../file";
 
 export class Project {
 
@@ -23,22 +23,29 @@ export class Project {
         public info: string
     ) { }
 
-    static async fromLocalInstance(instance: ProjectInstance): Promise<Project> {
-        const port = await getFreePort()
+    static async fromInstance(instance: ProjectInstance): Promise<Project> {
+        let server: Server
+        if(instance.isLocal) {
+            const port = await getFreePort()
+            server = new LocalServer(
+                port,
+                Command.create('run-server', [`${port}`, 'false', fullPath(projectsDir, instance.identifier)]),
+                'Opened Project Server'
+            )
+        } else {
+            server = new RemoteServer(instance.url!)
+        }
+
         const architectPort = await getFreePort()
 
         return new Project(
             instance.identifier, instance.version, instance.dependencies,
             Architect.fromInstance(instance.architect, new LocalServer(
                 architectPort,
-                Command.create(fullPath(projectsDir, instance.identifier, 'architect', 'architect.exe'), [instance.identifier, `${architectPort}`, 'true']),
+                Command.create('run-minecraft-architect', [instance.identifier, `${architectPort}`, 'true']),
                 'Architect started'
             )),
-            new LocalServer(
-                port,
-                Command.create(fullPath('server.exe'), [`${port}`, 'false', fullPath(projectsDir, instance.identifier)]),
-                'Opened Project Server'
-            ),
+            server,
             instance.name, instance.authors, instance.description, instance.info
         )
     }
@@ -50,7 +57,7 @@ export class Project {
             instance.identifier, instance.version, instance.dependencies,
             Architect.fromInstance(instance.architect, new LocalServer(
                 architectPort,
-                Command.create(fullPath(projectsDir, instance.identifier, 'architect', 'architect.exe'), [instance.identifier, `${architectPort}`, 'true']),
+                Command.create(assetPath(projectsDir, instance.identifier, 'architect', 'architect.exe'), [instance.identifier, `${architectPort}`, 'true']),
                 'Architect started'
             )),
             new RemoteServer(url),
@@ -70,6 +77,7 @@ export class Project {
             const process = new Process(`load_project:${this.identifier}`, {
                 title: `Loading ${this.name}`,
                 description: 'Funziona per favore',
+                cancellable: true,
                 autoClose: true
             }, [
                 serverTask,
@@ -78,8 +86,12 @@ export class Project {
                 ])
             ], (cancelled) => resolve(!cancelled))
 
-            await process.executeTask(0)
-            process.executeTask(1)
+            if(await process.start()) {
+                process.executeTask(0)
+                process.executeTask(1)
+            } else {
+                resolve(false)
+            }
         })
     }
 
@@ -88,10 +100,10 @@ export class Project {
     }
 
     get image(): string {
-        return fullPath(this.dir, 'image.png')
+        return assetPath(this.dir, 'image.png')
     }
 
     get background(): string {
-        return fullPath(this.dir, 'background.png')
+        return assetPath(this.dir, 'background.png')
     }
 }

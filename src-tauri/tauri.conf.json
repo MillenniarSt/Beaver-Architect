@@ -21,8 +21,12 @@
       "csp": "default-src 'self' ipc: http://ipc.localhost; img-src 'self' asset: http://asset.localhost",
       "assetProtocol": {
         "enable": true,
-        "scope": ["**/*"]
-      }
+        "scope": [
+          "**/*",
+          "C:/Users/Ange/AppData/Roaming/io.github.MillenniarSt.Beaver-Architect/*"
+        ]
+      },
+      "capabilities": ["default", "dialog", "process", "project", "settings"]
     }
   },
   "bundle": {
@@ -39,6 +43,9 @@
   "plugins": {
     "fs": {
       "requireLiteralLeadingDot": true
+    },
+    "shell": {
+      "open": false
     }
   }
 }

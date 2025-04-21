@@ -10,7 +10,7 @@
 //
 
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { Material, MaterialGroup, ProjectService } from '../../../../services/project.service';
+import { Page, ProjectService } from '../../../../services/project.service';
 import { Subject } from 'rxjs';
 import { NgClass, NgFor, NgIf, NgStyle } from '@angular/common';
 import { SplitterModule } from 'primeng/splitter';
@@ -23,127 +23,74 @@ import { InputTextModule } from 'primeng/inputtext';
 import { HiddenInputComponent } from "../../../../components/simple/hidden-input.component";
 import { ElementPickerComponent } from "../../../../components/element-picker/element-picker.component";
 import { SearchBarComponent } from "../../../../components/simple/search-bar.component";
-import { FormOutput } from '../../../../components/form/inputs/inputs';
 import { PanelModule } from 'primeng/panel';
-
-export type StyleImplementation = {
-  pack?: string,
-  location: string
-}
-
-export type Pattern = {
-  id: string,
-  type: string,
-  fromImplementations: string[]
-}
-
-export type PatternItem = {
-  id: string,
-  type: string,
-  fromImplementations: string[],
-  materials: MaterialItem[],
-  preview?: string[][]
-}
-
-export type MaterialItem = {
-  id: string,
-  weight: number,
-  size?: number,
-
-  icon: string,
-  percent: number
-}
+import { ListUpdateObject, ResourceReference } from '../../../../../client/project/engineer/engineer';
+import { Style, StyleRule, StyleUpdate } from '../../../../../client/project/engineer/style';
+import { mapToEntries } from '../../../../../client/util';
 
 @Component({
   standalone: true,
-  imports: [NgIf, NgFor, NgClass, SplitterModule, NgStyle, PanelModule, FormsModule, DropdownModule, InputNumberModule, InputIconModule, IconFieldModule, InputTextModule, HiddenInputComponent, ElementPickerComponent, SearchBarComponent],
+  imports: [NgIf, NgFor, NgClass, SplitterModule, PanelModule, FormsModule, DropdownModule, InputNumberModule, InputIconModule, IconFieldModule, InputTextModule, HiddenInputComponent, SearchBarComponent],
   templateUrl: './style.component.html',
   styleUrl: './style.component.css'
 })
 export class StyleComponent implements OnInit, OnDestroy {
 
-  readonly patternTypes = [
-    { name: 'Basic', code: 'basic' }
-  ]
-  materials: Material[]
+  @Input() page!: Page<{ ref: ResourceReference }>
 
-  @Input() index!: number
-  ref!: string
+  style: Style = Style.LOADING
 
-  isAbstract: boolean = false
-  implementations: StyleImplementation[] = []
-  patterns: Pattern[] = []
-
-  possibleImplementations: StyleImplementation[] = []
+  possibleImplementations: ResourceReference[] = []
 
   implementationResearch: string = ''
 
-  newPattern?: string
-  selected?: PatternItem
-  zoom: number = 5
-  editing?: {
-    label: string
+  newRule?: string
+  selected?: {
+    id: string
+    rule: StyleRule
   }
 
-  editingMaterialIndex?: number
-
-  constructor(private cdr: ChangeDetectorRef, private ps: ProjectService) {
-    this.materials = Object.entries(this.ps.materials).map((entry) => entry[1])
-  }
+  constructor(private cdr: ChangeDetectorRef, private ps: ProjectService) { }
 
   private destroy$ = new Subject<void>()
 
   ngOnInit(): void {
-    const path = this.ps.getPage(this.index).data.path
-    this.ref = path.substring(17, path.lastIndexOf('.'))
-    this.ps.server.request('data-pack/styles/get', { ref: this.ref }).then((data: any) => {
-      this.patterns = data.materials
-      this.implementations = data.implementations
-      this.isAbstract = data.isAbstract
+    this.ps.project.server.request('data-pack/style/get', { ref: this.page.data.ref.toJson() }).then((data: any) => {
+      this.style = Style.fromJson(this.page.data.ref, data)
       this.searchForImplementations()
     })
 
-    this.ps.server.listenUntil('data-pack/styles/update', (data: any) => {
-      data.forEach((style: { ref: string, update: any }) => {
-        if (style.ref === this.ref) {
-          this.isAbstract = style.update.isAbstract ?? this.isAbstract
+    this.ps.project.server.listenUntil('data-pack/style/update', (data: ListUpdateObject<StyleUpdate>[]) => {
+      data.forEach((style) => {
+        if (style.id === this.style.ref.toString()) {
+          const update = style.data!
+          console.log(update)
 
-          if (style.update.implementations) {
-            style.update.implementations.forEach((implementation: any) => {
+          this.style.isAbstract = update.isAbstract ?? this.style.isAbstract
+
+          if (update.implementations) {
+            update.implementations.forEach((implementation) => {
               if (implementation.mode === 'push') {
-                this.implementations.push(implementation.data)
+                this.style.implementations.push(new ResourceReference(implementation.id!))
               } else if (implementation.mode === 'delete') {
-                this.implementations.splice(this.implementations.findIndex((imp) => imp.pack === implementation.pack && imp.location === implementation.location), 1)
+                const ref = new ResourceReference(implementation.id!)
+                this.style.implementations.splice(this.style.implementations.findIndex((imp) => imp.equals(ref)), 1)
               }
               this.searchForImplementations()
             })
           }
 
-          if (style.update.patterns) {
-            style.update.patterns.forEach((pattern: any) => {
-              if (pattern.mode === 'push') {
-                this.patterns.push({ id: pattern.id, type: pattern.data.type, fromImplementations: pattern.data.fromImplementations })
-              } else if (pattern.mode === 'delete') {
-                this.patterns.splice(this.patterns.findIndex((pt) => pt.id === pattern.id), 1)
-                if (pattern.id === this.selected?.id) {
-                  this.selected = undefined
+          if (update.rules) {
+            update.rules.forEach((rule) => {
+              if (rule.mode === 'push') {
+                this.style.rules.set(rule.id, StyleRule.fromJson(rule.data!))
+              } else if (rule.mode === 'delete') {
+                this.style.rules.delete(rule.id)
+                if(this.selected?.id === rule.id) {
+                  this.select(null)
                 }
-              } else if (pattern.data) {
-                if (pattern.data.id) {
-                  this.patterns.find((p) => p.id === pattern.id)!.id = pattern.data.id
-                  if (this.selected && pattern.id === this.selected.id) {
-                    this.selected.id = pattern.data.id
-                  }
-                }
-                if (pattern.data.type) {
-                  this.patterns.find((p) => p.id === pattern.id)!.type = pattern.data.type
-                  if (this.selected && pattern.id === this.selected.id) {
-                    this.selected.type = pattern.data.type
-                  }
-                }
-                if (pattern.data.materials && this.selected!.id === pattern.id) {
-                  this.updatePattern(pattern.id)
-                }
+              } else if (rule.data) {
+                
               }
             })
           }
@@ -153,39 +100,13 @@ export class StyleComponent implements OnInit, OnDestroy {
     }, this.destroy$)
   }
 
-  async updatePattern(id: string) {
-    const data = await this.ps.server.request('data-pack/styles/get-material', { ref: this.ref, id: id })
-    if (this.selected && this.selected.id === id) {
-      let totalWeight = 0
-      data.paints.forEach((paint: any) => totalWeight += paint.weight)
-      this.selected.materials = data.paints.map((paint: any) => {
-        return {
-          id: paint.id,
-          weight: paint.weight,
-          size: paint.size,
-          icon: this.ps.materials[paint.id].icon,
-          percent: paint.weight / totalWeight * 100
-        }
-      })
-      this.cdr.detectChanges()
-
-      this.updatePatternPreview(id)
-    }
-  }
-
-  async updatePatternPreview(id: string | undefined = this.selected?.id) {
-    if (this.selected && this.selected.id === id) {
-      const previewData: string[][][] = await this.ps.server.request('data-pack/styles/preview', { ref: this.ref, material: id, size: [1, this.zoom, this.zoom * 4] })
-      //const preview = await this.ps.architect.request('data-pack/materials/textures', { materials: previewData[0] })
-      //this.selected.preview = preview
-      this.selected.preview = previewData[0].map((i: string[]) => i.map((j: string) => this.ps.materials[j].icon))
-      this.cdr.detectChanges()
-    }
-  }
-
   ngOnDestroy(): void {
     this.destroy$.next()
     this.destroy$.complete()
+  }
+
+  rulesIds(): string[] {
+    return mapToEntries(this.style.rules).map(([id, rule]) => id)
   }
 
   displayId(name: string): string {
@@ -196,124 +117,55 @@ export class StyleComponent implements OnInit, OnDestroy {
     return name.trim().toLowerCase().replace(' ', '_')
   }
 
-  materialLabel(id: string): string {
-    return this.ps.materials[id].label
-  }
-
   edit(changes: {}) {
-    this.ps.server.send('data-pack/styles/edit', { ref: this.ref, changes: changes })
+    this.ps.project.server.send('data-pack/style/edit', { ref: this.style.ref, changes: changes })
   }
 
   searchForImplementations(research?: string) {
     this.implementationResearch = research ?? this.implementationResearch
-    this.ps.server.request('data-pack/styles/possible-implementations', { ref: this.ref, research: this.idName(this.implementationResearch.trim()) }).then((data: any) => {
+    this.ps.project.server.request('data-pack/style/possible-implementations', { ref: this.style.ref, research: this.idName(this.implementationResearch.trim()) }).then((data: any) => {
       this.possibleImplementations = data
       this.cdr.detectChanges()
     })
   }
 
-  pushImplementation(implementation: StyleImplementation) {
-    this.ps.server.send('data-pack/styles/push-implementation', { ref: this.ref, implementation: { pack: implementation.pack, location: implementation.location } })
+  pushImplementation(implementation: ResourceReference) {
+    this.ps.project.server.send('data-pack/style/push-implementation', { ref: this.style.ref, implementation: { pack: implementation.pack, location: implementation.location } })
   }
 
-  deleteImplementation(implementation: StyleImplementation) {
-    this.ps.server.send('data-pack/styles/delete-implementation', { ref: this.ref, implementation: { pack: implementation.pack, location: implementation.location } })
+  deleteImplementation(implementation: ResourceReference) {
+    this.ps.project.server.send('data-pack/style/delete-implementation', { ref: this.style.ref, implementation: { pack: implementation.pack, location: implementation.location } })
   }
 
-  setZoom(zoom: number) {
-    this.zoom = Math.max(zoom, 1)
-    this.updatePatternPreview()
-  }
-
-  textureOpacity(index: number): number {
-    if (index <= this.zoom) {
-      return 0
-    } else if (index >= this.zoom * 2.5) {
-      return 1
-    }
-    return (this.zoom * 1.5 / (index - this.zoom)) + ((Math.random() * 0.4) - 0.2)
-  }
-
-  setNewPattern(value?: string) {
-    this.newPattern = value
+  setNewRule(value?: string) {
+    this.newRule = value
     this.cdr.detectChanges()
   }
 
-  createPattern(id: string) {
-    this.setNewPattern(undefined)
-    this.ps.server.send('data-pack/styles/create-material', { ref: this.ref, id: this.idName(id) })
-  }
-
-  editPattern() {
-    this.ps.server.send('data-pack/styles/edit-material', { ref: this.ref, id: this.selected!.id, changes: { id: this.idName(this.editing!.label) } })
-    this.editing = undefined
-    this.cdr.detectChanges()
-  }
-
-  deletePattern(id: string) {
-    this.ps.server.send('data-pack/styles/delete-material', { ref: this.ref, id: id })
-  }
-
-  select(pattern?: Pattern) {
-    this.editing = undefined
-    if (!pattern || this.selected?.id === pattern.id) {
-      this.selected = undefined
-      this.cdr.detectChanges()
+  select(ruleId: string | null) {
+    if(ruleId) {
+      this.selected = { id: ruleId, rule: this.style.rules.get(ruleId)! }
     } else {
-      this.selected = { id: pattern.id, type: pattern.type, fromImplementations: pattern.fromImplementations, materials: [] }
-      this.updatePattern(pattern.id)
-    }
-  }
-
-  isSelected(id: string): boolean {
-    return id === this.selected?.id
-  }
-
-  startEditEditing() {
-    this.editing = {
-      label: this.displayId(this.selected!.id)
+      this.selected = undefined
     }
     this.cdr.detectChanges()
+  }
+
+  createRule(id: string) {
+    this.setNewRule(undefined)
+    this.ps.project.server.send('data-pack/style/create-rule', { ref: this.style.ref, id: this.idName(id), type: 'number' })
+  }
+
+  deleteRule(id: string) {
+    this.setNewRule(undefined)
+    this.ps.project.server.send('data-pack/style/delete-rule', { ref: this.style.ref, id })
   }
 
   trackByFn(index: number, item: any): string {
     return item.id;
   }
 
-  addMaterial() {
-    this.ps.server.send('data-pack/styles/add-paint', { ref: this.ref, material: this.selected!.id })
-  }
-
-  changeMaterial(index: number, material: Material | null) {
-    if (material === null) {
-      this.deleteMaterial(index)
-    } else {
-      this.editMaterial(index, { id: 'id', value: material.id, isValid: true })
-    }
-  }
-
-  editMaterial(index: number, changes: FormOutput<any>) {
-    this.ps.server.send('data-pack/styles/edit-paint', { ref: this.ref, material: this.selected!.id, index: index, changes: changes })
-  }
-
-  deleteMaterial(index: number) {
-    this.ps.server.send('data-pack/styles/delete-paint', { ref: this.ref, material: this.selected!.id, index: index })
-  }
-
-  clickMaterial(index: number) {
-    this.editingMaterialIndex = this.editingMaterialIndex === index ? undefined : index
-    this.cdr.detectChanges()
-  }
-
-  get editingMaterial(): MaterialItem {
-    return this.selected!.materials[this.editingMaterialIndex!]
-  }
-
   toNumber(string: string): number {
     return Number(string)
-  }
-
-  get groups(): MaterialGroup[] {
-    return this.ps.materialGroups
   }
 }
