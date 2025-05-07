@@ -1,0 +1,7 @@
+<div class="bg-primary-400 rounded-xl flex flex-col p-2 gap-2">
+    <span>{{data.label}}</span>
+    <div *ngFor="let output of builderOutputs">
+        <span>{{output.label}}</span>
+        <div class="socket" [attr.data-socket]="output.key" [attr.data-socket-type]="'output'" #outputSocket class="h-6 bg-white"></div>
+    </div>
+</div>

@@ -43,9 +43,6 @@
   "plugins": {
     "fs": {
       "requireLiteralLeadingDot": true
-    },
-    "shell": {
-      "open": false
     }
   }
 }

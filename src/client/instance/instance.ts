@@ -1,10 +1,11 @@
 import { v4 } from "uuid";
 import { IdAlreadyExists, KeyNotRegistered } from "../errors";
-import { architectsDir, copy, ensureDir, exists, joinPath, mkdir, projectsDir, readDir, readOrCreate, removeDir } from "../file";
+import { architectsDir, copy, ensureDir, exists, joinPath, mkdir, projectsDir, read, readAsset, readDir, readOrCreate, readOrGet, removeDir, resourcesDir } from "../file";
 import { User } from "../connection/user";
 import { ArchitectInstance } from "./architect";
 import { ProjectInstance } from "./project";
 import { appDataDir } from "@tauri-apps/api/path";
+import { Icons, Lang } from "./resources";
 
 let dir!: string
 
@@ -13,9 +14,13 @@ let localUser!: User
 export const architects: ArchitectInstance[] = []
 export const projects: ProjectInstance[] = []
 
+export const LANG = new Lang('en_us')
+export const ICONS = new Icons(joinPath(resourcesDir, 'icon'))
+
 export async function initInstance() {
     dir = await appDataDir()
 
+    ensureDir(resourcesDir)
     ensureDir(architectsDir)
     ensureDir(projectsDir)
 
@@ -23,6 +28,11 @@ export async function initInstance() {
         name: 'User',
         bio: 'Hy, I\'m using Beaver Architect'
     }).toJson()))
+
+    LANG.load(await readAsset('lang', `${LANG.language}.json`))
+    LANG.load(await readOrGet(joinPath(resourcesDir, 'lang', `${LANG.language}.json`), {}))
+    ICONS.load(await readAsset('icon', 'icons.json'))
+    ICONS.load(await readOrGet(joinPath(resourcesDir, 'icons.json'), {}))
 
     const architectDirs = await readDir(architectsDir)
     for (let i = 0; i < architectDirs.length; i++) {

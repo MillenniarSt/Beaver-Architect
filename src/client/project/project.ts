@@ -4,9 +4,26 @@ import { getFreePort, LocalServer, RemoteServer, Server } from "../connection/se
 import { ProjectInstance } from "../instance/project";
 import { Version } from "../instance/version";
 import { Architect } from "./architect";
-import { assetPath, fullPath, joinPath, projectsDir } from "../file";
+import { resourcePath, fullPath, joinPath, projectsDir } from "../file";
+import { registerRandomType } from "./random";
+import { Register } from "../register/register";
+import { GeoRegistry } from "../register/geo";
+import { BuilderRegistry } from "../register/builder";
+
+let _project: Project | undefined
+
+export function setProject(project: Project) {
+    _project = project
+}
+
+export function getProject(): Project {
+    return _project!
+}
 
 export class Project {
+
+    readonly GEOS: Register<GeoRegistry> = new Register('geos', GeoRegistry.fromJson)
+    readonly BUILDERS: Register<BuilderRegistry> = new Register('builders', BuilderRegistry.fromJson)
 
     constructor(
         readonly identifier: string,
@@ -30,7 +47,7 @@ export class Project {
             server = new LocalServer(
                 port,
                 Command.create('run-server', [`${port}`, 'false', fullPath(projectsDir, instance.identifier)]),
-                'Opened Project Server'
+                'Started Project'
             )
         } else {
             server = new RemoteServer(instance.url!)
@@ -57,7 +74,7 @@ export class Project {
             instance.identifier, instance.version, instance.dependencies,
             Architect.fromInstance(instance.architect, new LocalServer(
                 architectPort,
-                Command.create(assetPath(projectsDir, instance.identifier, 'architect', 'architect.exe'), [instance.identifier, `${architectPort}`, 'true']),
+                Command.create(resourcePath(projectsDir, instance.identifier, 'architect', 'architect.exe'), [instance.identifier, `${architectPort}`, 'true']),
                 'Architect started'
             )),
             new RemoteServer(url),
@@ -67,11 +84,11 @@ export class Project {
 
     load(): Promise<boolean> {
         return new Promise(async (resolve) => {
-            let serverTask: Task
+            let serverOpeningTask: Task
             if (this.server.isLocal) {
-                serverTask = new SingleTask('Opening', 2, () => this.server.open())
+                serverOpeningTask = new SingleTask('Opening', 2, () => this.server.open())
             } else {
-                serverTask = new SingleTask('Connecting', 1, () => this.server.open())
+                serverOpeningTask = new SingleTask('Connecting', 1, () => this.server.open())
             }
 
             const process = new Process(`load_project:${this.identifier}`, {
@@ -80,13 +97,23 @@ export class Project {
                 cancellable: true,
                 autoClose: true
             }, [
-                serverTask,
+                new TaskGroup('Server', 3, [
+                    serverOpeningTask,
+                    new SingleTask('Data', 1, async () => {
+                        this.GEOS.loadJson(await this.server.request('register/get-all', { box: this.GEOS.box }))
+                    })
+                ]),
                 new TaskGroup('Architect', 4, [
-                    new SingleTask('Opening', 1, () => this.architect.server.open())
+                    new SingleTask('Opening', 1, () => this.architect.server.open()),
+                    new SingleTask('Resources', 1, async () => {
+                        
+                    })
                 ])
             ], (cancelled) => resolve(!cancelled))
 
             if(await process.start()) {
+                setProject(this)
+
                 process.executeTask(0)
                 process.executeTask(1)
             } else {
@@ -100,10 +127,10 @@ export class Project {
     }
 
     get image(): string {
-        return assetPath(this.dir, 'image.png')
+        return resourcePath(this.dir, 'image.png')
     }
 
     get background(): string {
-        return assetPath(this.dir, 'background.png')
+        return resourcePath(this.dir, 'background.png')
     }
 }

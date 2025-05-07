@@ -15,7 +15,59 @@
         <ng-template *ngIf="selected; then rule else main" />
 
         <ng-template #rule>
-            TO DO
+            <div class="w-full flex flex-col p-3 gap-5">
+                <div class="flex flex-col gap-1">
+                    <span *ngIf="selected!.rule.isDependency" class="text-sm text-right text-surface-400 pr-2">-> {{displayRuleDependencies(selected!.id)}}</span>
+                    <p-toolbar>
+                        <ng-template #start>
+                            <p-button *ngIf="!selected!.rule.isDependency" icon="pi pi-angle-left" class="mr-2" [rounded]="true" severity="secondary" (onClick)="select(null)"/>
+                            <p-select [disabled]="selected!.rule.isDependency" [options]="randomTypeOptions()" [ngModel]="selected!.randomTypeOption" optionLabel="label" class="w-44" (onChange)="editRule(selected!.id, { type: $event.value.code })">
+                                <ng-template let-option #selectedItem>
+                                    <div class="flex items-center gap-2">
+                                        <img [src]="iconOfRandomType(option.code)" class="h-5">
+                                        <span>{{ option.label }}</span>
+                                    </div>
+                                </ng-template>
+                                <ng-template let-option #item>
+                                    <div class="flex items-center gap-2">
+                                        <img [src]="iconOfRandomType(option.code)" class="h-5">
+                                        <span>{{ option.label }}</span>
+                                    </div>
+                                </ng-template>
+                            </p-select>
+                        </ng-template>
+                        <ng-template #center>
+                            <span class="text-lg font-semibold">{{displayId(selected!.id)}}</span>
+                        </ng-template>
+                        <ng-template #end>
+                            <p-select [options]="[DEFINED_OPTION, ABSTRACT_OPTION]" [disabled]="!style.isAbstract" [ngModel]="selected!.abstractOption" optionLabel="label" class="w-32 mr-2" (onChange)="editRule(selected!.id, { isAbstract: $event.value.code })"/>
+                            <p-button *ngIf="!selected!.rule.isDependency" icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" severity="secondary" />
+                            <p-button *ngIf="!selected!.rule.isDependency" icon="pi pi-trash" [rounded]="true" [outlined]="true" severity="danger" (onClick)="deleteRule(selected!.id)"/>
+                        </ng-template>
+                    </p-toolbar>
+                </div>
+                <ng-template *ngIf="selected!.rule.isAbstract; then abstract else concrete" />
+                <ng-template #abstract>
+                    <div class="h-full flex flex-col gap-4 items-center justify-center">
+                        <span>This Rule is Abstract: sub style must define it</span>
+                        <p-button label="Make Concrete" icon="pi pi-angle-double-right" severity="info" (onClick)="editRule(selected!.id, { isAbstract: false })"/>
+                    </div>
+                </ng-template>
+                <ng-template #concrete>
+                    <div class="flex gap-3 items-center">
+                        <p-select [options]="randomOptions(selected!.rule.type)" [ngModel]="selected!.randomTypeOption" optionLabel="label" class="w-36" (onChange)="changeRuleRandom(selected!.id, $event.value.code)"/>
+                        <p-button *ngIf="!selected!.rule.random.isConstant" label="Make Constant" icon="pi pi-angle-double-down" severity="secondary" (onClick)="transformRuleRandom(selected!.id, true)"/>
+                        <p-button *ngIf="selected!.rule.random.isConstant" label="Make Random" icon="pi pi-angle-double-up" severity="secondary" (onClick)="transformRuleRandom(selected!.id, false)"/>
+                        <div class="grow"></div>
+                        <p-selectbutton [options]="[VARIABLE_OPTION, FIXED_OPTION]" [allowEmpty]="false" [ngModel]="selected!.fixedOption!" optionLabel="label" (onChange)="editRule(selected!.id, { fixed: $event.value.code })"/>
+                    </div>
+                    <p-card>
+                        <div class="p-3">
+                            <random [random]="selected!.rule.random" [data]="selected!.rule.data" (edit)="editRuleRandom(selected!.id, $event)"></random>
+                        </div>
+                    </p-card>
+                </ng-template>
+            </div>
         </ng-template>
 
         <ng-template #main>
@@ -105,12 +157,12 @@
             <div class="flex flex-grow flex-col gap-1">
                 <div *ngFor="let rule of rulesIds()" class="flex px-1 rule"
                     [ngClass]="{'rule-selected': selected?.id === rule}">
-                    <button class="grow node-area flex gap-2.5 items-center" (click)="select(rule)">
-                        <i class="pi pi-file"></i>
+                    <button class="grow node-area flex gap-2.5 items-center" (click)="select(rule === selected?.id ? null : rule)">
+                        <img class="h-5" [src]="iconOfRule(rule)">
                         <span class="grow text-start">{{ displayId(rule) }}</span>
                     </button>
                     <button class="rule-actions items-center">
-                        <i class="pi pi-trash" (click)="deleteRule(rule)"></i>
+                        <i class="pi pi-trash" *ngIf="!hasRuleDependencies(rule)" (click)="deleteRule(rule)"></i>
                     </button>
                 </div>
                 <hidden-input *ngIf="newRule !== undefined" [value]="newRule" (submit)="createRule($event)"

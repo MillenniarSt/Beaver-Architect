@@ -4,6 +4,7 @@ import { appDir } from "./instance/instance"
 
 const separator = '\\'
 
+export const resourcesDir = 'resources'
 export const projectsDir = 'projects'
 export const architectsDir = 'architects'
 
@@ -11,8 +12,12 @@ export function joinPath(...names: string[]): string {
     return names.join(separator)
 }
 
-export function assetPath(...names: string[]): string {
+export function resourcePath(...names: string[]): string {
     return convertFileSrc(joinPath(appDir(), ...names))
+}
+
+export function absoluteResourcePath(...names: string[]): string {
+    return convertFileSrc(joinPath(...names))
 }
 
 export function fullPath(...names: string[]): string {
@@ -25,6 +30,16 @@ export async function read(path: string) {
 
 export function readText(path: string) {
     return fs_readText(path, { baseDir: BaseDirectory.AppData })
+}
+
+export async function readAsset(...names: string[]) {
+    return (await fetch(joinPath('assets', ...names))).json()
+}
+
+export async function readOrGet(path: string, data: {}) {
+    if(await exists(path))
+        return await read(path)
+    return data
 }
 
 export async function readOrCreate(path: string, data: {}) {

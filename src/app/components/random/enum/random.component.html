@@ -1,0 +1,54 @@
+<!--             _____
+             ___/     \___        |  |
+          ##/  _.- _.-    \##  -  |  |                       -
+          ##\#=_  '    _=#/##  |  |  |  /---\  |      |      |   ===\  |  __
+          ##   \\#####//   ##  |  |  |  |___/  |===\  |===\  |   ___|  |==/
+          ##       |       ##  |  |  |  |      |   |  |   |  |  /   |  |
+          ##       |       ##  |  \= \= \====  |   |  |   |  |  \___/  |
+          ##\___   |   ___/
+          ##    \__|__/
+-->
+
+<div class="w-full flex flex-col gap-2">
+   <div *ngFor="let item of data; index as i" class="flex gap-2">
+      <p-select class="grow" [options]="getPossibleOptionsFor(i)" [(ngModel)]="options[i]" [virtualScroll]="isHuge" [virtualScrollItemSize]="32"
+            optionLabel="label" [filter]="hasFilter" filterBy="label" (onChange)="changeItem(i, $event.value.code)">
+         <ng-template #selectedItem let-option>
+            <div class="relative">
+               <div class="absolute h-full w-full rounded-sm"
+                  [style]="{'background': 'linear-gradient(90deg, var(--p-primary-50) 0%, var(--p-primary-200) 30%, var(--p-primary-300) 100%)'}"
+                  [ngStyle]="{ width: getWeightInPercent(i) + '%' }"></div>
+               <div class="flex items-center gap-2 z-10">
+                  <img [src]="option.icon" [class]="option.piIcon" class="h-5" [style]="{'font-size': '20px'}"/>
+                  <span>{{ option.label }}</span>
+                  <div class="grow"></div>
+                  <span class="text-fore-4 mr-2 z-10">{{getWeightInPercent(i)}}%</span>
+               </div>
+            </div>
+         </ng-template>
+         <ng-template let-option #item>
+            <div class="flex items-center gap-2">
+               <img [src]="option.icon" [class]="option.piIcon" class="h-5" [style]="{'font-size': '20px'}"/>
+               <span>{{ option.label }}</span>
+            </div>
+         </ng-template>
+         <ng-template #dropdownicon>
+            <i class="pi pi-pencil"></i>
+         </ng-template>
+      </p-select>
+      <p-inputNumber [(ngModel)]="item.weight" [min]="0" [showButtons]="true" class="w-20" (onInput)="changeItemWeight(i, $event.value!)" />
+      <p-button *ngIf="data.length > 1" icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" (onClick)="deleteItem(i)"/>
+   </div>
+   <p-select *ngIf="possibleOptions.length > 0" [options]="possibleOptions" [(ngModel)]="addNewItemOption" [virtualScroll]="isHuge" [virtualScrollItemSize]="32"
+         placeholder="Add New Item" optionLabel="label" [filter]="hasFilter" filterBy="label" (onChange)="addItem($event.value)">
+      <ng-template let-option #item>
+         <div class="flex items-center gap-2">
+            <img [src]="option.icon" [class]="option.piIcon" class="h-5" [style]="{'font-size': '20px'}"/>
+            <span>{{ option.label }}</span>
+         </div>
+      </ng-template>
+      <ng-template #dropdownicon>
+         <i class="pi pi-plus"></i>
+      </ng-template>
+   </p-select>
+</div>

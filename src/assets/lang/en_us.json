@@ -1,0 +1,12 @@
+{
+    "random_type": {
+        "boolean": "Boolean",
+        "align": "Alignment"
+    },
+    "random": {
+        "c_boolean": "Constant",
+        "boolean": "Random",
+        "c_enum": "Constant",
+        "enum": "Random"
+    }
+}

@@ -1,0 +1,34 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "start frontend",
+      "type": "shell",
+      "command": "bun run start:frontend",
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": [
+          {
+            "regexp": ".*",
+            "file": 1,
+            "location": 2,
+            "message": 3
+          }
+        ],
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*Local:.*localhost:4200.*",
+          "endsPattern": ".*Local:.*localhost:4200.*"
+        }
+      }
+    },
+    {
+      "label": "start tauri",
+      "type": "shell",
+      "command": "bunx tauri dev",
+      "dependsOn": ["start frontend"],
+      "isBackground": false,
+      "problemMatcher": []
+    }
+  ]
+}

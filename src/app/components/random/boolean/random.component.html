@@ -1,0 +1,15 @@
+<!--             _____
+             ___/     \___        |  |
+          ##/  _.- _.-    \##  -  |  |                       -
+          ##\#=_  '    _=#/##  |  |  |  /---\  |      |      |   ===\  |  __
+          ##   \\#####//   ##  |  |  |  |___/  |===\  |===\  |   ___|  |==/
+          ##       |       ##  |  |  |  |      |   |  |   |  |  /   |  |
+          ##       |       ##  |  \= \= \====  |   |  |   |  |  \___/  |
+          ##\___   |   ___/
+          ##    \__|__/
+-->
+
+<div class="w-full flex flex-col gap-4">
+    <p-inputnumber suffix=" %" [(ngModel)]="value" [disabled]="!editable" [showButtons]="true" [step]="5" [min]="0" [max]="100" (onInput)="change($event.value!)"/>
+    <p-slider class="mx-3 mb-1" [style]="{ width: 'calc(100% - 0.75rem)' }" [(ngModel)]="value" [disabled]="!editable" [step]="5" (onChange)="change($event.value!)"/>
+</div>

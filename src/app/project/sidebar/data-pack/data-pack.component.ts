@@ -16,11 +16,11 @@ import { TreeModule } from 'primeng/tree';
 import { baseErrorDialog, openBaseDialog, openInputDialog } from '../../../dialog/dialogs';
 import { NgClass, NgFor } from '@angular/common';
 import { StyleComponent } from '../../page/data-pack/style/style.component';
-import { StructureComponent } from '../../page/data-pack/structure/structure.component';
 import { ListUpdateObject, MappedResourceReference, ResourceReference } from '../../../../client/project/engineer/engineer';
 import { idToLabel } from '../../../../client/util';
 import { Project } from '../../../../client/project/project';
 import { Subject } from 'rxjs';
+import { ComponentComponent } from '../../page/data-pack/component/component.component';
 
 type FolderType = {
   title: string,
@@ -46,11 +46,11 @@ export class DataPackComponent implements OnInit, OnDestroy {
 
   folders: FolderType[] = [
     {
-      title: 'Structures',
-      label: 'Structure',
-      id: 'structure',
-      icon: 'assets/icon/structure.svg',
-      component: StructureComponent
+      title: 'Components',
+      label: 'Component',
+      id: 'component',
+      icon: 'assets/icon/component.svg',
+      component: ComponentComponent
     },
     {
       title: 'Styles',
@@ -77,7 +77,6 @@ export class DataPackComponent implements OnInit, OnDestroy {
 
     this.folders.forEach((folder) => {
       this.ps.project.server.listenUntil(`data-pack/${folder.id}/update`, (data: ListUpdateObject[]) => data.forEach((update) => {
-        console.log('root', this.treeRoot)
         if(folder === this.selectedFolder) {
           if(update.mode === 'push') {
             this.addFile(new ResourceReference(update.id))

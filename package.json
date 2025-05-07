@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "scripts": {
     "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
     "app": "tauri dev",
-    "server": "node ../server/dist/index.js -id"
+    
+    "start:frontend": "bun run ng serve --port 4200",
+    "start:tauri": "bun run tauri dev",
+    "tauri": "bunx tauri"
   },
   "private": true,
   "dependencies": {

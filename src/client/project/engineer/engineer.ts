@@ -18,6 +18,8 @@ export type MappedResourceReference = { ref: ResourceReference, name: string, ch
 
 export class ResourceReference {
 
+    static readonly LOADING: ResourceReference = new ResourceReference({ pack: 'undefined', location: 'loading' })
+
     readonly pack: string
     readonly location: string
 

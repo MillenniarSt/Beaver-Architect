@@ -1,5 +1,5 @@
 import { RemoteServer } from "../connection/server";
-import { copy, assetPath, joinPath, mkdir, projectsDir, read, readText, removeDir, rename, write, writeText, copyFromPc } from "../file";
+import { copy, resourcePath, joinPath, mkdir, projectsDir, read, readText, removeDir, rename, write, writeText, copyFromPc } from "../file";
 import { ArchitectInstance } from "./architect";
 import { Version } from "./version";
 
@@ -120,10 +120,10 @@ export class ProjectInstance {
     }
 
     get image(): string {
-        return assetPath(this.dir, 'image.png')
+        return resourcePath(this.dir, 'image.png')
     }
 
     get background(): string {
-        return assetPath(this.dir, 'background.png')
+        return resourcePath(this.dir, 'background.png')
     }
 }

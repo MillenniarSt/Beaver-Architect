@@ -5,6 +5,7 @@
         "floatlabel",
         "inputgroup",
         "minimizable",
+        "selectbutton",
         "unmaximize"
     ]
 }

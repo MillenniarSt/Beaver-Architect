@@ -1,0 +1,19 @@
+<!--             _____
+             ___/     \___        |  |
+          ##/  _.- _.-    \##  -  |  |                       -
+          ##\#=_  '    _=#/##  |  |  |  /---\  |      |      |   ===\  |  __
+          ##   \\#####//   ##  |  |  |  |___/  |===\  |===\  |   ___|  |==/
+          ##       |       ##  |  |  |  |      |   |  |   |  |  /   |  |
+          ##       |       ##  |  \= \= \====  |   |  |   |  |  \___/  |
+          ##\___   |   ___/
+          ##    \__|__/
+-->
+
+<div class="w-full flex gap-3 p-3">
+    <button [ngClass]="{'bg-green-700': data, 'border-surface-400 border-2': !data}" class="grow rounded-lg flex justify-center p-2" (click)="switch(true)">
+        True
+    </button>
+    <button [ngClass]="{'bg-red-700': !data, 'border-surface-400 border-2': data}" class="grow rounded-lg flex justify-center p-2" (click)="switch(false)">
+        False
+    </button>
+</div>

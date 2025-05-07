@@ -1,4 +1,4 @@
-import { architectsDir, assetPath, joinPath, read } from "../file"
+import { architectsDir, resourcePath, joinPath, read } from "../file"
 import { Version } from "./version"
 
 export class ArchitectInstance {
@@ -34,6 +34,6 @@ export class ArchitectInstance {
     }
 
     get icon(): string {
-        return assetPath(this.dir, 'icon.png')
+        return resourcePath(this.dir, 'icon.png')
     }
 }
