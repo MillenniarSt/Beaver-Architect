@@ -13,20 +13,31 @@ import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angu
 import { InputNumberModule } from 'primeng/inputnumber';
 import { FormsModule } from '@angular/forms';
 import { NgFor, NgIf, NgStyle } from '@angular/common';
-import { RandomCollectionItem, RandomEnumValue } from '../../../../client/project/random';
 import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
+import { Icon } from '../../../../client/instance/resources';
+import { ICONS, LANG } from '../../../../client/instance/instance';
+import { IconComponent } from '../../simple/icon.component';
+import { RandomTypeRegistry } from '../../../../client/register/random';
+
+type EnumCollectionItem = { icon: Icon, label: string, code: string }
+
+type RandomEnumValue = { id: string, weight: number }
 
 @Component({
   standalone: true,
-  imports: [FormsModule, NgIf, NgStyle, NgFor, ButtonModule, SelectModule, InputNumberModule],
+  imports: [FormsModule, NgIf, NgStyle, NgFor, ButtonModule, SelectModule, InputNumberModule, IconComponent],
   templateUrl: './random.component.html'
 })
 export class RandomEnumComponent {
 
   @Input() editable: boolean = true
 
-  @Input() collection: RandomCollectionItem<string>[] = []
+  collection: EnumCollectionItem[] = []
+
+  @Input() set randomType(type: RandomTypeRegistry<string>) {
+    this.collection = (type.allowed ?? []).map((value) => { return { icon: ICONS.get(`random_type.${type.id}.collection.${value}`), label: LANG.get(`random_type.${type.id}.collection.${value}`), code: value } })
+  }
 
   private _data: RandomEnumValue[] = []
   @Input() set data(values: RandomEnumValue[]) {
@@ -44,10 +55,10 @@ export class RandomEnumComponent {
     return this._data
   }
 
-  options: RandomCollectionItem<string>[] = []
+  options: EnumCollectionItem[] = []
 
-  possibleOptions: RandomCollectionItem<string>[] = []
-  addNewItemOption?: RandomCollectionItem<string>
+  possibleOptions: EnumCollectionItem[] = []
+  addNewItemOption?: EnumCollectionItem
 
   @Output() edit = new EventEmitter<RandomEnumValue[]>()
 
@@ -58,7 +69,7 @@ export class RandomEnumComponent {
   }
 
   get isHuge(): boolean {
-    return this.collection.length > 100
+    return false
   }
 
   getWeightInPercent(index: number): string {
@@ -67,11 +78,11 @@ export class RandomEnumComponent {
     return (this.data[index].weight / totalWeight * 100).toFixed(1)
   }
 
-  getPossibleOptionsFor(index: number): RandomCollectionItem<string>[] {
+  getPossibleOptionsFor(index: number): EnumCollectionItem[] {
     return [...this.possibleOptions, this.options[index]]
   }
 
-  addItem(item: RandomCollectionItem<string>) {
+  addItem(item: EnumCollectionItem) {
     this.data.push({ id: item.code, weight: 1 })
     this.options.push(item)
     this.possibleOptions.splice(this.possibleOptions.findIndex((option) => option.code === item.code), 1)
@@ -102,21 +113,22 @@ export class RandomEnumComponent {
 
 @Component({
   standalone: true,
-  imports: [SelectModule, FormsModule],
+  imports: [SelectModule, FormsModule, IconComponent],
   templateUrl: './constant.component.html'
 })
 export class ConstantEnumComponent {
 
   @Input() editable: boolean = true
 
-  @Input() collection: RandomCollectionItem<string>[] = []
-  @Input() set data(value: string) {
-    this.option = this.collection.find((item) => item.code === value)!
+  collection: EnumCollectionItem[] = []
+
+  @Input() set randomType(type: RandomTypeRegistry<string>) {
+    this.collection = (type.allowed ?? []).map((value) => { return { icon: ICONS.get(`random_type.${type.id}.collection.${value}`), label: LANG.get(`random_type.${type.id}.collection.${value}`), code: value } })
   }
 
   @Output() edit = new EventEmitter<string>()
 
-  option!: RandomCollectionItem<string>
+  option!: EnumCollectionItem
 
   get hasFilter(): boolean {
     return this.collection.length > 15
@@ -133,21 +145,20 @@ export class ConstantEnumComponent {
 
 @Component({
   standalone: true,
-  imports: [],
+  imports: [IconComponent],
   template: `
     <div class="flex gap-2">
-      <img [src]="result.icon" [class]="result.piIcon" class="h-5" [style]="{'font-size': '20px'}"/>
+      <icon [icon]="result.icon"></icon>
       <span>{{result.label}}</span>
     </div>
   `
 })
 export class RandomEnumResultComponent {
 
-  @Input() collection: RandomCollectionItem<string>[] = []
+  @Input() randomType!: RandomTypeRegistry
   @Input() set data(value: string) {
-    console.log(this.collection, value)
-    this.result = this.collection.find((item) => item.code === value)!
+    this.result = { icon: ICONS.get(`random_type.${this.randomType.id}.collection.${value}`), label: LANG.get(`random_type.${this.randomType.id}.collection.${value}`), code: value }
   }
 
-  result: RandomCollectionItem<string> = this.collection[0]
+  result: EnumCollectionItem = { icon: ICONS.undefinedValue, label: LANG.undefinedValue, code: 'undefined' }
 }

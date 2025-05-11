@@ -14,6 +14,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { SliderModule } from 'primeng/slider';
 import { FormsModule } from '@angular/forms';
 import { NgClass } from '@angular/common';
+import { RandomTypeRegistry } from '../../../../client/register/random';
 
 @Component({
   standalone: true,
@@ -24,7 +25,7 @@ export class RandomBooleanComponent {
 
   @Input() editable: boolean = true
 
-  @Input() collection: undefined
+  @Input() randomType!: RandomTypeRegistry
   @Input() set data(value: number) {
     this.value = value * 100
   }
@@ -50,7 +51,7 @@ export class ConstantBooleanComponent {
 
   @Input() editable: boolean = true
 
-  @Input() collection: undefined
+  @Input() randomType!: RandomTypeRegistry
   @Input() data: boolean = false
 
   @Output() edit = new EventEmitter<boolean>()
@@ -74,6 +75,6 @@ export class ConstantBooleanComponent {
 })
 export class RandomBooleanResultComponent {
 
-  @Input() collection: undefined
+  @Input() randomType!: RandomTypeRegistry
   @Input() data!: boolean
 }

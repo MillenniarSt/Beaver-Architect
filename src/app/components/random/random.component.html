@@ -15,7 +15,7 @@
     </div>
     <div class="flex gap-3 items-center">
         <p-button icon="pi pi-sync" [rounded]="true" [outlined]="true" severity="secondary" (onClick)="refreshResult(true)"/>
-        <span class="text-sm text-surface-300">{{seed.seed}}</span>
+        <span class="text-sm text-surface-300">{{seed.current}}</span>
         <div class="grow"></div>
         <ng-template #result></ng-template>
     </div>

@@ -1,7 +1,7 @@
 import { ClassicPreset } from "rete";
-import { RandomType } from "../../project/random";
 import { idToLabel } from "../../util";
 import { ReteConnection, ReteNode, ReteSocket } from "../preset";
+import { RandomTypeRegistry } from "../../register/random";
 
 export class StyleRuleNode extends ReteNode<
     {},
@@ -11,21 +11,17 @@ export class StyleRuleNode extends ReteNode<
 
     constructor(
         readonly ruleId: string,
-        readonly type: string
+        readonly type: RandomTypeRegistry
     ) {
         super(idToLabel(ruleId))
         this.addOutput('rule', new ClassicPreset.Output(new StyleRuleSocket(type), 'Rule', false))
-    }
-
-    get randomType(): RandomType {
-        return RandomType.get(this.type)
     }
 }
 
 export class StyleRuleSocket extends ReteSocket {
 
     constructor(
-        readonly type?: string
+        readonly type?: RandomTypeRegistry
     ) {
         super('Rule')
     }

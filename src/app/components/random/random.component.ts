@@ -10,8 +10,8 @@
 //
 
 import { ChangeDetectorRef, Component, ComponentRef, EventEmitter, Input, Output, ViewChild, ViewContainerRef } from '@angular/core';
-import { Random, Seed } from '../../../client/project/random';
 import { ButtonModule } from 'primeng/button';
+import { RandomRegistry, RandomTypeRegistry, Seed } from '../../../client/register/random';
 
 @Component({
   selector: 'random',
@@ -27,10 +27,14 @@ export class RandomComponent {
   private editorRef?: ComponentRef<any>
   private resultRef?: ComponentRef<any>
 
-  private _random!: Random
+  @Input() type!: RandomTypeRegistry
+
+  @Input() evaluate!: (seed: Seed) => Promise<any[]>
+
+  private _random!: RandomRegistry
 
   @Input()
-  set random(value: Random) {
+  set random(value: RandomRegistry) {
     this._random = value
     this._data = undefined
     if (value?.editor) {
@@ -38,7 +42,7 @@ export class RandomComponent {
     }
   }
 
-  get random(): any {
+  get random(): RandomRegistry {
     return this._random
   }
 
@@ -87,11 +91,12 @@ export class RandomComponent {
 
   constructor(private cdr: ChangeDetectorRef) { }
 
-  loadRandom(random: Random) {
+  loadRandom(random: RandomRegistry) {
     this.editor.clear()
+    console.log(this)
     this.editorRef = this.editor.createComponent(random.editor)
     this.editorRef.setInput('editable', this.editable)
-    this.editorRef.setInput('collection', random.collection)
+    this.editorRef.setInput('randomType', this.type)
     if(this.data) {
       this.editorRef.setInput('data', this.data)
     }
@@ -110,10 +115,8 @@ export class RandomComponent {
       this.cdr.detectChanges()
     }
     if(this.resultRef) {
-      this.resultRef.setInput('collection', this.random.collection)
-      if(this.data) {
-        this.resultRef.setInput('data', this.random.evaluate(this.seed, this.data))
-      }
+      this.resultRef.setInput('randomType', this.type)
+      this.evaluate(this.seed).then((values) => this.resultRef!.setInput('data', values[0]))
     }
   }
 

@@ -23,12 +23,12 @@
       "allow": [
         {
           "name": "run-server",
-          "cmd": "C:\\Users\\Ange\\AppData\\Roaming\\io.github.MillenniarSt.Beaver-Architect\\server.exe",
+          "cmd": "dC:\\Users\\Ange\\AppData\\Roaming\\io.github.MillenniarSt.Beaver-Architect\\server.exe",
           "args": true
         },
         {
           "name": "run-minecraft-architect",
-          "cmd": "C:\\Users\\Ange\\AppData\\Roaming\\io.github.MillenniarSt.Beaver-Architect\\architects\\minecraft\\architect.exe",
+          "cmd": "dC:\\Users\\Ange\\AppData\\Roaming\\io.github.MillenniarSt.Beaver-Architect\\architects\\minecraft\\architect.exe",
           "args": true
         }
       ]

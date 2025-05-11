@@ -24,13 +24,13 @@
                             <p-select [disabled]="selected!.rule.isDependency" [options]="randomTypeOptions()" [ngModel]="selected!.randomTypeOption" optionLabel="label" class="w-44" (onChange)="editRule(selected!.id, { type: $event.value.code })">
                                 <ng-template let-option #selectedItem>
                                     <div class="flex items-center gap-2">
-                                        <img [src]="iconOfRandomType(option.code)" class="h-5">
+                                        <icon [icon]="option.code.icon"></icon>
                                         <span>{{ option.label }}</span>
                                     </div>
                                 </ng-template>
                                 <ng-template let-option #item>
                                     <div class="flex items-center gap-2">
-                                        <img [src]="iconOfRandomType(option.code)" class="h-5">
+                                        <icon [icon]="option.code.icon"></icon>
                                         <span>{{ option.label }}</span>
                                     </div>
                                 </ng-template>
@@ -56,14 +56,14 @@
                 <ng-template #concrete>
                     <div class="flex gap-3 items-center">
                         <p-select [options]="randomOptions(selected!.rule.type)" [ngModel]="selected!.randomTypeOption" optionLabel="label" class="w-36" (onChange)="changeRuleRandom(selected!.id, $event.value.code)"/>
-                        <p-button *ngIf="!selected!.rule.random.isConstant" label="Make Constant" icon="pi pi-angle-double-down" severity="secondary" (onClick)="transformRuleRandom(selected!.id, true)"/>
-                        <p-button *ngIf="selected!.rule.random.isConstant" label="Make Random" icon="pi pi-angle-double-up" severity="secondary" (onClick)="transformRuleRandom(selected!.id, false)"/>
+                        <p-button *ngIf="!selected!.rule.random!.isConstant" label="Make Constant" icon="pi pi-angle-double-down" severity="secondary" (onClick)="transformRuleRandom(selected!.id, true)"/>
+                        <p-button *ngIf="selected!.rule.random!.isConstant" label="Make Random" icon="pi pi-angle-double-up" severity="secondary" (onClick)="transformRuleRandom(selected!.id, false)"/>
                         <div class="grow"></div>
                         <p-selectbutton [options]="[VARIABLE_OPTION, FIXED_OPTION]" [allowEmpty]="false" [ngModel]="selected!.fixedOption!" optionLabel="label" (onChange)="editRule(selected!.id, { fixed: $event.value.code })"/>
                     </div>
                     <p-card>
                         <div class="p-3">
-                            <random [random]="selected!.rule.random" [data]="selected!.rule.data" (edit)="editRuleRandom(selected!.id, $event)"></random>
+                            <random [type]="selected!.rule.type" [evaluate]="evaluateRule(selected!.id)" [random]="selected!.rule.random!" [data]="selected!.rule.data" (edit)="editRuleRandom(selected!.id, $event)"></random>
                         </div>
                     </p-card>
                 </ng-template>
@@ -158,7 +158,7 @@
                 <div *ngFor="let rule of rulesIds()" class="flex px-1 rule"
                     [ngClass]="{'rule-selected': selected?.id === rule}">
                     <button class="grow node-area flex gap-2.5 items-center" (click)="select(rule === selected?.id ? null : rule)">
-                        <img class="h-5" [src]="iconOfRule(rule)">
+                        <icon [icon]="iconOfRule(rule)"></icon>
                         <span class="grow text-start">{{ displayId(rule) }}</span>
                     </button>
                     <button class="rule-actions items-center">

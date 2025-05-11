@@ -1,6 +1,12 @@
 {
     "random_type": {
         "boolean": "§random/boolean.svg",
-        "align": "§random/align.svg"
+        "align": "&align-left",
+        "align.collection": {
+            "start": "&align-left",
+            "center": "&align-center",
+            "end": "&align-right",
+            "fill": "&align-justify"
+        }
     }
 }

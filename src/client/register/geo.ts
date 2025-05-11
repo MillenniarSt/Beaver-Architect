@@ -1,4 +1,5 @@
 import { ICONS, LANG } from "../instance/instance";
+import { Icon } from "../instance/resources";
 import { getProject } from "../project/project";
 import { Registry } from "./register";
 
@@ -19,7 +20,7 @@ export class GeoRegistry extends Registry {
         return LANG.get(`geo.${this.id}`, 'Unnamed Geo')
     }
 
-    get icon(): string {
+    get icon(): Icon {
         return ICONS.get(`geo.${this.id}`)
     }
 

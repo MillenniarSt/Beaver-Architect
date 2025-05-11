@@ -81,7 +81,6 @@ export class ProjectInstance {
     async setArchitect(architect: ArchitectInstance) {
         await removeDir(this.architectDir)
         await mkdir(this.architectDir)
-        await copy(architect.exe, joinPath(this.architectDir, 'architect.exe'))
 
         this._architect = architect
         await this.save()

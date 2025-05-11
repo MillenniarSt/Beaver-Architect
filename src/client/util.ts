@@ -1,11 +1,13 @@
+export type JsonFormat = undefined | null |  boolean | number | string | JsonFormat[] | { [key: string]: JsonFormat }
+
 export interface ToJson {
 
-    toJson(): {}
+    toJson(): JsonFormat
 }
 
 export interface FromJson {
 
-    mapFromJson(json: any): Object
+    fromJson(json: JsonFormat): Object
 }
 
 export interface Equals {
@@ -16,6 +18,10 @@ export interface Equals {
 export interface ToKey {
 
     toKey(): string
+}
+
+export function ensureJson(data: { toJson?: () => JsonFormat }): JsonFormat {
+    return data.toJson ? data.toJson() : data as JsonFormat
 }
 
 // String Utils ID -> Label : Label -> ID
@@ -60,11 +66,11 @@ export function mapToRecord<T, V>(map: Map<string, T>, transformItem: (item: T) 
     return Object.fromEntries(mapToEntries(map).map(([key, item]) => [key, transformItem(item)]))
 }
 
-export function mapToJson<T extends ToJson>(map: Map<string, T>): Record<string, {}> {
+export function mapToJson<T extends ToJson>(map: Map<string, T>): Record<string, JsonFormat> {
     return Object.fromEntries(mapToEntries(map).map(([key, item]) => [key, item.toJson()]))
 }
 
-export function mapFromJson<T>(json: any, itemFromJson: (json: any) => T): Map<string, T> {
+export function mapFromJson<T>(json: Record<string, JsonFormat>, itemFromJson: (json: JsonFormat) => T): Map<string, T> {
     return new Map(Object.entries(json).map(([key, item]) => [key, itemFromJson(item)]))
 }
 
@@ -74,11 +80,11 @@ export function parseRecord<T, R>(record: Record<any, T>, parse: (value: T) => R
     return Object.fromEntries(Object.entries(record).map(([key, value]) => [key, parse(value)]))
 }
 
-export function recordToJson<T extends ToJson>(record: Record<string, T>): Record<string, {}> {
+export function recordToJson<T extends ToJson>(record: Record<string, T>): Record<string, JsonFormat> {
     return Object.fromEntries(Object.entries(record).map(([key, item]) => [key, item.toJson()]))
 }
 
-export function recordFromJson<T>(json: any, itemFromJson: (json: any) => T): Record<string, T> {
+export function recordFromJson<T>(json: Record<string, JsonFormat>, itemFromJson: (json: JsonFormat) => T): Record<string, T> {
     return Object.fromEntries(Object.entries(json).map(([key, item]) => [key, itemFromJson(item)]))
 }
 

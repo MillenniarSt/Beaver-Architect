@@ -4,7 +4,7 @@
   "scripts": {
     "start": "ng serve",
     "app": "tauri dev",
-    
+    "build": "ng build --configuration production --base-href ./",
     "start:frontend": "bun run ng serve --port 4200",
     "start:tauri": "bun run tauri dev",
     "tauri": "bunx tauri"
@@ -19,7 +19,7 @@
     "@angular/platform-browser": "^19.0.5",
     "@angular/platform-browser-dynamic": "^19.0.5",
     "@angular/router": "^19.0.5",
-    "@primeng/themes": "^19.0.2",
+    "@primeng/themes": "^19.1.2",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-dialog": "^2.2.0",
     "@tauri-apps/plugin-fs": "^2.2.0",
@@ -27,7 +27,7 @@
     "@tauri-apps/plugin-shell": "^2.2.0",
     "angular-three": "^2.14.0",
     "primeicons": "^7.0.0",
-    "primeng": "^19.0.2",
+    "primeng": "^19.1.2",
     "quill": "^2.0.3",
     "rete": "^2.0.5",
     "rete-angular-plugin": "^2.3.1",

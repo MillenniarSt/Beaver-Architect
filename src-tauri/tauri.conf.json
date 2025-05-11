@@ -13,12 +13,13 @@
     "windows": [
       {
         "title": "Beaver Architect",
+        "devtools": true,
         "width": 900,
         "height": 600
       }
     ],
     "security": {
-      "csp": "default-src 'self' ipc: http://ipc.localhost; img-src 'self' asset: http://asset.localhost",
+      "csp": "default-src 'self' ipc: http://ipc.localhost; style-src 'self' 'unsafe-inline'; img-src 'self' asset: http://asset.localhost; connect-src 'self' ws: wss:;",
       "assetProtocol": {
         "enable": true,
         "scope": [

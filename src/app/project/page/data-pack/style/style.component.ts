@@ -31,12 +31,14 @@ import { idToLabel, labelToId, mapToEntries } from '../../../../../client/util';
 import { ToolbarModule } from 'primeng/toolbar';
 import { ButtonModule } from 'primeng/button';
 import { RandomComponent } from "../../../../components/random/random.component";
-import { RANDOM_TYPES, RandomType } from '../../../../../client/project/random';
 import { CardModule } from 'primeng/card';
+import { RandomRegistry, RandomTypeRegistry, Seed } from '../../../../../client/register/random';
+import { Icon } from '../../../../../client/instance/resources';
+import { IconComponent } from "../../../../components/simple/icon.component";
 
 @Component({
   standalone: true,
-  imports: [NgIf, NgFor, NgClass, CardModule, SelectModule, SelectButtonModule, SplitterModule, PanelModule, FormsModule, DropdownModule, InputNumberModule, InputIconModule, IconFieldModule, InputTextModule, HiddenInputComponent, SearchBarComponent, ToolbarModule, ButtonModule, RandomComponent],
+  imports: [NgIf, NgFor, NgClass, CardModule, SelectModule, SelectButtonModule, SplitterModule, PanelModule, FormsModule, DropdownModule, InputNumberModule, InputIconModule, IconFieldModule, InputTextModule, HiddenInputComponent, SearchBarComponent, ToolbarModule, ButtonModule, RandomComponent, IconComponent],
   templateUrl: './style.component.html',
   styleUrl: './style.component.css'
 })
@@ -56,8 +58,8 @@ export class StyleComponent implements OnInit, OnDestroy {
     rule: StyleRule
 
     abstractOption: { label: string, code: boolean }
-    randomTypeOption: { label: string, code: string }
-    randomOption?: { label: string, code: string }
+    randomTypeOption: { label: string, code: RandomTypeRegistry }
+    randomOption?: { label: string, code: RandomRegistry }
     fixedOption: { label: string, code: boolean }
   }
 
@@ -108,21 +110,21 @@ export class StyleComponent implements OnInit, OnDestroy {
               } else if(rule.data) {
                 if(rule.id === this.selected?.id) {
                   this.selected.rule = rule.data.random === null ? new StyleRule(
-                    rule.data.type ?? this.selected.rule.type,
+                    rule.data.type ? this.ps.project.RANDOM_TYPES.get(rule.data.type) : this.selected.rule.type,
                     null,
                     undefined,
                     rule.data.fixed ?? this.selected.rule.fixed,
                     rule.data.fromImplementations ? rule.data.fromImplementations.map((ref) => new ResourceReference(ref)) : this.selected.rule.fromImplementations
                   ) : new StyleRule(
-                    rule.data.type ?? this.selected.rule.type,
-                    rule.data.random?.typeId ?? this.selected.rule.randomName,
+                    rule.data.type ? this.ps.project.RANDOM_TYPES.get(rule.data.type) : this.selected.rule.type,
+                    rule.data.random?.type ? this.ps.project.RANDOMS.get(rule.data.random.type) : this.selected.rule.random,
                     rule.data.random?.data ?? this.selected.rule.data,
                     rule.data.fixed ?? this.selected.rule.fixed,
                     rule.data.fromImplementations ? rule.data.fromImplementations.map((ref) => new ResourceReference(ref)) : this.selected.rule.fromImplementations
                   )
                   this.selected.abstractOption = this.selected.rule.isAbstract ? this.ABSTRACT_OPTION : this.DEFINED_OPTION
-                  this.selected.randomTypeOption = { label: this.selected.rule.randomType.label, code: this.selected.rule.type }
-                  this.selected.randomOption = this.selected.rule.isAbstract ? undefined : { label: this.selected.rule.random.label, code: this.selected.rule.randomName! }
+                  this.selected.randomTypeOption = { label: this.selected.rule.type.label, code: this.selected.rule.type }
+                  this.selected.randomOption = this.selected.rule.isAbstract ? undefined : { label: this.selected.rule.random!.label, code: this.selected.rule.random! }
                   this.selected.fixedOption = this.selected.rule.fixed ? this.FIXED_OPTION : this.VARIABLE_OPTION
                   this.style.rules.set(rule.id, this.selected.rule)
                 }
@@ -144,15 +146,15 @@ export class StyleComponent implements OnInit, OnDestroy {
     return mapToEntries(this.style.rules).map(([id, rule]) => id)
   }
 
-  randomTypeOptions(): { label: string, code: string }[] {
-    return Object.entries(RANDOM_TYPES).map(([key, type]) => {
-      return { label: type.label, code: key }
+  randomTypeOptions(): { label: string, code: RandomTypeRegistry }[] {
+    return this.ps.project.RANDOM_TYPES.getAll().map((type) => {
+      return { label: type.label, code: type }
     })
   }
 
-  randomOptions(type: string): { label: string, code: string }[] {
-    return Object.entries(RANDOM_TYPES[type].randoms).map(([key, random]) => {
-      return { label: random.label, code: key }
+  randomOptions(type: RandomTypeRegistry): { label: string, code: RandomRegistry }[] {
+    return type.randomList.map((random) => {
+      return { label: random.label, code: random }
     })
   }
 
@@ -160,12 +162,8 @@ export class StyleComponent implements OnInit, OnDestroy {
     return idToLabel(name)
   }
 
-  iconOfRule(id: string): string {
-    return this.style.rules.get(id)!.randomType.icon
-  }
-
-  iconOfRandomType(name: string): string {
-    return RandomType.get(name).icon
+  iconOfRule(id: string): Icon {
+    return this.style.rules.get(id)!.type.icon
   }
 
   hasRuleDependencies(id: string): boolean {
@@ -208,8 +206,8 @@ export class StyleComponent implements OnInit, OnDestroy {
         id: ruleId, 
         rule: rule,
         abstractOption: rule.isAbstract ? this.ABSTRACT_OPTION : this.DEFINED_OPTION,
-        randomTypeOption: { label: rule.randomType.label, code: rule.type },
-        randomOption: rule.isAbstract ? undefined : { label: rule.random.label, code: rule.randomName! },
+        randomTypeOption: { label: rule.type.label, code: rule.type },
+        randomOption: rule.isAbstract ? undefined : { label: rule.random!.label, code: rule.random! },
         fixedOption: rule.fixed ? this.FIXED_OPTION : this.VARIABLE_OPTION
       }
     } else {
@@ -228,24 +226,26 @@ export class StyleComponent implements OnInit, OnDestroy {
     this.ps.project.server.send('data-pack/style/delete-rule', { ref: this.style.ref, id })
   }
 
+  evaluateRule(id: string) {
+    return (seed: Seed) => this.ps.project.server.request('data-pack/style/evaluate-rule', { ref: this.style.ref, id: id, seed: seed.current })
+  }
+
   renameRule(id: string, newId: string) {
     this.ps.project.server.send('data-pack/style/rename-rule', { ref: this.style.ref, id: id, newId: newId })
   }
 
-  editRule(id: string, changes: { isAbstract?: boolean, type?: string, fixed?: boolean, random?: string }) {
-    this.ps.project.server.send('data-pack/style/edit-rule', { ref: this.style.ref, id: id, changes: changes })
+  editRule(id: string, changes: { isAbstract?: boolean, type?: RandomTypeRegistry, fixed?: boolean, random?: RandomRegistry }) {
+    this.ps.project.server.send('data-pack/style/edit-rule', { ref: this.style.ref, id: id, changes: { isAbstract: changes.isAbstract, type: changes.type?.id, fixed: changes.fixed, random: changes.random?.id } })
   }
 
-  changeRuleRandom(id: string, random: string) {
-    console.log(this.style.rules.get(id)!.randomName, random)
-    if(this.style.rules.get(id)!.randomName !== random) {
+  changeRuleRandom(id: string, random: RandomRegistry) {
+    if(this.style.rules.get(id)!.random !== random) {
       this.editRule(id, { random })
     }
   }
 
   transformRuleRandom(id: string, constant: boolean) {
-    const type = RandomType.get(this.style.rules.get(id)!.type)
-    this.editRule(id, { random: constant ? 'constant' : Object.keys(type.randoms)[1] })
+    this.editRule(id, { random: constant ? this.style.rules.get(id)!.type.constant : this.style.rules.get(id)!.type.randomList[0] })
   }
 
   editRuleRandom(id: string, data: any) {

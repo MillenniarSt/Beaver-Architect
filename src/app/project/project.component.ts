@@ -78,12 +78,10 @@ export class ProjectComponent {
 	public isLoaded: boolean = false
 
 	ngOnInit() {
-		once<{ identifier: string, url?: string, isPublic: boolean }>('project:get', async (event) => {
+		once<{ identifier: string, isPublic: boolean }>('project:get', async (event) => {
 			await initInstance()
 
-			const project = event.payload.url ?
-				await Project.fromRemoteInstance(getProjectInstance(event.payload.identifier), event.payload.url) :
-				await Project.fromInstance(getProjectInstance(event.payload.identifier))
+			const project = await Project.fromInstance(getProjectInstance(event.payload.identifier), event.payload.isPublic)
 
 			this.ps._project = project
 			project.server.onClose = async () => {

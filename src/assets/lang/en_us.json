@@ -1,7 +1,13 @@
 {
     "random_type": {
         "boolean": "Boolean",
-        "align": "Alignment"
+        "align": "Alignment",
+        "align.collection": {
+            "start": "Start",
+            "center": "Center",
+            "end": "End",
+            "fill": "Fill"
+        }
     },
     "random": {
         "c_boolean": "Constant",

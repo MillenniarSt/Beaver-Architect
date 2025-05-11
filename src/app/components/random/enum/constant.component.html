@@ -13,13 +13,13 @@
         optionLabel="label" [filter]="hasFilter" filterBy="label" size="large" class="w-full" (onChange)="change($event.value.code)">
     <ng-template #selectedItem let-option>
         <div class="flex items-center gap-2">
-            <img [src]="option.icon" [class]="option.piIcon" class="h-5" [style]="{'font-size': '20px'}"/>
+            <icon [icon]="option.icon"></icon>
             <span>{{ option.label }}</span>
         </div>
     </ng-template>
     <ng-template let-option #item>
         <div class="flex items-center gap-2">
-            <img [src]="option.icon" [class]="option.piIcon" class="h-5" [style]="{'font-size': '20px'}"/>
+            <icon [icon]="option.icon"></icon>
             <span>{{ option.label }}</span>
         </div>
     </ng-template>

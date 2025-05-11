@@ -5,10 +5,12 @@ import { ProjectInstance } from "../instance/project";
 import { Version } from "../instance/version";
 import { Architect } from "./architect";
 import { resourcePath, fullPath, joinPath, projectsDir } from "../file";
-import { registerRandomType } from "./random";
 import { Register } from "../register/register";
 import { GeoRegistry } from "../register/geo";
 import { BuilderRegistry } from "../register/builder";
+import { RandomRegistry, RandomTypeRegistry } from "../register/random";
+import { ICONS, LANG } from "../instance/instance";
+import { Icons, Lang } from "../instance/resources";
 
 let _project: Project | undefined
 
@@ -23,6 +25,8 @@ export function getProject(): Project {
 export class Project {
 
     readonly GEOS: Register<GeoRegistry> = new Register('geos', GeoRegistry.fromJson)
+    readonly RANDOMS: Register<RandomRegistry> = new Register('randoms', RandomRegistry.fromJson)
+    readonly RANDOM_TYPES: Register<RandomTypeRegistry> = new Register('random_types', RandomTypeRegistry.fromJson)
     readonly BUILDERS: Register<BuilderRegistry> = new Register('builders', BuilderRegistry.fromJson)
 
     constructor(
@@ -40,13 +44,15 @@ export class Project {
         public info: string
     ) { }
 
-    static async fromInstance(instance: ProjectInstance): Promise<Project> {
+    static async fromInstance(instance: ProjectInstance, isPublic: boolean = false): Promise<Project> {
         let server: Server
         if(instance.isLocal) {
             const port = await getFreePort()
             server = new LocalServer(
                 port,
-                Command.create('run-server', [`${port}`, 'false', fullPath(projectsDir, instance.identifier)]),
+                //Command.create('run-server', [`${port}`, `${isPublic}`, fullPath(projectsDir, instance.identifier), fullPath(instance.architect.exe)]),
+                fullPath('server.exe'),
+                [`${port}`, `${isPublic}`, fullPath(projectsDir, instance.identifier), fullPath(instance.architect.exe)],
                 'Started Project'
             )
         } else {
@@ -59,25 +65,12 @@ export class Project {
             instance.identifier, instance.version, instance.dependencies,
             Architect.fromInstance(instance.architect, new LocalServer(
                 architectPort,
-                Command.create('run-minecraft-architect', [instance.identifier, `${architectPort}`, 'true']),
+                //Command.create('run-minecraft-architect', [instance.identifier, `${architectPort}`, 'true', fullPath(instance.architectDir)]),
+                fullPath(instance.architect.exe),
+                [instance.identifier, `${architectPort}`, 'true', fullPath(instance.architectDir)],
                 'Architect started'
             )),
             server,
-            instance.name, instance.authors, instance.description, instance.info
-        )
-    }
-
-    static async fromRemoteInstance(instance: ProjectInstance, url: string): Promise<Project> {
-        const architectPort = await getFreePort()
-
-        return new Project(
-            instance.identifier, instance.version, instance.dependencies,
-            Architect.fromInstance(instance.architect, new LocalServer(
-                architectPort,
-                Command.create(resourcePath(projectsDir, instance.identifier, 'architect', 'architect.exe'), [instance.identifier, `${architectPort}`, 'true']),
-                'Architect started'
-            )),
-            new RemoteServer(url),
             instance.name, instance.authors, instance.description, instance.info
         )
     }
@@ -100,13 +93,19 @@ export class Project {
                 new TaskGroup('Server', 3, [
                     serverOpeningTask,
                     new SingleTask('Data', 1, async () => {
-                        this.GEOS.loadJson(await this.server.request('register/get-all', { box: this.GEOS.box }))
+                        this.GEOS.loadJson(await this.server.request('register/geos/get-all'))
+                        this.RANDOMS.loadJson(await this.server.request('register/randoms/get-all'))
+                        this.RANDOM_TYPES.loadJson(await this.server.request('register/random_types/get-all'))
+                        this.BUILDERS.loadJson(await this.server.request('register/builders/get-all'))
                     })
                 ]),
                 new TaskGroup('Architect', 4, [
                     new SingleTask('Opening', 1, () => this.architect.server.open()),
                     new SingleTask('Resources', 1, async () => {
-                        
+                        LANG.load(await this.architect.server.request('resources/get-lang', { language: LANG.language }))
+                        const icons = new Icons(joinPath(this.dir, 'architect'))
+                        icons.load(await this.architect.server.request('resources/get-icons'))
+                        ICONS.join(icons)
                     })
                 ])
             ], (cancelled) => resolve(!cancelled))
@@ -114,7 +113,7 @@ export class Project {
             if(await process.start()) {
                 setProject(this)
 
-                process.executeTask(0)
+                await process.executeTask(0)
                 process.executeTask(1)
             } else {
                 resolve(false)

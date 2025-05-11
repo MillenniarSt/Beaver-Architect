@@ -77,7 +77,6 @@ export async function createProject(project: ProjectInstance) {
     await mkdir(project.dir)
     await project.save()
     await mkdir(project.architectDir)
-    await copy(project.architect.exe, joinPath(project.architectDir, 'architect.exe'))
 
     projects.push(project)
 }

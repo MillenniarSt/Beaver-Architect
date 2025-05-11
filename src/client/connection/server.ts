@@ -1,7 +1,7 @@
 import { Observable, Subject, takeUntil } from "rxjs"
 import { ServerProblem, WebSocketError } from "../errors"
 import { v4 } from "uuid"
-import { baseErrorDialog, openBaseDialog, openErrorDialog } from "../../app/dialog/dialogs"
+import { baseErrorDialog, infoDialog, openBaseDialog, openErrorDialog } from "../../app/dialog/dialogs"
 import { Child, Command } from "@tauri-apps/plugin-shell"
 import { invoke } from "@tauri-apps/api/core"
 
@@ -59,7 +59,7 @@ export abstract class Server {
                             console.error('Socket Error:', message.err)
                             openErrorDialog(message.err, message.path)
                         }
-                        
+
                         const resolve = this.channels.get(message.id)
                         if (resolve) {
                             if (resolve(message.data)) {
@@ -78,14 +78,14 @@ export abstract class Server {
 
             this.ws.onclose = (event) => {
                 console.warn('Connection WebSocket closed')
-                if(this.onClose) {
+                if (this.onClose) {
                     this.onClose(event)
                 }
             }
 
             this.ws.onerror = (error) => {
                 console.error('WebSocket Error:', error)
-                if(this.onError) {
+                if (this.onError) {
                     this.onError(error)
                 }
             }
@@ -180,16 +180,27 @@ export class LocalServer extends Server {
 
     protected process: Child | null = null
 
-    constructor(
+    /*constructor(
         readonly port: number,
         readonly command: Command<string>,
+        protected readonly openKey: string
+    ) {
+        super()
+    }*/
+
+    constructor(
+        readonly port: number,
+        readonly path: string,
+        readonly args: string[],
         protected readonly openKey: string
     ) {
         super()
     }
 
     override async open(): Promise<void> {
-        await new Promise<void>(async (resolve) => {
+        await invoke('run_exe', { path: this.path, args: this.args, readySignal: this.openKey })
+
+        /*await new Promise<void>(async (resolve) => {
             this.command.stdout.on('data', (line) => {
                 if (`${line}`.includes(this.openKey)) {
                     resolve()
@@ -207,8 +218,8 @@ export class LocalServer extends Server {
         })
         this.command.stdout.removeAllListeners('data')
         this.command.stdout.on('data', (line) => {
-            console.debug(`${line}`.trim())
-        })
+            console.log(`${line}`.trim())
+        })*/
 
         await this.connect()
     }

@@ -19,7 +19,7 @@
                   [style]="{'background': 'linear-gradient(90deg, var(--p-primary-50) 0%, var(--p-primary-200) 30%, var(--p-primary-300) 100%)'}"
                   [ngStyle]="{ width: getWeightInPercent(i) + '%' }"></div>
                <div class="flex items-center gap-2 z-10">
-                  <img [src]="option.icon" [class]="option.piIcon" class="h-5" [style]="{'font-size': '20px'}"/>
+                  <icon [icon]="option.icon"></icon>
                   <span>{{ option.label }}</span>
                   <div class="grow"></div>
                   <span class="text-fore-4 mr-2 z-10">{{getWeightInPercent(i)}}%</span>
@@ -28,7 +28,7 @@
          </ng-template>
          <ng-template let-option #item>
             <div class="flex items-center gap-2">
-               <img [src]="option.icon" [class]="option.piIcon" class="h-5" [style]="{'font-size': '20px'}"/>
+               <icon [icon]="option.icon"></icon>
                <span>{{ option.label }}</span>
             </div>
          </ng-template>
@@ -43,7 +43,7 @@
          placeholder="Add New Item" optionLabel="label" [filter]="hasFilter" filterBy="label" (onChange)="addItem($event.value)">
       <ng-template let-option #item>
          <div class="flex items-center gap-2">
-            <img [src]="option.icon" [class]="option.piIcon" class="h-5" [style]="{'font-size': '20px'}"/>
+            <icon [icon]="option.icon"></icon>
             <span>{{ option.label }}</span>
          </div>
       </ng-template>
